@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>How To : Using MS AJAX CaseAnimation in your applications – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="I hang out at the forums a lot .( http://forums.asp.net/1022/ShowForum.aspx&nbsp;), I&nbsp;go by &nbsp;phanatic.
+Looking at a couple of threads let me know that there are no examples of the caseAnimation anywhere :-(
+Ok, so I built a simple sample which illustrates the use of a CaseAnimation .
+See demo here 
+&nbsp;
+
+So , here we go ....
+1) Add a reference to the AjaxControlToolkit to your page.
+
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+
+
+2) Add the AnimationExtender's Markup.
+
+&lt;ajaxToolKit:AnimationExtender runat="server" ID="animateDiv" TargetControlID="btnAnimate"&gt;
+
+
+3) We will trigger the animation on the Click of a button 
+
+&lt;Animations&gt;
+  &lt;OnClick&gt;
+
+
+4) The Markup for the Case Animation.
+
+&lt;Case SelectScript="ReturnAnimationIndexToPlay()" &gt;
+
+
+The SelectScript is used to return an index of the child animation to play.
+The indices are Zero-based.
+5) Under the&nbsp; Case Animation , we will put in a couple of child animations .
+
+&lt;Length  Property="style" PropertyKey="height" Fps="50" duration="0.2" StartValue="400" EndValue="100" AnimationTarget="div1"  &gt;&lt;/Length&gt;
+&lt;Move duration="0.2" Horizontal="500"  Vertical="300" Relative="false" AnimationTarget="div1" Unit="px"&gt;&lt;/Move&gt;
+&lt;FadeOut duration="0.2"  MinimumOpacity ="0" MaximumOpacity="100" AnimationTarget="div1" &gt;&lt;/FadeOut&gt;   
+
+
+6) End Tags
+&nbsp;
+
+&lt;/Case&gt;
+&lt;/OnClick&gt;
+&lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+
+
+&nbsp;
+7) The SelectScript Function ,&nbsp; ReturnAnimationIndexToPlay.
+&nbsp;
+
+&lt;script language="javascript"&gt;
+   1: &nbsp;
+   2:             var animIndex = -1;
+   3:             function ReturnAnimationIndexToPlay()
+   4:             {
+   5:                 animIndex++;
+   6:                 animIndex = ( animIndex ) % 3;
+   7:                 return animIndex;
+   8:             }
+   9:         
+
+&lt;/script&gt;
+
+
+&nbsp;
+Complete Markup .
+&nbsp;
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Case Animation Demo&lt;/title&gt;
+    &lt;link rel="stylesheet" href="../css/defaultStyles.css" type="text/css" /&gt;
+    &lt;style&gt;
+        div { position:absolute;}
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmCaseAnimation" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+            var animIndex = -1;
+            function ReturnAnimationIndexToPlay()
+            {
+                animIndex++;
+                animIndex = ( animIndex ) % 3;
+                return animIndex;
+            }
+        &lt;/script&gt;
+
+        &lt;asp:ScriptManager runat="server" ID="ScrpManager"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;asp:Button runat="server" ID="btnAnimate" OnClientClick="return false;" Text="Animate Using Case Animation" /&gt;
+        &lt;ajaxToolKit:AnimationExtender runat="server" ID="animateDiv" TargetControlID="btnAnimate"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Case SelectScript="ReturnAnimationIndexToPlay()" &gt;
+                        &lt;Length  Property="style" PropertyKey="height" Fps="50" duration="0.2" StartValue="400" EndValue="100" AnimationTarget="div1"  &gt;&lt;/Length&gt;
+                        &lt;Move duration="0.2" Horizontal="500"  Vertical="300" Relative="false" AnimationTarget="div1" Unit="px"&gt;&lt;/Move&gt;
+                        &lt;FadeOut duration="0.2"  MinimumOpacity ="0" MaximumOpacity="100" AnimationTarget="div1" &gt;&lt;/FadeOut&gt;
+                    &lt;/Case&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+        &lt;/ajaxToolKit:AnimationExtender&gt;
+        &lt;div id="div1" runat="server" style="display: block; width: 100px; height: 400px;
+            position: absolute; background-color: #000000; color: #FFCC00"&gt;
+            Paragraph One
+        &lt;/div&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+Hope this helps.
+Feel free to chime in with questions / comments.
+" />
+    <meta property="og:description" content="I hang out at the forums a lot .( http://forums.asp.net/1022/ShowForum.aspx&nbsp;), I&nbsp;go by &nbsp;phanatic.
+Looking at a couple of threads let me know that there are no examples of the caseAnimation anywhere :-(
+Ok, so I built a simple sample which illustrates the use of a CaseAnimation .
+See demo here 
+&nbsp;
+
+So , here we go ....
+1) Add a reference to the AjaxControlToolkit to your page.
+
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+
+
+2) Add the AnimationExtender's Markup.
+
+&lt;ajaxToolKit:AnimationExtender runat="server" ID="animateDiv" TargetControlID="btnAnimate"&gt;
+
+
+3) We will trigger the animation on the Click of a button 
+
+&lt;Animations&gt;
+  &lt;OnClick&gt;
+
+
+4) The Markup for the Case Animation.
+
+&lt;Case SelectScript="ReturnAnimationIndexToPlay()" &gt;
+
+
+The SelectScript is used to return an index of the child animation to play.
+The indices are Zero-based.
+5) Under the&nbsp; Case Animation , we will put in a couple of child animations .
+
+&lt;Length  Property="style" PropertyKey="height" Fps="50" duration="0.2" StartValue="400" EndValue="100" AnimationTarget="div1"  &gt;&lt;/Length&gt;
+&lt;Move duration="0.2" Horizontal="500"  Vertical="300" Relative="false" AnimationTarget="div1" Unit="px"&gt;&lt;/Move&gt;
+&lt;FadeOut duration="0.2"  MinimumOpacity ="0" MaximumOpacity="100" AnimationTarget="div1" &gt;&lt;/FadeOut&gt;   
+
+
+6) End Tags
+&nbsp;
+
+&lt;/Case&gt;
+&lt;/OnClick&gt;
+&lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+
+
+&nbsp;
+7) The SelectScript Function ,&nbsp; ReturnAnimationIndexToPlay.
+&nbsp;
+
+&lt;script language="javascript"&gt;
+   1: &nbsp;
+   2:             var animIndex = -1;
+   3:             function ReturnAnimationIndexToPlay()
+   4:             {
+   5:                 animIndex++;
+   6:                 animIndex = ( animIndex ) % 3;
+   7:                 return animIndex;
+   8:             }
+   9:         
+
+&lt;/script&gt;
+
+
+&nbsp;
+Complete Markup .
+&nbsp;
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Case Animation Demo&lt;/title&gt;
+    &lt;link rel="stylesheet" href="../css/defaultStyles.css" type="text/css" /&gt;
+    &lt;style&gt;
+        div { position:absolute;}
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmCaseAnimation" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+            var animIndex = -1;
+            function ReturnAnimationIndexToPlay()
+            {
+                animIndex++;
+                animIndex = ( animIndex ) % 3;
+                return animIndex;
+            }
+        &lt;/script&gt;
+
+        &lt;asp:ScriptManager runat="server" ID="ScrpManager"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;asp:Button runat="server" ID="btnAnimate" OnClientClick="return false;" Text="Animate Using Case Animation" /&gt;
+        &lt;ajaxToolKit:AnimationExtender runat="server" ID="animateDiv" TargetControlID="btnAnimate"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Case SelectScript="ReturnAnimationIndexToPlay()" &gt;
+                        &lt;Length  Property="style" PropertyKey="height" Fps="50" duration="0.2" StartValue="400" EndValue="100" AnimationTarget="div1"  &gt;&lt;/Length&gt;
+                        &lt;Move duration="0.2" Horizontal="500"  Vertical="300" Relative="false" AnimationTarget="div1" Unit="px"&gt;&lt;/Move&gt;
+                        &lt;FadeOut duration="0.2"  MinimumOpacity ="0" MaximumOpacity="100" AnimationTarget="div1" &gt;&lt;/FadeOut&gt;
+                    &lt;/Case&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+        &lt;/ajaxToolKit:AnimationExtender&gt;
+        &lt;div id="div1" runat="server" style="display: block; width: 100px; height: 400px;
+            position: absolute; background-color: #000000; color: #FFCC00"&gt;
+            Paragraph One
+        &lt;/div&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+Hope this helps.
+Feel free to chime in with questions / comments.
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="How To : Using MS AJAX CaseAnimation in your applications" />
+    <meta property="twitter:title" content="How To : Using MS AJAX CaseAnimation in your applications" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>How To : Using MS AJAX CaseAnimation in your applications</h1>
+
+  <div class="entry">
+    <p>I hang out at the forums a lot .( <a title="http://forums.asp.net/1022/ShowForum.aspx" href="http://forums.asp.net/1022/ShowForum.aspx">http://forums.asp.net/1022/ShowForum.aspx</a>&nbsp;), I&nbsp;go by &nbsp;phanatic.</p>
+<p>Looking at a couple of threads let me know that there are no examples of the caseAnimation anywhere :-(</p>
+<p>Ok, so I built a simple sample which illustrates the use of a CaseAnimation .</p>
+<p><strong><u>See demo here </u></strong></p>
+<p><strong><u></u></strong>&nbsp;</p>
+<div class="wlWriterSmartContent" id="d49da610-fc34-4988-88d9-3c0a788fd878:7ea9a5f6-314f-455f-9795-a3ab22217d1a" contenteditable="false" style="padding-right: 0px; display: inline; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px"><embed src="http://images.soapbox.msn.com/flash/soapbox1_1.swf" quality="high" width="412" height="362" wmode="transparent" name="msn_soapbox" type="application/x-shockwave-flash" pluginspage="http://macromedia.com/go/getflashplayer" flashvars="c=v&v=e68c5d0a-bd7d-4dbf-87e8-10f427e7303c"></embed></div>
+<p>So , here we go ....</p>
+<p>1) Add a reference to the AjaxControlToolkit to your page.</p>
+<div>
+<pre class="csharpcode"><span class="asp">&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>2) Add the AnimationExtender's Markup.</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolKit:AnimationExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="animateDiv"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnAnimate"</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>3) We will trigger the animation on the Click of a button </p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>4) The Markup for the Case Animation.</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Case</span> <span class="attr">SelectScript</span><span class="kwrd">="ReturnAnimationIndexToPlay()"</span> <span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>The SelectScript is used to return an index of the child animation to play.</p>
+<p>The indices are Zero-based.</p>
+<p>5) Under the&nbsp; Case Animation , we will put in a couple of child animations .</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Length</span>  <span class="attr">Property</span><span class="kwrd">="style"</span> <span class="attr">PropertyKey</span><span class="kwrd">="height"</span> <span class="attr">Fps</span><span class="kwrd">="50"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span> <span class="attr">StartValue</span><span class="kwrd">="400"</span> <span class="attr">EndValue</span><span class="kwrd">="100"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span>  <span class="kwrd">&gt;&lt;/</span><span class="html">Length</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span> <span class="attr">Horizontal</span><span class="kwrd">="500"</span>  <span class="attr">Vertical</span><span class="kwrd">="300"</span> <span class="attr">Relative</span><span class="kwrd">="false"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span> <span class="attr">Unit</span><span class="kwrd">="px"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">FadeOut</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span>  <span class="attr">MinimumOpacity</span> <span class="kwrd">="0"</span> <span class="attr">MaximumOpacity</span><span class="kwrd">="100"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span> <span class="kwrd">&gt;&lt;/</span><span class="html">FadeOut</span><span class="kwrd">&gt;</span>   </pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>6) End Tags</p>
+<p>&nbsp;</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;/</span><span class="html">Case</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>&nbsp;</p>
+<p>7) The SelectScript Function ,&nbsp; <strong>ReturnAnimationIndexToPlay.</strong></p>
+<p><strong></strong>&nbsp;</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span></pre>
+<pre class="alt"><span class="lnum">   1:</span> &nbsp;</pre>
+<pre><span class="lnum">   2:</span>             <span class="kwrd">var</span> animIndex = -1;</pre>
+<pre class="alt"><span class="lnum">   3:</span>             <span class="kwrd">function</span> ReturnAnimationIndexToPlay()</pre>
+<pre><span class="lnum">   4:</span>             {</pre>
+<pre class="alt"><span class="lnum">   5:</span>                 animIndex++;</pre>
+<pre><span class="lnum">   6:</span>                 animIndex = ( animIndex ) % 3;</pre>
+<pre class="alt"><span class="lnum">   7:</span>                 <span class="kwrd">return</span> animIndex;</pre>
+<pre><span class="lnum">   8:</span>             }</pre>
+<pre class="alt"><span class="lnum">   9:</span>         </pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+<p><span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span></p>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>&nbsp;</p>
+<p><strong><u>Complete Markup .</u></strong></p>
+<p><strong><u></u></strong>&nbsp;</p>
+<pre class="csharpcode"><span class="asp">&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;</span>
+<span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="kwrd">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">="http://www.w3.org/1999/xhtml"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Case Animation Demo<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">rel</span><span class="kwrd">="stylesheet"</span> <span class="attr">href</span><span class="kwrd">="../css/defaultStyles.css"</span> <span class="attr">type</span><span class="kwrd">="text/css"</span> <span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">style</span><span class="kwrd">&gt;</span>
+        div { position:absolute;}
+    <span class="kwrd">&lt;/</span><span class="html">style</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">="frmCaseAnimation"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+
+        <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">var</span> animIndex = -1;
+            <span class="kwrd">function</span> ReturnAnimationIndexToPlay()
+            {
+                animIndex++;
+                animIndex = ( animIndex ) % 3;
+                <span class="kwrd">return</span> animIndex;
+            }
+        <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+        <span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="ScrpManager"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnAnimate"</span> <span class="attr">OnClientClick</span><span class="kwrd">="return false;"</span> <span class="attr">Text</span><span class="kwrd">="Animate Using Case Animation"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ajaxToolKit:AnimationExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="animateDiv"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnAnimate"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">Case</span> <span class="attr">SelectScript</span><span class="kwrd">="ReturnAnimationIndexToPlay()"</span> <span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">Length</span>  <span class="attr">Property</span><span class="kwrd">="style"</span> <span class="attr">PropertyKey</span><span class="kwrd">="height"</span> <span class="attr">Fps</span><span class="kwrd">="50"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span> <span class="attr">StartValue</span><span class="kwrd">="400"</span> <span class="attr">EndValue</span><span class="kwrd">="100"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span>  <span class="kwrd">&gt;&lt;/</span><span class="html">Length</span><span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span> <span class="attr">Horizontal</span><span class="kwrd">="500"</span>  <span class="attr">Vertical</span><span class="kwrd">="300"</span> <span class="attr">Relative</span><span class="kwrd">="false"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span> <span class="attr">Unit</span><span class="kwrd">="px"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">FadeOut</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span>  <span class="attr">MinimumOpacity</span> <span class="kwrd">="0"</span> <span class="attr">MaximumOpacity</span><span class="kwrd">="100"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="div1"</span> <span class="kwrd">&gt;&lt;/</span><span class="html">FadeOut</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;/</span><span class="html">Case</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:AnimationExtender</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="div1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">style</span><span class="kwrd">="display: block; width: 100px; height: 400px;
+            position: absolute; background-color: #000000; color: #FFCC00"</span><span class="kwrd">&gt;</span>
+            Paragraph One
+        <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span>
+</pre>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>
+<p>Hope this helps.</p>
+<p>Feel free to chime in with questions / comments.</p>
+
+  </div>
+
+  <div class="date">
+    Written on March 21, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

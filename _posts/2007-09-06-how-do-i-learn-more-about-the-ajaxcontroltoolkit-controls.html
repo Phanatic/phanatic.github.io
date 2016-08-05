@@ -1,0 +1,159 @@
+---
+layout: post
+title: How Do I learn more about the AjaxControlToolkit Controls ?
+date: 2007-09-06 14:27:48.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/09/06/how-do-i-learn-more-about-the-ajaxcontroltoolkit-controls.aspx
+  orig_site_id: '7524'
+  orig_post_id: '4790861'
+  orig_parent_id: '4790861'
+  orig_thread_id: '533838'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/09/06/how-do-i-learn-more-about-the-ajaxcontroltoolkit-controls.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="How Do I learn more about the AjaxControlToolkit Controls ?" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/09/06/how-do-i-learn-more-about-the-ajaxcontroltoolkit-controls/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Use Debuggers to see Object State and associated methods : Use the WebDevhelper from Nikhil Kothari which provides you with debug API to inspect Object State. The methods available when you install the WebDevHelper are : window.debugService.trace You&nbsp; can use this api to write messages onto the Script Trace Console. Ex : if( window.debugService )..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/window.debugService.trace_thumb.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="How Do I learn more about the AjaxControlToolkit Controls ?" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/09/06/how-do-i-learn-more-about-the-ajaxcontroltoolkit-controls/" />
+    <meta name="twitter:description" content="Use Debuggers to see Object State and associated methods : Use the WebDevhelper from Nikhil Kothari which provides you with debug API to inspect Object State. The methods available when you install the WebDevHelper are : window.debugService.trace You&nbsp; can use this api to write messages onto the Script Trace Console. Ex : if( window.debugService )..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/window.debugService.trace_thumb.jpg" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Use Debuggers to see Object State and associated methods : </p>
+<p>Use the WebDevhelper from Nikhil Kothari which provides you with debug API to inspect Object State. </p>
+<p>The methods available when you install the WebDevHelper are :</p>
+<p><strong><u>window.debugService.trace <br /></u></strong>You&nbsp; can use this api to write messages onto the Script Trace Console.</p>
+<p>Ex :</p>
+<pre class="csharpcode"><span class="kwrd">if</span>( window.debugService ) {
+  window.debugService.trace(<span class="str">"I am a trace message from the DebugService"</span>) ;
+}
+</pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/window.debugService.trace.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/window.debugService.trace.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="442" alt="window.debugService.trace" src="{{ site.baseurl }}/assets/window.debugService.trace_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/window.debugService.trace_thumb.jpg" width="570" border="0" /></a>
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong><u>window.debugService.inspect<br /></u></strong>You can use this API to inspect the state of an Object at runtime .<br />Ex: </p>
+<pre class="csharpcode"><span class="kwrd">if</span>( window.debugService ) {
+window.debugService.inspect(<span class="str">"Auto Complete Extender"</span>,$find(<span class="str">"AutoCompleteEx"</span>));
+}</pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/ObjectInspector.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/ObjectInspector.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="328" alt="ObjectInspector" src="{{ site.baseurl }}/assets/ObjectInspector_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/b79dc342c2c8_13573/ObjectInspector_thumb.jpg" width="600" border="0" /></a> </pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">How do I use these methods to help me work with the AjaxControlToolkit Controls?<br />Whenever you want to work on the AjaxControlToolkit controls , there are a couple of things that hinder you</pre>
+<ol>
+<li>
+<pre class="csharpcode">You don't know which methods are available on an extender </pre>
+</li>
+<li>
+<pre class="csharpcode">You don't know how to invoke those methods on the extender</pre>
+</li>
+</ol>
+<pre class="csharpcode"><strong>1) You don't know which methods are available on the Extender :</strong></pre>
+<pre class="csharpcode">a) Get a handle to the Behavior of the Extender using the <a href="http://www.asp.net/AJAX/Documentation/Live/ClientReference/Global/FindShortcutMethod.aspx" target="_blank">$find</a> Method.<br />ex : </pre>
+<pre class="csharpcode"><span class="kwrd">var</span> autoCompleteBehavior = $find(<span class="str">"AutoCompleteEx"</span>);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<blockquote><pre class="csharpcode"> b) Use an Object Explorer to view the methods exposed by it :<br />  <strong>In Web Dev Helper's Script Console  :<br /></strong>      window.debugService.inspect(<span class="str">"AutoComplete Extender"</span>,autoCompleteBehavior);</pre>
+</blockquote>
+<pre class="csharpcode"><strong>       Using the ASP.NET AJAX API  :<br /></strong>          <a href="http://asp.net/AJAX/Documentation/Live/ClientReference/Sys/DebugClass/DebugTraceDumpProperty.aspx"><font face="Consolas" size="2">Sys.Debug.traceDump</font></a><a href="http://asp.net/AJAX/Documentation/Live/ClientReference/Sys/DebugClass/DebugTraceDumpProperty.aspx"><font face="Consolas" size="2">(object, name)</font></a><font face="Consolas" size="2"> <br />          Dumps an object to the debugger console and to the TraceConsoletextarea element, if available.</font></pre>
+<pre class="csharpcode"><strong>        </strong>  <font face="Consolas" size="2">Sys.Debug.traceDump</font><font face="Consolas" size="2">(<span class="str">"AutoComplete Extender"</span>,autoCompleteBehavior);</font></pre>
+<pre class="csharpcode"><strong> 2) You don't know how to invoke those methods on the extender</strong></pre>
+<pre class="csharpcode">   In general , you can have a general rule about how to invoke these methods :<br />      The general syntax would be :</pre>
+<pre class="csharpcode">    &lt;ExtenderBehaviorHandle&gt;.&lt;MethodName&gt;([Params])<br />     ex : <br />     autoCompleteBehavior.set_firstRowSelected(<span class="kwrd">true</span>)</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">And finally :</pre>
+<pre class="csharpcode">The best way to know which methods are exposed and what are the parameters exposed by the extender <br />is to <u><strong>Read the Source Code</strong> .</u></pre>
+<pre class="csharpcode">Download the Latest Release Source Code from <a href="http://www.codeplex.com/AtlasControlToolkit/Release/ProjectReleases.aspx" target="_blank">Here</a><br /></pre>
+<pre class="csharpcode">Hope this helps.<br />If you have a question about a specific Extender , feel free to drop a comment or contact me .<strong></strong></pre>

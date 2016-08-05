@@ -1,0 +1,375 @@
+---
+layout: post
+title: Extending the PhotoGrid to allow Xml DataBinding using JavaScript Enumerations
+date: 2007-02-03 15:04:06.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- Components
+- JavaScript
+- Prototype
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/02/03/extending-the-photogrid-to-allow-xml-databinding-using-javascript-enumerations.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1592154'
+  orig_parent_id: '1592154'
+  orig_thread_id: '493728'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/02/03/extending-the-photogrid-to-allow-xml-databinding-using-javascript-enumerations.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Extending the PhotoGrid to allow Xml DataBinding using JavaScript Enumerations" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/03/extending-the-photogrid-to-allow-xml-databinding-using-javascript-enumerations/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="If you remember one of my previous posts about the PhotoGrid Control , we talked about the control binding to JSON data . Today&nbsp; , we talk about using Enumerations in Javascript to allow the PhotoGrid to bind to multiple Data Source Types. Well, lets get going then&#8230;. Constructing the Enumeration /**** Enumeration to specify..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Extending the PhotoGrid to allow Xml DataBinding using JavaScript Enumerations" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/03/extending-the-photogrid-to-allow-xml-databinding-using-javascript-enumerations/" />
+    <meta name="twitter:description" content="If you remember one of my previous posts about the PhotoGrid Control , we talked about the control binding to JSON data . Today&nbsp; , we talk about using Enumerations in Javascript to allow the PhotoGrid to bind to multiple Data Source Types. Well, lets get going then&#8230;. Constructing the Enumeration /**** Enumeration to specify..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>If you remember one of my previous posts about the PhotoGrid Control , we talked about the control binding to JSON data .</p>
+<p>Today&nbsp; , we talk about using Enumerations in Javascript to allow the PhotoGrid to bind to multiple Data Source Types.</p>
+<p>Well, lets get going then....</p>
+<p>Constructing the Enumeration</p>
+<pre class="csharpcode"><span class="rem">/**** Enumeration to specify the Data Source Type**********/</span></pre>
+<pre class="csharpcode">1) The Constructor for the Enumeration</pre>
+<pre class="csharpcode">AtlasDemo.DataSourceType = <span class="kwrd">function</span>(){};</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">2) Define the different Types of data that can be bound using the Prototype Model .</pre>
+<pre class="csharpcode">AtlasDemo.DataSourceType.prototype =
+{
+    JSON : 0,
+    XMLString : 1
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">3) Register the Enumeration using the "registerEnum" function of the ASP.net AJAX framework.</pre>
+<pre class="csharpcode">AtlasDemo.DataSourceType.registerEnum(<span class="str">"AtlasDemo.DataSourceType"</span>);</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">Modify the  BindGrid Function to accept the type of dataBinding to be performed.</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">BindGrid : <span class="kwrd">function</span>(dataSourceType)</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">Using the Enumeration from the client application </pre>
+<pre class="csharpcode">as a parameter to the  function  BindGrid , </pre>
+<pre class="csharpcode"><span class="kwrd">function</span> CreateGrid( JSONDataToBeBound )
+{
+  <span class="rem">//Create an instance of the PhotoGrid Control</span>
+  <span class="kwrd">var</span> gridElement = <span class="kwrd">new</span> AtlasDemo.PhotoGrid( leftPosition , topPosition,<span class="str">""</span>,0,<span class="str">"tblThumbnails"</span>,horizontalOffset,VerticalOffset) ;
+  <span class="rem">//Set the Data for the PhotoGrid Control</span>
+  gridElement.setData(JSONDataToBeBound);
+  <span class="rem">//Set the Number of images to be shown in one Page</span>
+  gridElement.setPageSize( pageSize );
+  <span class="rem">//Bind the Grid</span>
+  gridElement.BindGrid( AtlasDemo.DataSourceType.JSON  );
+
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The Xml Data Format Supported by the PhotoGrid Component</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ResultSet</span> <span class="attr">totalResultsAvailable</span><span class="kwrd">="2"</span> <span class="attr">totalResultsReturned</span><span class="kwrd">="2"</span> <span class="attr">firstResultPosition</span><span class="kwrd">="0"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">Results</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Result</span> <span class="attr">Title</span><span class="kwrd">="just-a-little-bit_1024.jpg"</span> <span class="attr">Summary</span><span class="kwrd">="Website: Deviant Art Homepage Download: 1024x768"</span> <span class="attr">Url</span><span class="kwrd">="http:\/\/www.pixelgirlpresents.com\/images\/desktops\/elyse\/just-a-little-bit_1024.jpg"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Result</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Result</span> <span class="attr">Title</span><span class="kwrd">="just-a-little-bit_1024.jpg"</span> <span class="attr">Summary</span><span class="kwrd">="Website: Deviant Art Homepage Download: 1024x768"</span> <span class="attr">Url</span><span class="kwrd">="http:\/\/www.pixelgirlpresents.com\/images\/desktops\/elyse\/just-a-little-bit_1024.jpg"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Result</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">Results</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ResultSet</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><strong><u>Calling the BindGrid Function With XMl Data </u></strong></pre>
+<pre class="csharpcode">1) Create and append the XML String to  a stringBuilder Object </pre>
+<pre class="csharpcode">   <span class="kwrd">var</span> sBuilder = <span class="kwrd">new</span> Sys.StringBuilder(<span class="str">""</span>);
+    sBuilder.append(<span class="str">"&lt;ResultSet totalResultsAvailable=\"2\" totalResultsReturned=\"2\" firstResultPosition=\"0\"&gt;"</span>);
+        sBuilder.append(<span class="str">"&lt;Results&gt;"</span>);
+            sBuilder.append(<span class="str">"&lt;Result Title=\"just-a-little-bit_1024.jpg\" Summary=\"Website: Deviant Art Homepage Download: 1024x768\" Url=\"http:\/\/www.pixelgirlpresents.com\/images\/desktops\/elyse\/just-a-little-bit_1024.jpg\"&gt;&lt;/Result&gt;"</span>);
+            sBuilder.append(<span class="str">"&lt;Result Title=\"just-a-little-bit_1024.jpg\" Summary=\"Website: Deviant Art Homepage Download: 1024x768\" Url=\"http:\/\/www.pixelgirlpresents.com\/images\/desktops\/elyse\/just-a-little-bit_1024.jpg\"&gt;&lt;/Result&gt;"</span>);   </pre>
+<pre class="csharpcode">        sBuilder.append(<span class="str">"&lt;/Results&gt;"</span>);
+    sBuilder.append(<span class="str">"&lt;/ResultSet&gt;"</span>);</pre>
+<pre class="csharpcode">2) Set the Data to be rendered by the PhotoGrid Control </pre>
+<pre class="csharpcode">PhotoGridGlobalInstance.setData( sBuilder.toString() );</pre>
+<pre class="csharpcode">3) Set the DataSource Type to be XML while Binding ..</pre>
+<pre class="csharpcode">gridElement.BindGrid( AtlasDemo.DataSourceType.XMLString  );</pre>
+<pre class="csharpcode">You are done .. Simple , neat and easy ...</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

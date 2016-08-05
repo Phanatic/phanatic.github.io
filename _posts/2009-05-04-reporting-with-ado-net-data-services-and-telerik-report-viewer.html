@@ -1,0 +1,59 @@
+---
+layout: post
+title: Reporting with ADO.NET Data Services and Telerik Report Viewer
+date: 2009-05-04 01:00:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2009/05/04/reporting-with-ado-net-data-services-and-telerik-report-viewer.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9585341'
+  orig_parent_id: '9585341'
+  orig_thread_id: '652416'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2009/05/04/reporting-with-ado-net-data-services-and-telerik-report-viewer.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Reporting with ADO.NET Data Services and Telerik Report Viewer" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/05/04/reporting-with-ado-net-data-services-and-telerik-report-viewer/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here : ADO.NET Data Services with Telerik Controls Kevin Babcock has a great post over at Telerik where he talks about using ADO.NET Data Services with Telerik Reporting suite . I wanted to..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Reporting with ADO.NET Data Services and Telerik Report Viewer" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/05/04/reporting-with-ado-net-data-services-and-telerik-report-viewer/" />
+    <meta name="twitter:description" content="Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here : ADO.NET Data Services with Telerik Controls Kevin Babcock has a great post over at Telerik where he talks about using ADO.NET Data Services with Telerik Reporting suite . I wanted to..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here :</p>
+<p><a href="http://blogs.telerik.com/SearchResults.aspx?IndexCatalogue=Blogs&amp;SearchQuery=ado.net%20data%20services" target="_blank" mce_href="http://blogs.telerik.com/SearchResults.aspx?IndexCatalogue=Blogs&amp;SearchQuery=ado.net%20data%20services">ADO.NET Data Services with Telerik Controls</a></p>
+<p><a href="http://www.myviewstate.net/blog/post/2009/05/01/A-fresh-starte280a6.aspx" target="_blank" mce_href="http://www.myviewstate.net/blog/post/2009/05/01/A-fresh-starte280a6.aspx">Kevin Babcock</a> has a great post over at Telerik where he talks about <a href="http://blogs.telerik.com/kevinbabcock/posts/09-04-24/connecting_the_dots_ado_net_data_services_and_telerik_reporting.aspx" target="_blank" mce_href="http://blogs.telerik.com/kevinbabcock/posts/09-04-24/connecting_the_dots_ado_net_data_services_and_telerik_reporting.aspx">using ADO.NET Data Services with Telerik Reporting suite</a> .</p>
+<p>I wanted to address one small point in the blog post which I felt can be improved upon. </p>
+<p><script src="http://gist.github.com/109416.js" mce_src="http://gist.github.com/109416.js"></script></p>
+<p>“You might be curious why I chose to iterate through the list of categories in the report parameter value, calling the web service for each one and appending the results to a collection. <br />The reason is that, due to the limitations of ADO.NET Data Services, you can’t use methods like Contains to filter data in your LINQ queries.“</p>
+<p>Yes , this is absolutely correct. <br />We don't support the “Contains” operator to select a primitive property of the Entity Type from a given range of values. <br />The client linq implementation doesn't support Contains on Navigation properties is because we don't have a URI Query operator&nbsp; that corresponds to the "Contains" function to select a value from a set. But you can semantically achieve the same effect by “OR”ing a couple of “EQUALS” expressions.</p>
+<p>ex: </p>
+<p>If A={0,1,2,3}&nbsp; , then A.Contains(B) is equivalent to ( B == A[0] OR B ==A[1] OR B == A[2])</p>
+<p>I wrote about achieving this effect here :&nbsp; <a href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx">Set Based Operations in Ado.net Data Services</a></p>
+<p>Now, in this sample , we are filtering an Entity Set (Products) based on the value of a primitive property ( CategoryID ) of a Navigation Property (Categories). <br />Now , since this is the Northwind model Schema, Products are related to categories in a 1..M association and Categories to Products in a 1..M association. </p>
+<p>What this means is that the above query can be expressed as :&nbsp; <br /><span style="COLOR: green"></span></p>
+<p><script src="http://gist.github.com/109412.js" mce_src="http://gist.github.com/109412.js"></script></p>
+<p>Now , this is still not as optimal as it can be , but we reduced the number of round trips as we download only relevant categories and their associated Products. <br />To make this even easier , we use the IsIn&lt;T&gt; extension method I wrote from <a href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx">Set Based Operations in Ado.net Data Services</a>.</p>
+<p><script src="http://gist.github.com/109419.js" mce_src="http://gist.github.com/109419.js"></script></p>
+<p>So , there you have it , we reduced the number of network calls and also the lines of code to achieve this filtering.</p>
+<p>On a side note , <a href="http://blogs.telerik.com/blogs/09-05-02/saying_goodbye_hellip.aspx" target="_blank" mce_href="http://blogs.telerik.com/blogs/09-05-02/saying_goodbye_hellip.aspx">Kevin has left Telerik</a> and now blogs at : <a title="http://www.myviewstate.net/blog/" href="http://www.myviewstate.net/blog/" mce_href="http://www.myviewstate.net/blog/">http://www.myviewstate.net/blog/</a></p>
+<p>All the best for your future endeavours Kevin !!</p>

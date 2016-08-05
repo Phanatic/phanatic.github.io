@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bookmarklet to customize Facebook buttons – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="What is it ?&nbsp;
+This bookmarklet is a simple javascript function that changes the contents of standard buttons on Facebook.com.It changes the "Like" button content to be "Can you Dig it?", unlike to "Stop Digging it", and Comment to "Holler!"
+How do I install this bookmarklet ?&nbsp;
+Step 1 : Right-click this link and select "Copy Link address", Bookmarklet linkStep 2 : Open the bookmarklet manager in your browser and add a bookmark with the contents of the above link as the Link Address.Step 3 : Open up facebook.com and click the bookmark you created in Step 2.&nbsp;Step 4 : Profit !&nbsp;
+" />
+    <meta property="og:description" content="What is it ?&nbsp;
+This bookmarklet is a simple javascript function that changes the contents of standard buttons on Facebook.com.It changes the "Like" button content to be "Can you Dig it?", unlike to "Stop Digging it", and Comment to "Holler!"
+How do I install this bookmarklet ?&nbsp;
+Step 1 : Right-click this link and select "Copy Link address", Bookmarklet linkStep 2 : Open the bookmarklet manager in your browser and add a bookmark with the contents of the above link as the Link Address.Step 3 : Open up facebook.com and click the bookmark you created in Step 2.&nbsp;Step 4 : Profit !&nbsp;
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Bookmarklet to customize Facebook buttons" />
+    <meta property="twitter:title" content="Bookmarklet to customize Facebook buttons" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Bookmarklet to customize Facebook buttons</h1>
+
+  <div class="entry">
+    <p><span style="font-size: medium;">What is it ?&nbsp;</span></p>
+<p><span style="font-size: small;">This bookmarklet is a simple javascript function that changes the contents of standard buttons on Facebook.com.<br /></span><span style="font-size: small;">It changes the "Like" button content to be "Can you Dig it?", unlike to "Stop Digging it", and Comment to "Holler!"</span></p>
+<p><span style="font-size: medium;">How do I install this bookmarklet ?</span>&nbsp;</p>
+<p><span style="font-size: small;">Step 1 : Right-click this link and select "Copy Link address",<a href="javascript:function digIt(){var cLT=function(l,m){l.value=m;l.title=m;};var cLH=function(l,m){l.innerHTML=m;l.title=m;};var gECN=function(cN){return document.getElementsByClassName(cN);};var lMr=&quot;Can you Dig it?&quot;;var i=0;var links=gECN(&quot;default_message&quot;);for(i=0;i
+<links.length;i++){cLH(links[i],links[i].innerHTML==&quot;Like&quot;?lMr:&quot;Stop digging it&quot;);}var lBs=gECN(&quot;like_link&quot;);for(i=0;i<lBs.length;i++){cLT(lBs[i],lMr);}var cL=gECN(&quot;comment_link&quot;);for(i=0;i<cL.length;i++){cLT(cL[i].firstChild,&quot;Holler!&quot;)}};digIt();"> Bookmarklet link</a></span><br /><span style="font-size: small;">Step 2 : Open the bookmarklet manager in your browser and add a bookmark with the contents of the above link as the Link Address.</span><br /><span style="font-size: small;">Step 3 : Open up facebook.com and click the bookmark you created in Step 2.&nbsp;</span><br /><span style="font-size: small;">Step 4 : Profit !&nbsp;</span></p>
+
+  </div>
+
+  <div class="date">
+    Written on May 16, 2012
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DataServiceContext , Detect if there are pending changes – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="
+Hi ,
+I ran into this interesting scenario in the forums today .    How does one find out if there are any pending changes in the DataServiceContext that you have to submit to the store ?     &#160; This is quite simple actually .     The DataServiceContext has 2 collections called Entities and Links. These collections contain entities and links that are tracked by the context.     Given these collections , how does one know if any of them were changed on the client by the appropriate API ?     Lets look at the collections one by one ,     &#160;
+Entities
+DataServiceContext.Entities gives you a List&lt;EntityDescriptor&gt;&#160; , each EntityDescriptor instance contains a State property.     If the State is anything other than Unchanged , then the changes made to the entity on the client side are not commited to the server.     This is because we change the states of the entities to Unchanged&#160;&#160; after you call SaveChanges on the context.
+The basic state changes are : 
+UpdateObject –&gt; Modified&#160;&#160; -&gt; SaveChanges –&gt; UnChanged    DeleteObject&#160; –&gt; Deleted&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged     AddObject&#160;&#160;&#160;&#160; –&gt; Added&#160;&#160;&#160;&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged
+So , to find out if there are any entities&#160; in the DataServiceContext which have been changed and not saved,    you would write something like this :     
+bool pendingEntityChanges = dsContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged);
+
+Links
+DataServiceContext.Links gives you a List&lt;LinkDescriptor&gt; , each LinkDescriptor instance contains a State property ,
+
+Links that point to collection properties
+&#160;&#160;&#160; AddLink-&gt; Added –&gt; SaveChanges –&gt; UnChanged
+&#160;&#160; DeleteLink –&gt; Deleted –&gt; SaveChanges –&gt; Detached
+Links that point to reference properties
+SetLink with Target not Null –&gt; Modified –&gt; SaveChanges –&gt; UnChanged
+  SetLink with Target Null –&gt; Modified –&gt; SaveChanges –&gt; Detached
+To query for links which have not yet been saved , you would write :
+
+bool pendingLinkChanges = dsContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged);
+
+  and finally , the function to check if there are any unsaved changes ( Entities / Links ) in the context :
+
+private bool HasUnsavedChanges(DataServiceContext dataContext){
+  //Check if any Entities are unsaved
+ return dataContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged)
+ //Check if any Links are unsaved
+ || dataContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged)
+}
+" />
+    <meta property="og:description" content="
+Hi ,
+I ran into this interesting scenario in the forums today .    How does one find out if there are any pending changes in the DataServiceContext that you have to submit to the store ?     &#160; This is quite simple actually .     The DataServiceContext has 2 collections called Entities and Links. These collections contain entities and links that are tracked by the context.     Given these collections , how does one know if any of them were changed on the client by the appropriate API ?     Lets look at the collections one by one ,     &#160;
+Entities
+DataServiceContext.Entities gives you a List&lt;EntityDescriptor&gt;&#160; , each EntityDescriptor instance contains a State property.     If the State is anything other than Unchanged , then the changes made to the entity on the client side are not commited to the server.     This is because we change the states of the entities to Unchanged&#160;&#160; after you call SaveChanges on the context.
+The basic state changes are : 
+UpdateObject –&gt; Modified&#160;&#160; -&gt; SaveChanges –&gt; UnChanged    DeleteObject&#160; –&gt; Deleted&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged     AddObject&#160;&#160;&#160;&#160; –&gt; Added&#160;&#160;&#160;&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged
+So , to find out if there are any entities&#160; in the DataServiceContext which have been changed and not saved,    you would write something like this :     
+bool pendingEntityChanges = dsContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged);
+
+Links
+DataServiceContext.Links gives you a List&lt;LinkDescriptor&gt; , each LinkDescriptor instance contains a State property ,
+
+Links that point to collection properties
+&#160;&#160;&#160; AddLink-&gt; Added –&gt; SaveChanges –&gt; UnChanged
+&#160;&#160; DeleteLink –&gt; Deleted –&gt; SaveChanges –&gt; Detached
+Links that point to reference properties
+SetLink with Target not Null –&gt; Modified –&gt; SaveChanges –&gt; UnChanged
+  SetLink with Target Null –&gt; Modified –&gt; SaveChanges –&gt; Detached
+To query for links which have not yet been saved , you would write :
+
+bool pendingLinkChanges = dsContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged);
+
+  and finally , the function to check if there are any unsaved changes ( Entities / Links ) in the context :
+
+private bool HasUnsavedChanges(DataServiceContext dataContext){
+  //Check if any Entities are unsaved
+ return dataContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged)
+ //Check if any Links are unsaved
+ || dataContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged)
+}
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="DataServiceContext , Detect if there are pending changes" />
+    <meta property="twitter:title" content="DataServiceContext , Detect if there are pending changes" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>DataServiceContext , Detect if there are pending changes</h1>
+
+  <div class="entry">
+    <p><strike></strike>
+<p>Hi ,</p>
+<p>I ran into this interesting scenario in the forums today .    <br />How does one find out if there are any pending changes in the DataServiceContext that you have to submit to the store ?     <br />&#160; <br />This is quite simple actually .     <br />The DataServiceContext has 2 collections called <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.dataservicecontext.entities.aspx">Entities</a> and <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.dataservicecontext.links.aspx">Links</a>. These collections contain entities and links that are tracked by the context.     <br />Given these collections , how does one know if any of them were changed on the client by the appropriate API ?     <br />Lets look at the collections one by one ,     <br />&#160;</p>
+<h4>Entities</h4>
+<p>DataServiceContext.Entities gives you a List&lt;<a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.entitydescriptor.aspx">EntityDescriptor</a>&gt;&#160; , each EntityDescriptor instance contains a <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.descriptor.state.aspx">State</a> property.     <br />If the State is anything other than <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.entitystates.aspx">Unchanged</a> , then the changes made to the entity on the client side are not commited to the server.     <br />This is because we change the states of the entities to Unchanged&#160;&#160; after you call SaveChanges on the context.</p>
+<p>The basic state changes are : </p>
+<p>UpdateObject –&gt; Modified&#160;&#160; -&gt; SaveChanges –&gt; UnChanged    <br />DeleteObject&#160; –&gt; Deleted&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged     <br />AddObject&#160;&#160;&#160;&#160; –&gt; Added&#160;&#160;&#160;&#160;&#160;&#160; -&gt; SaveChanges –&gt; UnChanged</p>
+<p>So , to find out if there are any entities&#160; in the DataServiceContext which have been changed and not saved,    <br />you would write something like this :     </p>
+<pre class="darkcsharpcode"><span class="kwrd">bool</span> pendingEntityChanges = dsContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged);</pre>
+<p></p>
+<h4>Links</h4>
+<p>DataServiceContext.Links gives you a List&lt;<a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.linkdescriptor.aspx">LinkDescriptor</a>&gt; , each LinkDescriptor instance contains a <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.descriptor.state.aspx">State</a> property ,</p>
+<p></p>
+<h5>Links that point to collection properties</h5>
+<p>&#160;&#160;&#160; AddLink-&gt; Added –&gt; SaveChanges –&gt; UnChanged</p>
+<p>&#160;&#160; DeleteLink –&gt; Deleted –&gt; SaveChanges –&gt; Detached</p>
+<h5>Links that point to reference properties</h5>
+<p>SetLink with Target not Null –&gt; Modified –&gt; SaveChanges –&gt; UnChanged<br />
+  <br />SetLink with Target Null –&gt; Modified –&gt; SaveChanges –&gt; Detached</p>
+<p>To query for links which have not yet been saved , you would write :</p>
+<p></p>
+<pre class="darkcsharpcode"><span class="kwrd">bool</span> pendingLinkChanges = dsContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged);</pre>
+<p>
+  <br />and finally , the function to check if there are any unsaved changes ( Entities / Links ) in the context :</p>
+<p></p>
+<pre class="darkcsharpcode"><span class="kwrd">private</span> <span class="kwrd">bool</span> HasUnsavedChanges(DataServiceContext dataContext){
+  <span class="rem">//Check if any Entities are unsaved</span>
+ <span class="kwrd">return</span> dataContext.Entities.Any(ed =&gt; ed.State != EntityStates.Unchanged)
+ <span class="rem">//Check if any Links are unsaved</span>
+ || dataContext.Links.Any(ld =&gt; ld.State != EntityStates.Unchanged)
+}</pre>
+
+  </div>
+
+  <div class="date">
+    Written on October  3, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

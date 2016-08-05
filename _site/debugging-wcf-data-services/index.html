@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debugging WCF Data Services – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="When developing your service , you might run into some issues and you want to debug your service. Imagine that you are inserting data into the store using astoria and you start getting DataServiceExceptions in your client code. The normal error message would be ..
+&lt;?xml version="1.0" encoding="utf-8" standalone="yes"?&gt;
+&lt;error xmlns="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"&gt;
+  &lt;code&gt;&lt;/code&gt;
+  &lt;message xml:lang="en-US"&gt;An error occurred while processing this request.&lt;/message&gt;
+&lt;/error&gt;
+While debugging the service , you would need more information that just this generic error message . To switch to the dev error mode, you can use the following config settings.&nbsp; 
+1) Set UseVerboseErrors to true in the ServiceConfiguration
+public class YoruService : DataService&lt;YourProvider&gt; {   public static void InitializeService(IDataServiceConfiguration config) {
+       config.UseVerboseErrors = true;
+        . . . . . .
+    }......
+}
+Once this mode is setup , your error messages look like this ..
+&lt;?xml version="1.0" encoding="utf-8" standalone="yes"?&gt;
+&lt;error xmlns="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"&gt;
+  &lt;code&gt;&lt;/code&gt;
+  &lt;message xml:lang="en-US"&gt;An error occurred while processing this request.&lt;/message&gt;
+  &lt;innererror xmlns="xmlns"&gt;
+    &lt;message&gt;An error occurred while updating the entries. See the InnerException for details.&lt;/message&gt;
+    &lt;type&gt;System.Data.UpdateException&lt;/type&gt;
+    &lt;stacktrace&gt;   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)&amp;#xD;
+   at System.Data.Objects.ObjectContext.SaveChanges(Boolean acceptChangesDuringSave)&amp;#xD;
+   at System.Data.Services.Providers.ObjectContextServiceProvider.SaveChanges()&amp;#xD;
+   at System.Data.Services.DataService`1.HandleNonBatchRequest(RequestDescription description)&amp;#xD;
+   at System.Data.Services.DataService`1.HandleRequest()&lt;/stacktrace&gt;
+    &lt;internalexception&gt;
+      &lt;message&gt;Violation of PRIMARY KEY constraint 'PK_Region'. Cannot insert duplicate key in object 'dbo.Region'.&amp;#xD;
+The statement has been terminated.&lt;/message&gt;
+      &lt;type&gt;System.Data.SqlClient.SqlException&lt;/type&gt;
+      &lt;stacktrace&gt;   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.Run(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, DbAsyncResult result)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(DbAsyncResult result, String methodName, Boolean sendToPipe)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()&amp;#xD;
+   at System.Data.Mapping.Update.Internal.DynamicUpdateCommand.Execute(UpdateTranslator translator, EntityConnection connection, Dictionary`2 identifierValues, List`1 generatedValues)&amp;#xD;
+   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)&lt;/stacktrace&gt;
+    &lt;/internalexception&gt;
+  &lt;/innererror&gt;
+&lt;/error&gt;
+This works well when you have a working service all prepped up and ready to go .But , what do you do when your service won't even start ?If the service fails to initialize due to some error , you get the generic WCF Error message,which is seldom useful .
+The error message would look like this ..
+ 
+&nbsp;
+The reason you see this and not the Pretty formatted error message from astoria is that the astoria frameworknever initialized the service and failed in the WCF pipeline.To see the error at this layer , you will need to 
+2) Configure your Servicebehavior with the IncludeExceptionDetailInFaults attribute.
+Via Code :
+[System.ServiceModel.ServiceBehavior(IncludeExceptionDetailInFaults = true)]
+public class YourService : DataService&lt;YourProvider&gt;
+Via Config :
+
+&lt;system.serviceModel&gt;
+    &lt;services&gt;
+      &lt;service name="ServiceNamespace.ServiceClassName"  behaviorConfiguration ="DebugEnabled"&gt;
+      &lt;/service&gt;
+    &lt;/services&gt;
+    &lt;behaviors&gt;
+      &lt;serviceBehaviors &gt;
+        &lt;behavior name="DebugEnabled"&gt;
+          &lt;serviceDebug includeExceptionDetailInFaults="True"/&gt;
+        &lt;/behavior&gt;
+      &lt;/serviceBehaviors&gt;
+    &lt;/behaviors&gt;
+    &lt;serviceHostingEnvironment aspNetCompatibilityEnabled="true"/&gt;
+&lt;/system.serviceModel&gt;
+
+After setting this config , this is what the error  looks like ..
+ 
+&nbsp;Happy Debugging !
+" />
+    <meta property="og:description" content="When developing your service , you might run into some issues and you want to debug your service. Imagine that you are inserting data into the store using astoria and you start getting DataServiceExceptions in your client code. The normal error message would be ..
+&lt;?xml version="1.0" encoding="utf-8" standalone="yes"?&gt;
+&lt;error xmlns="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"&gt;
+  &lt;code&gt;&lt;/code&gt;
+  &lt;message xml:lang="en-US"&gt;An error occurred while processing this request.&lt;/message&gt;
+&lt;/error&gt;
+While debugging the service , you would need more information that just this generic error message . To switch to the dev error mode, you can use the following config settings.&nbsp; 
+1) Set UseVerboseErrors to true in the ServiceConfiguration
+public class YoruService : DataService&lt;YourProvider&gt; {   public static void InitializeService(IDataServiceConfiguration config) {
+       config.UseVerboseErrors = true;
+        . . . . . .
+    }......
+}
+Once this mode is setup , your error messages look like this ..
+&lt;?xml version="1.0" encoding="utf-8" standalone="yes"?&gt;
+&lt;error xmlns="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"&gt;
+  &lt;code&gt;&lt;/code&gt;
+  &lt;message xml:lang="en-US"&gt;An error occurred while processing this request.&lt;/message&gt;
+  &lt;innererror xmlns="xmlns"&gt;
+    &lt;message&gt;An error occurred while updating the entries. See the InnerException for details.&lt;/message&gt;
+    &lt;type&gt;System.Data.UpdateException&lt;/type&gt;
+    &lt;stacktrace&gt;   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)&amp;#xD;
+   at System.Data.Objects.ObjectContext.SaveChanges(Boolean acceptChangesDuringSave)&amp;#xD;
+   at System.Data.Services.Providers.ObjectContextServiceProvider.SaveChanges()&amp;#xD;
+   at System.Data.Services.DataService`1.HandleNonBatchRequest(RequestDescription description)&amp;#xD;
+   at System.Data.Services.DataService`1.HandleRequest()&lt;/stacktrace&gt;
+    &lt;internalexception&gt;
+      &lt;message&gt;Violation of PRIMARY KEY constraint 'PK_Region'. Cannot insert duplicate key in object 'dbo.Region'.&amp;#xD;
+The statement has been terminated.&lt;/message&gt;
+      &lt;type&gt;System.Data.SqlClient.SqlException&lt;/type&gt;
+      &lt;stacktrace&gt;   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.Run(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, DbAsyncResult result)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(DbAsyncResult result, String methodName, Boolean sendToPipe)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()&amp;#xD;
+   at System.Data.Mapping.Update.Internal.DynamicUpdateCommand.Execute(UpdateTranslator translator, EntityConnection connection, Dictionary`2 identifierValues, List`1 generatedValues)&amp;#xD;
+   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)&lt;/stacktrace&gt;
+    &lt;/internalexception&gt;
+  &lt;/innererror&gt;
+&lt;/error&gt;
+This works well when you have a working service all prepped up and ready to go .But , what do you do when your service won't even start ?If the service fails to initialize due to some error , you get the generic WCF Error message,which is seldom useful .
+The error message would look like this ..
+ 
+&nbsp;
+The reason you see this and not the Pretty formatted error message from astoria is that the astoria frameworknever initialized the service and failed in the WCF pipeline.To see the error at this layer , you will need to 
+2) Configure your Servicebehavior with the IncludeExceptionDetailInFaults attribute.
+Via Code :
+[System.ServiceModel.ServiceBehavior(IncludeExceptionDetailInFaults = true)]
+public class YourService : DataService&lt;YourProvider&gt;
+Via Config :
+
+&lt;system.serviceModel&gt;
+    &lt;services&gt;
+      &lt;service name="ServiceNamespace.ServiceClassName"  behaviorConfiguration ="DebugEnabled"&gt;
+      &lt;/service&gt;
+    &lt;/services&gt;
+    &lt;behaviors&gt;
+      &lt;serviceBehaviors &gt;
+        &lt;behavior name="DebugEnabled"&gt;
+          &lt;serviceDebug includeExceptionDetailInFaults="True"/&gt;
+        &lt;/behavior&gt;
+      &lt;/serviceBehaviors&gt;
+    &lt;/behaviors&gt;
+    &lt;serviceHostingEnvironment aspNetCompatibilityEnabled="true"/&gt;
+&lt;/system.serviceModel&gt;
+
+After setting this config , this is what the error  looks like ..
+ 
+&nbsp;Happy Debugging !
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Debugging WCF Data Services" />
+    <meta property="twitter:title" content="Debugging WCF Data Services" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Debugging WCF Data Services</h1>
+
+  <div class="entry">
+    <p>When developing your service , you might run into some issues and you want to debug your service. <br />Imagine that you are inserting data into the store using astoria and you start getting DataServiceExceptions in your client code. <br />The normal error message would be ..</p>
+<pre class="csharpcode"><span class="kwrd">&lt;?</span><span class="html">xml</span> <span class="attr">version</span><span class="kwrd">="1.0"</span> <span class="attr">encoding</span><span class="kwrd">="utf-8"</span> <span class="attr">standalone</span><span class="kwrd">="yes"</span>?<span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">error</span> <span class="attr">xmlns</span><span class="kwrd">="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">code</span><span class="kwrd">&gt;&lt;/</span><span class="html">code</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">message</span> <span class="attr">xml:lang</span><span class="kwrd">="en-US"</span><span class="kwrd">&gt;</span>An error occurred while processing this request.<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">error</span><span class="kwrd">&gt;</span></pre></p>
+<p>While debugging the service , you would need more information that just this generic error message . <br />To switch to the dev error mode, you can use the following config settings.&nbsp; </p>
+<h5>1) Set UseVerboseErrors to true in the ServiceConfiguration</h5>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">class</span> YoruService : DataService&lt;YourProvider&gt; {<br />   <span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">void</span> InitializeService(IDataServiceConfiguration config) {
+       config.UseVerboseErrors = <span class="kwrd">true</span>;
+        . . . . . .
+    }<br />......</pre>
+<pre class="csharpcode">}</pre>
+<pre class="csharpcode">Once this mode is setup , your error messages look like this ..</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;?</span><span class="html">xml</span> <span class="attr">version</span><span class="kwrd">="1.0"</span> <span class="attr">encoding</span><span class="kwrd">="utf-8"</span> <span class="attr">standalone</span><span class="kwrd">="yes"</span>?<span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">error</span> <span class="attr">xmlns</span><span class="kwrd">="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">code</span><span class="kwrd">&gt;&lt;/</span><span class="html">code</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">message</span> <span class="attr">xml:lang</span><span class="kwrd">="en-US"</span><span class="kwrd">&gt;</span>An error occurred while processing this request.<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">innererror</span> <span class="attr">xmlns</span><span class="kwrd">="xmlns"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">message</span><span class="kwrd">&gt;</span>An error occurred while updating the entries. See the InnerException for details.<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">type</span><span class="kwrd">&gt;</span>System.Data.UpdateException<span class="kwrd">&lt;/</span><span class="html">type</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">stacktrace</span><span class="kwrd">&gt;</span>   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)&amp;#xD;
+   at System.Data.Objects.ObjectContext.SaveChanges(Boolean acceptChangesDuringSave)&amp;#xD;
+   at System.Data.Services.Providers.ObjectContextServiceProvider.SaveChanges()&amp;#xD;
+   at System.Data.Services.DataService`1.HandleNonBatchRequest(RequestDescription description)&amp;#xD;
+   at System.Data.Services.DataService`1.HandleRequest()<span class="kwrd">&lt;/</span><span class="html">stacktrace</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">internalexception</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">message</span><span class="kwrd">&gt;</span>Violation of PRIMARY KEY constraint 'PK_Region'. Cannot insert duplicate key in object 'dbo.Region'.&amp;#xD;
+The statement has been terminated.<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">type</span><span class="kwrd">&gt;</span>System.Data.SqlClient.SqlException<span class="kwrd">&lt;/</span><span class="html">type</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">stacktrace</span><span class="kwrd">&gt;</span>   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.TdsParser.Run(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, DbAsyncResult result)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(DbAsyncResult result, String methodName, Boolean sendToPipe)&amp;#xD;
+   at System.Data.SqlClient.SqlCommand.ExecuteNonQuery()&amp;#xD;
+   at System.Data.Mapping.Update.Internal.DynamicUpdateCommand.Execute(UpdateTranslator translator, EntityConnection connection, Dictionary`2 identifierValues, List`1 generatedValues)&amp;#xD;
+   at System.Data.Mapping.Update.Internal.UpdateTranslator.Update(IEntityStateManager stateManager, IEntityAdapter adapter)<span class="kwrd">&lt;/</span><span class="html">stacktrace</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">internalexception</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">innererror</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">error</span><span class="kwrd">&gt;</span></pre></p>
+<pre class="csharpcode">This works well when you have a working service all prepped up and ready to go .<br /><strong>But , what do you do when your service won't even start ?<br /></strong><br />If the service fails to initialize due to some error , you get the generic WCF Error message,<br />which is seldom useful .</pre>
+<pre class="csharpcode">The error message would look like this ..</pre>
+<pre class="csharpcode"><br /><br /><br /><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Generic_Error_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Generic_Error_2.jpg"><img height="264" width="644" src="/assets/WCF_Generic_Error_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Generic_Error_thumb.jpg" alt="WCF_Generic_Error" border="0" style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" /></a> <br /></pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The reason you see this and not the Pretty formatted error message from astoria is that the astoria framework<br />never initialized the service and failed in the WCF pipeline.<br />To see the error at this layer , you will need to </pre>
+<h5>2) Configure your Servicebehavior with the <a target="_blank" href="http://msdn.microsoft.com/en-gb/library/system.servicemodel.description.servicedebugbehavior.includeexceptiondetailinfaults.aspx">IncludeExceptionDetailInFaults</a> attribute.</h5>
+<pre class="csharpcode"><strong>Via Code :</strong></pre>
+<pre class="csharpcode">[System.ServiceModel.ServiceBehavior(IncludeExceptionDetailInFaults = <span class="kwrd">true</span>)]
+<span class="kwrd">public</span> <span class="kwrd">class</span> YourService : DataService&lt;YourProvider&gt;</pre></p>
+<pre class="csharpcode"><strong>Via Config :<br /></strong></pre>
+<p><strong></p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">system.serviceModel</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">services</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">service</span> <span class="attr">name</span><span class="kwrd">="ServiceNamespace.ServiceClassName"</span>  <span class="attr">behaviorConfiguration</span> <span class="kwrd">="DebugEnabled"</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;/</span><span class="html">service</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">services</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">behaviors</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">serviceBehaviors</span> <span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">behavior</span> <span class="attr">name</span><span class="kwrd">="DebugEnabled"</span><span class="kwrd">&gt;</span>
+          <span class="kwrd">&lt;</span><span class="html">serviceDebug</span> <span class="attr">includeExceptionDetailInFaults</span><span class="kwrd">="True"</span><span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">behavior</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;/</span><span class="html">serviceBehaviors</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">behaviors</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">serviceHostingEnvironment</span> <span class="attr">aspNetCompatibilityEnabled</span><span class="kwrd">="true"</span><span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">system.serviceModel</span><span class="kwrd">&gt;</span></pre>
+<p></strong></p>
+<pre class="csharpcode">After setting this config , this is what the error  looks like ..</pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Detailed_Error_6.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Detailed_Error_6.jpg"><img height="232" width="736" src="/assets/WCF_Detailed_Error_thumb_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DebuggingAdo.netDataServices_9B10/WCF_Detailed_Error_thumb_2.jpg" alt="WCF_Detailed_Error" border="0" style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" /></a> </pre>
+<pre class="csharpcode">&nbsp;<br />Happy Debugging !</pre></p>
+
+  </div>
+
+  <div class="date">
+    Written on June 18, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

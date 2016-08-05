@@ -1,0 +1,153 @@
+---
+layout: post
+title: Server Driven Paging With WCF Data Services
+date: 2010-04-25 11:32:39.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- DataServiceCollection
+- Demo
+- Documentation
+- OData
+- Server Driven Paging
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2010/04/25/server-driven-paging-with-wcf-data-services.aspx
+  orig_site_id: '7524'
+  orig_post_id: '10002235'
+  orig_parent_id: '10002235'
+  orig_thread_id: '713518'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2010/04/25/server-driven-paging-with-wcf-data-services.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Server Driven Paging With WCF Data Services" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/25/server-driven-paging-with-wcf-data-services/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Download Sample Application Server Side What is SDP ? Design notes Blog post , Channel 9 video Enabling SDP on the server. Setting Server-side paging limits in InitializeService. How to detect if a set is paged from the server-side. How QueryInterceptors affect the next link Uri. Navigating the next link Uri in the browser Client..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Server Driven Paging With WCF Data Services" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/25/server-driven-paging-with-wcf-data-services/" />
+    <meta name="twitter:description" content="Download Sample Application Server Side What is SDP ? Design notes Blog post , Channel 9 video Enabling SDP on the server. Setting Server-side paging limits in InitializeService. How to detect if a set is paged from the server-side. How QueryInterceptors affect the next link Uri. Navigating the next link Uri in the browser Client..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<ul>
+<li><a href="http://cid-925c2d2bb2d03c6b.skydrive.live.com/self.aspx/Public/ServerDrivenPagingDemo.zip">Download Sample Application</a> </li>
+<li>Server Side
+<ol>
+<li><a href="http://blogs.msdn.com/astoriateam/archive/2009/03/19/ado-net-data-services-v1-5-ctp1-server-driven-paging.aspx">What is SDP ?</a> </li>
+<li><a href="https://channel9.msdn.com/shows/10-4/10-4-Episode-27-Server-Driven-Paging-with-ADONET-Data-Services/">Design notes Blog post , Channel 9 video</a> </li>
+<li>Enabling SDP on the server. </li>
+<li>Setting Server-side paging limits in InitializeService. </li>
+<li>How to detect if a set is paged from the server-side. </li>
+<li>How QueryInterceptors affect the next link Uri. </li>
+<li>Navigating the next link Uri in the browser </li>
+</ol>
+</li>
+<li>Client Side
+<ol>
+<li>SDP and DataServiceCollection APIs </li>
+<li>SDP and QueryOperationResponse </li>
+</ol>
+</li>
+</ul>
+<h2>Server Side</h2></p>
+<h3>3. Enabling SDP on the server.</h3>
+<p> On the Server-side , to use any of the V2 features , the DataServiceBehavior has to be set to V2.   <br />config.DataServiceBehavior.MaxDataServiceProtocolVersion = DataServiceProtocolVersion.V2;</p>
+<h3>4. Setting Server-side paging limits in InitializeService. </h3>
+<p>To have the SDP limits applied to an entity set on the server-side , you need to configure the    <br />page size on that entity set by using the SetEntitySetPageSize API available on DataServiceConfiguration. </p>
+<p>int requestSizeLimit = 5;    <br />config.SetEntitySetPageSize(&quot;*&quot;, requestSizeLimit);</p>
+<h3>5. How to detect if a set is paged on the server-side</h3>
+<p>From the metadata, no way.    <br />We don’t expose any information in the $metadata endpoint that a particular set is paged on the server-side.     <br />Without browsing to each entity set exposed by the service and asking for all the entities , there is no way to detect that a set is server paged.     <br />The client developer has to know that the paging limits are set on the server-side to change the client code accordingly.     <br />For more information about client side Querying strategies , please see the section :</p>
+<h3 style="margin: 10pt 0in 0pt">6. How QueryInterceptors affect server side paging. </h3>
+<p>Applying a QueryInterceptor to an entity set would cause the total visible amount of data to the Data Service to be filtered.    <br />If the Server can’t see it , it can’t page it. In other words, any limits that are currently in place now and apply to the /EntitySet     <br />endpoint , will continue to hold after enabling Server Driven paging for that Entity Set.</p>
+<h2>Client Side</h2>
+<h3>1. SDP and DataServiceCollection APIs </h3>
+<p>With the introduction of the SDP and DataBinding support in the client library , we have a new collection type called DataServiceCollection which provides support for natively reading the NextLinkUri , if it‘s present in the ATOM returned from the server. The type contains a property called Continuation,which contains the nextLinkUri present in the payload.</p>
+<p><a href="http://msdn.microsoft.com/en-us/library/ee474410(v=VS.96).aspx">DataServiceCollection&lt;T&gt;.Continuation Property on MSDN</a>&#160; <br />The simplest example of using this collection type is to use the DataServiceCollection type to hold the results of a Query.     <br />The attached sample application contains more scenario based examples.</p>
+<pre class="code"><span style="background: #2e2e2e; color: lime">  //Create an empty DataServiceCollection to hold the results of a query
+</span><span style="background: #2e2e2e; color: #f0dfaf">  DataServiceCollection</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt; </span><span style="background: #2e2e2e; color: #f8ffc6">customersPagedCollection </span><span style="background: #2e2e2e; color: #d2d200">= </span><span style="background: #2e2e2e; color: #eaeaac">new </span><span style="background: #2e2e2e; color: #f0dfaf">DataServiceCollection</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;();
+</span><span style="background: #2e2e2e; color: #eaeaac">  var </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery </span><span style="background: #2e2e2e; color: #d2d200">= (</span><span style="background: #2e2e2e; color: #eaeaac">from </span><span style="background: #2e2e2e; color: #f8ffc6">c </span><span style="background: #2e2e2e; color: #eaeaac">in </span><span style="background: #2e2e2e; color: #f8ffc6">ServiceContext</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Customers
+                                  </span><span style="background: #2e2e2e; color: #eaeaac">where </span><span style="background: #2e2e2e; color: #f8ffc6">c</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Name</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">StartsWith</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #c89191">&quot;P&quot;</span><span style="background: #2e2e2e; color: #d2d200">)
+                                  </span><span style="background: #2e2e2e; color: #eaeaac">select </span><span style="background: #2e2e2e; color: #f8ffc6">c</span><span style="background: #2e2e2e; color: #d2d200">) </span><span style="background: #2e2e2e; color: #eaeaac">as </span><span style="background: #2e2e2e; color: #f0dfaf">DataServiceQuery</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;;
+  </span><span style="background: #2e2e2e; color: lime">//Execute the query asynchronously
+  </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">BeginExecute</span><span style="background: #2e2e2e; color: #d2d200">(
+    (</span><span style="background: #2e2e2e; color: #f8ffc6">asyncResult</span><span style="background: #2e2e2e; color: #d2d200">) =&gt;
+     {
+       </span><span style="background: #2e2e2e; color: #eaeaac">var </span><span style="background: #2e2e2e; color: #f8ffc6">customerQueryResponse </span><span style="background: #2e2e2e; color: #d2d200">= </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">EndExecute</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f8ffc6">asyncResult</span><span style="background: #2e2e2e; color: #d2d200">) </span><span style="background: #2e2e2e; color: #eaeaac">as </span><span style="background: #2e2e2e; color: #f0dfaf">QueryOperationResponse</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;;
+       </span><span style="background: #2e2e2e; color: lime">//Call load on the DataServiceCollection with the QueryOperationResponse
+       //This will cause the collection to load the customer objects
+       //and the nextlink as found in the response.
+       </span><span style="background: #2e2e2e; color: #f8ffc6">customersPagedCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Load</span><span style="background: #2e2e2e; color: #d2d200">( </span><span style="background: #2e2e2e; color: #f8ffc6">customerQueryResponse </span><span style="background: #2e2e2e; color: #d2d200">);
+     }, </span><span style="background: #2e2e2e; color: #eaeaac">null
+  </span><span style="background: #2e2e2e; color: #d2d200">);</span></pre>
+<p><a href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste"></a></p>
+<p>Seeing as it is that the above pattern of querying for top level collections is a common practice in Silverlight applications,<br />
+  <br />we’ve introduced a method on the DataServiceCollection type to make this easier.</p>
+<p>Behold, <a href="http://msdn.microsoft.com/en-us/library/ee652610(v=VS.96).aspx">the LoadAsync method on DataServiceCollection&lt;T&gt;</a> for materializing top level collections without any user code.</p>
+<p><font color="#17365d">And <a href="http://msdn.microsoft.com/en-us/library/ee652761(v=VS.96).aspx">the LoadNextPartialSetAsync method</a> to load the next page in the collection.</p>
+<p></font></p>
+<p><font color="#17365d">To load the next page in the Collection, call the Execute&lt;T&gt;,BeginExecute&lt;T&gt; overloads which take a continuation token.</font></p>
+<pre class="code"><span style="background: #2e2e2e; color: lime">//To Load the next page, call the Execute&lt;T&gt; overload which takes a continuation token
+ </span><span style="background: #2e2e2e; color: #f8ffc6">ServiceContext</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">BeginExecute</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f8ffc6">customersPagedCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Continuation</span><span style="background: #2e2e2e; color: #d2d200">, </span><span style="background: #2e2e2e; color: #f8ffc6">QueryCallback</span><span style="background: #2e2e2e; color: #d2d200">, </span><span style="background: #2e2e2e; color: #eaeaac">null</span><span style="background: #2e2e2e; color: #d2d200">);</span></pre>
+<p><a href="http://11011.net/software/vspaste"></a></p>
+<p><font color="#17365d">Call the LoadNextPartialSetAsync method in your&#160; Silverlight applications:</font></p>
+<pre class="code"><span style="background: #2e2e2e; color: #f8ffc6">customersPagedCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">LoadNextPartialSetAsync</span><span style="background: #2e2e2e; color: #d2d200">();</span></pre>
+<h3>2. SDP and QueryOperationResponse</h3>
+<p>In case you don’t want to use the DataServiceCollection&lt;T&gt; type and instead want to use your own collection type,</p>
+<p>then fear not . You don’t <b style="mso-bidi-font-weight: normal"><i style="mso-bidi-font-style: normal">have</i></b> to use the DataServiceCollection type if you want to have Paging Support in the client library. The QueryOperationResponse&lt;T&gt; type from V1 has been updated to support Paging using custom collections.&#160; <br />The type now contains a new method called GetContinuation which will give you the continuation token if one was present in the response.</p>
+<p></p>
+<p><a href="http://msdn.microsoft.com/en-us/library/ee474245(v=VS.100).aspx">QueryOperationResponse&lt;T&gt;.GetContinuation Method&#160; on MSDN</a></p>
+<p><font color="#17365d">Consider a custom collection type called MyCollection and looks like this&#160; :<br />
+  </p>
+<pre class="code"><span style="background: #2e2e2e; color: gray">/// &lt;summary&gt;
+/// </span><span style="background: #2e2e2e; color: #7a987a">Custom collection type to illustrate pluggability of Continuation token.
+</span><span style="background: #2e2e2e; color: gray">/// &lt;/summary&gt;
+/// &lt;typeparam name=&quot;TEntity&quot;&gt;</span><span style="background: #2e2e2e; color: #7a987a">The Entitytype of the collection</span><span style="background: #2e2e2e; color: gray">&lt;/typeparam&gt;
+</span><span style="background: #2e2e2e; color: #eaeaac">public class </span><span style="background: #2e2e2e; color: #f0dfaf">MyCollectionType</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f8ffc6">TEntity</span><span style="background: #2e2e2e; color: #d2d200">&gt; : </span><span style="background: #2e2e2e; color: #f0dfaf">List</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f8ffc6">TEntity</span><span style="background: #2e2e2e; color: #d2d200">&gt; </span><span style="background: #2e2e2e; color: #eaeaac">where </span><span style="background: #2e2e2e; color: #f8ffc6">TEntity </span><span style="background: #2e2e2e; color: #d2d200">: </span><span style="background: #2e2e2e; color: #eaeaac">class</span><span style="background: #2e2e2e; color: #d2d200">, </span><span style="background: #2e2e2e; color: #eaeaac">new</span><span style="background: #2e2e2e; color: #d2d200">() {
+    </span><span style="background: #2e2e2e; color: gray">/// &lt;summary&gt;
+    /// </span><span style="background: #2e2e2e; color: #7a987a">This is a custom property on a collection type which can hold the continuation token
+    </span><span style="background: #2e2e2e; color: gray">/// </span><span style="background: #2e2e2e; color: #7a987a">Call GetContinuation on the response to get the continuation token for the response
+    </span><span style="background: #2e2e2e; color: gray">/// &lt;/summary&gt;
+    </span><span style="background: #2e2e2e; color: #eaeaac">public </span><span style="background: #2e2e2e; color: #f0dfaf">DataServiceQueryContinuation</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f8ffc6">TEntity</span><span style="background: #2e2e2e; color: #d2d200">&gt; </span><span style="background: #2e2e2e; color: #f8ffc6">NextLink </span><span style="background: #2e2e2e; color: #d2d200">{ </span><span style="background: #2e2e2e; color: #eaeaac">get</span><span style="background: #2e2e2e; color: #d2d200">; </span><span style="background: #2e2e2e; color: #eaeaac">set</span><span style="background: #2e2e2e; color: #d2d200">; }
+}
+</span></pre>
+<p>  <a href="http://11011.net/software/vspaste"></a></p>
+<p>Here’s an example of getting the continuation token and using it in the collection type:</p>
+<pre class="code"><span style="background: #2e2e2e; color: lime">   //Create the custom collection type and add the results of the query to the collection
+   </span><span style="background: #2e2e2e; color: #f0dfaf">MyCollectionType</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt; </span><span style="background: #2e2e2e; color: #f8ffc6">customCustomersCollection </span><span style="background: #2e2e2e; color: #d2d200">= </span><span style="background: #2e2e2e; color: #eaeaac">new </span><span style="background: #2e2e2e; color: #f0dfaf">MyCollectionType</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;();
+   </span><span style="background: #2e2e2e; color: #eaeaac">var </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery </span><span style="background: #2e2e2e; color: #d2d200">= (</span><span style="background: #2e2e2e; color: #eaeaac">from </span><span style="background: #2e2e2e; color: #f8ffc6">c </span><span style="background: #2e2e2e; color: #eaeaac">in </span><span style="background: #2e2e2e; color: #f8ffc6">ServiceContext</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Customers
+                                  </span><span style="background: #2e2e2e; color: #eaeaac">where </span><span style="background: #2e2e2e; color: #f8ffc6">c</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Name</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">StartsWith</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #c89191">&quot;P&quot;</span><span style="background: #2e2e2e; color: #d2d200">)
+                                  </span><span style="background: #2e2e2e; color: #eaeaac">select </span><span style="background: #2e2e2e; color: #f8ffc6">c</span><span style="background: #2e2e2e; color: #d2d200">) </span><span style="background: #2e2e2e; color: #eaeaac">as </span><span style="background: #2e2e2e; color: #f0dfaf">DataServiceQuery</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;;
+   </span><span style="background: #2e2e2e; color: lime">//Execute the query asynchronously
+   </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">BeginExecute</span><span style="background: #2e2e2e; color: #d2d200">(
+       (</span><span style="background: #2e2e2e; color: #f8ffc6">asyncResult</span><span style="background: #2e2e2e; color: #d2d200">) =&gt;
+        {
+          </span><span style="background: #2e2e2e; color: #eaeaac">var </span><span style="background: #2e2e2e; color: #f8ffc6">customerQueryResponse </span><span style="background: #2e2e2e; color: #d2d200">= </span><span style="background: #2e2e2e; color: #f8ffc6">customersQuery</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">EndExecute</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f8ffc6">asyncResult</span><span style="background: #2e2e2e; color: #d2d200">) </span><span style="background: #2e2e2e; color: #eaeaac">as </span><span style="background: #2e2e2e; color: #f0dfaf">QueryOperationResponse</span><span style="background: #2e2e2e; color: #d2d200">&lt;</span><span style="background: #2e2e2e; color: #f0dfaf">Customer</span><span style="background: #2e2e2e; color: #d2d200">&gt;;
+          </span><span style="background: #2e2e2e; color: #eaeaac">foreach </span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f0dfaf">Customer </span><span style="background: #2e2e2e; color: #f8ffc6">customerInstance </span><span style="background: #2e2e2e; color: #eaeaac">in </span><span style="background: #2e2e2e; color: #f8ffc6">customerQueryResponse</span><span style="background: #2e2e2e; color: #d2d200">)
+           {
+             </span><span style="background: #2e2e2e; color: #f8ffc6">customCustomersCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">Add</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f8ffc6">customerInstance</span><span style="background: #2e2e2e; color: #d2d200">);
+           }
+         </span><span style="background: #2e2e2e; color: lime">//Calling GetContinuation without any parameters gives you the nextlink of the
+         //top level feed element in the response
+         </span><span style="background: #2e2e2e; color: #f8ffc6">customCustomersCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">NextLink </span><span style="background: #2e2e2e; color: #d2d200">= </span><span style="background: #2e2e2e; color: #f8ffc6">customerQueryResponse</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">GetContinuation</span><span style="background: #2e2e2e; color: #d2d200">();
+         }, </span><span style="background: #2e2e2e; color: #eaeaac">null
+     </span><span style="background: #2e2e2e; color: #d2d200">);</span></pre>
+<p>  <a href="http://11011.net/software/vspaste"></a></p>
+<p><font color="#17365d">To load the next page in the Collection, call the Execute&lt;T&gt;,BeginExecute&lt;T&gt; overloads which take a continuation token.</font></p>
+<pre class="code"><span style="background: #2e2e2e; color: lime">//To Load the next page, call the Execute&lt;T&gt; overload which takes a continuation token
+ </span><span style="background: #2e2e2e; color: #f8ffc6">ServiceContext</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">BeginExecute</span><span style="background: #2e2e2e; color: #d2d200">(</span><span style="background: #2e2e2e; color: #f8ffc6">customCustomersCollection</span><span style="background: #2e2e2e; color: #d2d200">.</span><span style="background: #2e2e2e; color: #f8ffc6">NextLink </span><span style="background: #2e2e2e; color: #d2d200">, </span><span style="background: #2e2e2e; color: #f8ffc6">QueryCallback</span><span style="background: #2e2e2e; color: #d2d200">, </span><span style="background: #2e2e2e; color: #eaeaac">null</span><span style="background: #2e2e2e; color: #d2d200">);</span></pre>
+<p></font></p>

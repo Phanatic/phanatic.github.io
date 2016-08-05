@@ -1,0 +1,184 @@
+---
+layout: post
+title: Customizing the MS Ajax AutoCompleteExtender To Render Images Instead Of Text
+date: 2007-02-10 05:13:49.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- AutoCompleteExtender
+- Components
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/02/10/customizing-the-ms-ajax-autocompleteextender-to-render-images-instead-of-text.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1642056'
+  orig_parent_id: '1642056'
+  orig_thread_id: '494973'
+  _wds_ratings_users: '1'
+  _wds_ratings_score: '5'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/02/10/customizing-the-ms-ajax-autocompleteextender-to-render-images-instead-of-text.aspx
+  _wds_ratings_average: '5'
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Customizing the MS Ajax AutoCompleteExtender To Render Images Instead Of Text" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/10/customizing-the-ms-ajax-autocompleteextender-to-render-images-instead-of-text/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="We all know about the AutoComplete Extender from MS AJAX. It looks like this &#8230;.. &nbsp; I want to customize the Auto Complete behaviour to render images on the client side rather than the text nodes . My Server Side WebService returns an array of image URLs. I want to change the way the Results..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Original_thumb%5B1%5D.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Customizing the MS Ajax AutoCompleteExtender To Render Images Instead Of Text" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/10/customizing-the-ms-ajax-autocompleteextender-to-render-images-instead-of-text/" />
+    <meta name="twitter:description" content="We all know about the AutoComplete Extender from MS AJAX. It looks like this &#8230;.. &nbsp; I want to customize the Auto Complete behaviour to render images on the client side rather than the text nodes . My Server Side WebService returns an array of image URLs. I want to change the way the Results..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Original_thumb%5B1%5D.jpg" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>We all know about the AutoComplete Extender from MS AJAX.</p>
+<p>It looks like this .....</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Original%5B3%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Original%5B3%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="311" src="{{ site.baseurl }}/assets/AutoComplete_Original_thumb%5B1%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Original_thumb%5B1%5D.jpg" width="369" border="0" /></a> </p>
+<p>&nbsp;</p>
+<p>I want to customize the Auto Complete behaviour to render images on the client side rather than the text nodes .</p>
+<p>My Server Side WebService returns an array of image URLs. I want to change the way the Results are rendered.</p>
+<p>This is how I want it to look.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified%5B4%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified%5B4%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="245" src="{{ site.baseurl }}/assets/AutoComplete_Modified_thumb%5B2%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified_thumb%5B2%5D.jpg" width="373" border="0" /></a> </p>
+<p>I know that its pretty easy to achieve the effect using the client side proxy generated for a webservice.</p>
+<p>But, I need to leverage the advantages of the AJAX AutoComplete control such as</p>
+<ul>
+<li>Client Side&nbsp;Caching of Web Service Results</li>
+<li>Fully customisable with regard to specifying when and how the server side method call is made .</li>
+</ul>
+<p>So, we download the Source code of the AutoComplete Extender and start our process of hacking through it to achieve what we want.</p>
+<p>You can download the Source of the AjaxControlToolkit from <a href="http://www.codeplex.com/AtlasControlToolkit/">Here</a></p>
+<p>Once we downloaded , we take a look at the function that renders the Search Results.</p>
+<p>The Function inside the AutoComplete Extender that renders the search results is in Javascript.</p>
+<p>The File&nbsp; you gotta go to is AutoCompleteBehavior.js.</p>
+<p>&lt;Function&gt;</p>
+<pre class="csharpcode">_update: <span class="kwrd">function</span>(prefixText, completionItems, cacheResults) {
+        <span class="kwrd">if</span> (cacheResults &amp;&amp; <span class="kwrd">this</span>.get_enableCaching()) {
+            <span class="kwrd">if</span> (!<span class="kwrd">this</span>._cache) {
+                <span class="kwrd">this</span>._cache = {};
+            }
+            <span class="kwrd">this</span>._cache[prefixText] = completionItems;
+        }
+
+        <span class="kwrd">this</span>._completionListElement.innerHTML = <span class="str">''</span>;
+        <span class="kwrd">this</span>._selectIndex = -1;
+        <span class="kwrd">if</span> (completionItems &amp;&amp; completionItems.length) {
+            <span class="kwrd">for</span> (<span class="kwrd">var</span> i = 0; i &lt; completionItems.length; i++) {
+             <strong>  <font color="#ff8000"> <span class="kwrd">var</span> itemElement = document.createElement(<span class="str">'div'</span>);
+                itemElement.appendChild(document.createTextNode(completionItems[i]));
+                itemElement.__item = <span class="str">''</span>;
+
+                <span class="kwrd">var</span> itemElementStyle = itemElement.style;
+                itemElementStyle.padding = <span class="str">'1px'</span>;
+                itemElementStyle.textAlign = <span class="str">'left'</span>;
+                itemElementStyle.textOverflow = <span class="str">'ellipsis'</span>;
+                itemElementStyle.backgroundColor = <span class="kwrd">this</span>._textBackground;
+                itemElementStyle.color = <span class="kwrd">this</span>._textColor;
+
+                <span class="kwrd">this</span>._completionListElement.appendChild(itemElement);</font></strong>
+            }
+            <span class="kwrd">var</span> elementBounds = CommonToolkitScripts.getBounds(<span class="kwrd">this</span>.get_element());
+            <span class="kwrd">this</span>._completionListElement.style.width = Math.max(1, elementBounds.width - 2) + <span class="str">'px'</span>;
+            <span class="kwrd">this</span>._popupBehavior.show();
+        }
+        <span class="kwrd">else</span> {
+            <span class="kwrd">this</span>._popupBehavior.hide();
+        }
+    }    </pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>&lt;/Function&gt;&nbsp;</p>
+<p>The Lines of the function that Renders the Search Results is marked in this <font color="#ff8000"><strong>color.</strong></font></p>
+<p>Lets study these lines</p>
+<pre class="csharpcode"><span class="kwrd">var</span> itemElement = document.createElement(<span class="str">'div'</span>);
+    itemElement.appendChild(document.createTextNode(completionItems[i]));
+    itemElement.__item = <span class="str">''</span>;</pre>
+<pre class="csharpcode">
+These lines of code create a "DIV" for each search result from the Web service.</pre>
+<pre class="csharpcode">We will change it to be ...</pre>
+<pre class="csharpcode"><span class="kwrd">var</span> itemElement = document.createElement(<span class="str">'img'</span>);
+itemElement.src =  completionItems[i];</pre>
+<pre class="csharpcode">This would be enough to render images instead of Text .</pre>
+<pre class="csharpcode">Next, onClick of the image thumbnail , we want to assign the image url to another full image on the page.</pre>
+<pre class="csharpcode">The function  called when the image is clicked is</pre>
+<pre class="csharpcode"> _onListMouseDown: <span class="kwrd">function</span>(ev) {
+        <span class="kwrd">if</span> (ev.target !== <span class="kwrd">this</span>._completionListElement) {
+            <span class="kwrd">this</span>._setText(ev.target.firstChild.nodeValue);
+        }
+    },</pre>
+<pre class="csharpcode">We will change this to be :</pre>
+<pre class="csharpcode"> _onListMouseDown: <span class="kwrd">function</span>(ev) {
+        $get(<span class="str">"imgFullBlown"</span>).src = <span class="kwrd">event</span>.srcElement.src;
+        },</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">imgFullBlown is gonna be an &lt;IMG&gt; tag on the page that hosts the control .</pre>
+<pre class="csharpcode">As you can see, the src of the image that is clicked is assigned to the src of the "imgFullBlown" tag.</pre>
+<pre class="csharpcode">The Effects are as shown below .</pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified_FULL%5B4%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified_FULL%5B4%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="224" src="{{ site.baseurl }}/assets/AutoComplete_Modified_FULL_thumb%5B2%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CustomizingtheMSAjaxAutoCompleteExtender_D485/AutoComplete_Modified_FULL_thumb%5B2%5D.jpg" width="357" border="0" /></a> </pre>
+<pre class="csharpcode">There you go , build the Project and change the default behaviour or build your own control by extending the AutoCompleteExtender.</pre>
+<pre class="csharpcode">You are  only limited by your imagination.</pre>
+<pre class="csharpcode">Everyone has access to the source of some of our best controls.</pre>
+<pre class="csharpcode">&nbsp;</pre>

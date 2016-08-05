@@ -1,0 +1,87 @@
+---
+layout: post
+title: Astoria & IIS , HTTP 400 Bad Request on Posting Large Payloads to an astoria
+  service
+date: 2008-10-05 22:35:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- Debugging
+- Documentation
+- IIS
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/10/06/astoria-iis-http-400-bad-request-on-posting-large-payloads-to-an-astoria-service.aspx
+  orig_site_id: '7524'
+  orig_post_id: '8977408'
+  orig_parent_id: '8977408'
+  orig_thread_id: '610038'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/10/05/astoria-iis-http-400-bad-request-on-posting-large-payloads-to-an-astoria-service.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Astoria &amp; IIS , HTTP 400 Bad Request on Posting Large Payloads to an astoria service" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/10/05/astoria-iis-http-400-bad-request-on-posting-large-payloads-to-an-astoria-service/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="We’ve seen this in the labs and also reported by our customers on the forums, If you try to post&nbsp; a large amount of data to an astoria data service , you might receive a response code Http 400 Bad Request even though the response data is valid. An ADO.NET Data Service sits on top..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Astoria &amp; IIS , HTTP 400 Bad Request on Posting Large Payloads to an astoria service" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/10/05/astoria-iis-http-400-bad-request-on-posting-large-payloads-to-an-astoria-service/" />
+    <meta name="twitter:description" content="We’ve seen this in the labs and also reported by our customers on the forums, If you try to post&nbsp; a large amount of data to an astoria data service , you might receive a response code Http 400 Bad Request even though the response data is valid. An ADO.NET Data Service sits on top..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>We’ve seen this in the labs and also reported by our customers on the forums, If you try to post&nbsp; a large amount of data to <br />an astoria data service , you might receive a response code Http 400 Bad Request even though the response data is valid. </p>
+<p>An ADO.NET Data Service sits on top of Windows Communication Foundation , although most of the required plumbing is hidden away from you&nbsp; ,&nbsp; you can still see the effects in scenarios such as this .</p>
+<h6>Why do I get a generic 400 Bad Request in this case ?</h6>
+<p>When the request size ( including headers ) exceeds 64 K ( 65536 bytes ) , WCF chokes on the request as this request size is greater than the limit on the maximum size of the request the service can recieve and sends out a HTTP 400 Bad Request as the request is invalid. </p>
+<h6>How do I fix this ?</h6>
+<p>a)The maximum size of the request which a WCF service can process is controlled by the <a href="http://msdn.microsoft.com/en-us/library/system.servicemodel.channels.transportbindingelement.maxreceivedmessagesize.aspx" mce_href="http://msdn.microsoft.com/en-us/library/system.servicemodel.channels.transportbindingelement.maxreceivedmessagesize.aspx">MaxReceivedMessageSize</a> property on the WCF binding. <br />The default value is 65536 ,exceeding which you get the 400 response code. </p>
+<p>In the web.config of the web site hosting the service , add the following node in the &lt;System.ServiceModel&gt; section. </p>
+<p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">system.serviceModel</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">services</span><span class="kwrd">&gt;</span>
+  <span class="rem">&lt;!-- The name of the service --&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">service</span> <span class="attr">name</span><span class="kwrd">="NorthwindService"</span><span class="kwrd">&gt;</span>
+    <span class="rem">&lt;!-- you can leave the address blank or specify your end point URI --&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">endpoint</span> <span class="attr">address</span> <span class="kwrd">="YourServiceEndpoint"</span>
+              <span class="attr">binding</span><span class="kwrd">="webHttpBinding"</span> <span class="attr">bindingConfiguration</span><span class="kwrd">="higherMessageSize"</span>
+     <span class="attr">contract</span> <span class="kwrd">="System.Data.Services.IRequestHandler"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">endpoint</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">service</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">services</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">bindings</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">webHttpBinding</span><span class="kwrd">&gt;</span>
+    <span class="rem">&lt;!-- configure the maxReceivedMessageSize  value to suit the max size of </span>
+<span class="rem">         the request ( in bytes ) you want the service to recieve--&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">binding</span> <span class="attr">name</span><span class="kwrd">="higherMessageSize"</span> <span class="attr">maxReceivedMessageSize</span> <span class="kwrd">="MaxMessageSize"</span><span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">webHttpBinding</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">bindings</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">serviceHostingEnvironment</span> <span class="attr">aspNetCompatibilityEnabled</span><span class="kwrd">="true"</span><span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">system.serviceModel</span><span class="kwrd">&gt;</span></pre>
+<p>b) If hosted on IIS , the ASP.Net Request Size restriction can also cause a large request to be rejected, <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You will need to set the <a href="http://msdn.microsoft.com/en-us/library/system.web.configuration.httpruntimesection.maxrequestlength.aspx" target="_blank" mce_href="http://msdn.microsoft.com/en-us/library/system.web.configuration.httpruntimesection.maxrequestlength.aspx">HttpRuntimeSection.MaxRequestLength</a> Property. </p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">system.web</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">httpRuntime</span> <span class="attr">MaxRequestLength</span><span class="kwrd">="ValueInKiloBytes"</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">system.web</span><span class="kwrd">&gt;</span></pre>
+<h6>How do I Identify if the reason I am seeing a 400 Bad Request&nbsp; is because of the request size ?</h6>
+<p>Identify if WCF is throwing an exception under the covers which is not being surfaced to you at the HTTP level. <br />You can <a title="Instructions on configuring WCF tracing" href="http://msdn.microsoft.com/en-us/library/ms733025.aspx" target="_blank" mce_href="http://msdn.microsoft.com/en-us/library/ms733025.aspx">configure WCF tracing</a> on the server-side to log the necessary information from the WCF layer. <br />Once you have tracing setup and you reproduced the failure , check if the log contains one or both of these exception messages.&nbsp;&nbsp; <br />&nbsp;&nbsp;&nbsp;&nbsp; </p>
+<pre class="darkcsharpcode">System.ServiceModel.ProtocolException
+<span class="str">"The maximum message size quota for incoming messages (65536) has been exceeded.
+To increase the quota, use the MaxReceivedMessageSize property on the appropriate binding element."
+</span>
+System.Web.HttpException
+<span class="str">"Maximum request length exceeded."</span></pre>
+<p>If you see that the log does contain this message , then you can be sure that the failure is because of the message size <br />and apply this fix accordingly.</p>

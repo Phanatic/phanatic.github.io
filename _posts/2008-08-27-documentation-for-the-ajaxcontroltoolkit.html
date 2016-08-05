@@ -1,0 +1,85 @@
+---
+layout: post
+title: Documentation for the AjaxControlToolkit
+date: 2008-08-27 00:07:23.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- AjaxControlToolkit
+- Demo
+- Documentation
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/08/27/documentation-for-the-ajaxcontroltoolkit.aspx
+  orig_site_id: '7524'
+  orig_post_id: '8898885'
+  orig_parent_id: '8898885'
+  orig_thread_id: '602516'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/08/27/documentation-for-the-ajaxcontroltoolkit.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Documentation for the AjaxControlToolkit" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/08/27/documentation-for-the-ajaxcontroltoolkit/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Ready for some documentation for the ATK controls ? To skip my journey to create this , download the Documentation ( in CHM form) here : AjaxControlToolkit Docs Step 1 : Using AjaxDoc to generate the Reflection.org file required by Sandcastle &#160;&#160; 1.0) Download AjaxDoc here . &#160;&#160; 1.1) Download the Latest Source for the..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Documentation for the AjaxControlToolkit" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/08/27/documentation-for-the-ajaxcontroltoolkit/" />
+    <meta name="twitter:description" content="Ready for some documentation for the ATK controls ? To skip my journey to create this , download the Documentation ( in CHM form) here : AjaxControlToolkit Docs Step 1 : Using AjaxDoc to generate the Reflection.org file required by Sandcastle &#160;&#160; 1.0) Download AjaxDoc here . &#160;&#160; 1.1) Download the Latest Source for the..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p><strike></strike>
+<p>Ready for some documentation for the ATK controls ?    <br />To skip my journey to create this , download the Documentation ( in CHM form) here : <a href="http://cid-925c2d2bb2d03c6b.skydrive.live.com/self.aspx/AjaxControlToolkit%20Documentation/AjaxControlToolkit.chm">AjaxControlToolkit Docs</a></p>
+<h5>Step 1 : Using AjaxDoc to generate the Reflection.org file required by Sandcastle</h5>
+<p>&#160;&#160; 1.0) Download AjaxDoc <a href="http://www.codeplex.com/ajaxdoc">here </a>.     <br />&#160;&#160; 1.1) Download the Latest Source for the AjaxControlToolkit , <a href="http://www.codeplex.com/AjaxControlToolkit/Release/ProjectReleases.aspx?ReleaseId=16488">here</a> .&#160; <br />&#160;&#160; 1.2) Get the Script Files from the AjaxControlToolkit project .     <br />&#160;&#160; 1.3) Create the AjaxControlToolkit.project.xml for AjaxDoc which has script references to the ATK Scripts.     <br />&#160;&#160; 1.4) Run the Default.aspx page</p>
+<p>Hurdle 1 : DynamicPopulateBehavior.js just refused to load.&#160; <br />Added this line to ln 150 of ScriptDoc.js file to skip types which throw errors.     </p>
+<pre class="darkcsharpcode"> <span class="kwrd">if</span>(member ===<span class="kwrd">null</span> || <span class="kwrd">typeof</span>(member)===<span class="str">&quot;undefined&quot;</span>) <span class="kwrd">continue</span>; </pre>
+<p>&#160; 1.5) Run the Default.aspx page again</p>
+<p>Hurdle 2:&#160; “PopupBehavior is undefined”.</p>
+<p>1.6) Re-arranged the script references in the Project.xml file to order the script files according to their dependencies.</p>
+<p>1.7) Run the Default.aspx page again .</p>
+<p></p>
+<h5>Step 2 : Use SandCastle to produce the CHM File</h5>
+<p>Follow the Steps 5-12 defined here : <a href="http://blogs.msdn.com/sandcastle/archive/2006/07/29/Creating-a-Chm-build-using-Sandcastle.aspx">Creating a Chm build using Sandcastle</a></p>
+<p>Whichever Transform you use (Vs2005/Prototype) , in step 8, remove these lines in the sandcastle.config file.&#160; </p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">language</span> <span class="attr">label</span><span class="kwrd">=&quot;VisualBasic&quot;</span> <span class="attr">name</span><span class="kwrd">=&quot;VisualBasic&quot;</span> <span class="attr">style</span><span class="kwrd">=&quot;vb&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">language</span> <span class="attr">label</span><span class="kwrd">=&quot;CSharp&quot;</span> <span class="attr">name</span><span class="kwrd">=&quot;CSharp&quot;</span> <span class="attr">style</span><span class="kwrd">=&quot;cs&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">language</span> <span class="attr">label</span><span class="kwrd">=&quot;ManagedCPlusPlus&quot;</span> <span class="attr">name</span><span class="kwrd">=&quot;ManagedCPlusPlus&quot;</span> <span class="attr">style</span><span class="kwrd">=&quot;cpp&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="rem">&lt;!--&lt;language label=&quot;JSharp&quot; name=&quot;JSharp&quot; style=&quot;cs&quot; /&gt;</span>
+<span class="rem">&lt;language label=&quot;JScript&quot; name=&quot;JScript&quot; style=&quot;cs&quot; /&gt;--&gt;</span></pre>
+<p>There you go ! </p>
+<p>The CHM is not perfect ,&#160;
+<ol>
+<li>The documentation is missing for the following components
+<ol>
+<li>AnimationExtender </li>
+<li>RichTextEditor </li>
+<li>MultiHandleSlider </li>
+</ol>
+</li>
+<li>The Code Comments are missing from the CHM file </li>
+<li>Insert gripe here </li>
+</ol>
+<p>I'll probably take a look at this again to see if I can generate a CHM which has the missing parts.<br />
+  <br />And finally , while Its not everything , its not nothing either :) </p>
+<p>Resources:</p>
+<p><a href="http://weblogs.asp.net/bleroy/archive/2007/06/27/scriptdoc-1-0-available.aspx">Bertrand's blog </a></p>
+<p><a href="http://blogs.msdn.com/sandcastle/archive/2006/07/29/Creating-a-Chm-build-using-Sandcastle.aspx">SandCastle Blog</a></p>
+<p><a href="http://www.codeplex.com/ajaxdoc">AjaxDoc on CodePlex</a></p>
+<p><a href="http://www.codeplex.com/Sandcastle/">SandCastle on CodePlex</a></p>

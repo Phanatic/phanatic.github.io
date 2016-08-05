@@ -1,0 +1,391 @@
+---
+layout: post
+title: Scripting Animations from the Ms Ajax AnimationExtender
+date: 2007-05-31 17:54:38.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- Animation
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/05/31/scripting-animations-from-the-ms-ajax-animationextender.aspx
+  orig_site_id: '7524'
+  orig_post_id: '3013645'
+  orig_parent_id: '3013645'
+  orig_thread_id: '516607'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/05/31/scripting-animations-from-the-ms-ajax-animationextender.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Scripting Animations from the Ms Ajax AnimationExtender" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/05/31/scripting-animations-from-the-ms-ajax-animationextender/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="An ignored / unknown / very useful&nbsp; feature of the animation Framework is that it allows you to control the animation as its playing. You can Play, Pause , Resume , Stop and Quit&nbsp; an Animation Instance by using appropriate methods in JavaScript. Setting up the Animation The Animation we will be playing is a..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Scripting Animations from the Ms Ajax AnimationExtender" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/05/31/scripting-animations-from-the-ms-ajax-animationextender/" />
+    <meta name="twitter:description" content="An ignored / unknown / very useful&nbsp; feature of the animation Framework is that it allows you to control the animation as its playing. You can Play, Pause , Resume , Stop and Quit&nbsp; an Animation Instance by using appropriate methods in JavaScript. Setting up the Animation The Animation we will be playing is a..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<h1></h1>
+<p>An ignored / unknown / very useful&nbsp; feature of the animation Framework is that it allows you to control the animation as its playing.</p>
+<p>You can <strong><u>Play, Pause , Resume , Stop and Quit&nbsp;</u></strong> an Animation Instance by using appropriate methods in JavaScript.</p>
+<p><strong><u>Setting up the Animation</u></strong></p>
+<p>The Animation we will be playing is a Length Animation on a DIV element with ID "<font color="#ff0000">divMovable</font>".</p>
+<p>The DIV will Increase in length from 200 px to 550px over a duration of 1.5 Seconds OnClick of the DIV.</p>
+<h3>Markup For Div</h3>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="divMovable"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">class</span><span class="kwrd">="demoDivYellow"</span><span class="kwrd">&gt;</span>
+    I Move Away
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<h3><span class="kwrd">Markup for the Animation Extender</span></h3>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">BehaviorID</span><span class="kwrd">="controlledAnimation"</span>
+                        <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="divMovable"</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+             <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Length</span> <span class="attr">duration</span><span class="kwrd">="1.5"</span> <span class="attr">fps</span><span class="kwrd">="40"</span>
+                            <span class="attr">Property</span><span class="kwrd">="style"</span>  <span class="attr">PropertyKey</span><span class="kwrd">="height"</span>
+                            <span class="attr">StartValue</span><span class="kwrd">="200"</span>  <span class="attr">EndValue</span><span class="kwrd">="550"</span>
+                            <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="divMovable"</span> <span class="kwrd">/&gt;</span>
+              <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+         <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Notice that the AnimationExtender has the BehaviorID assigned to be "<font color="#0000ff"><strong>controlledAnimation</strong></font>".</p>
+<p>We will be accessing the Control Methods using this BehaviorID.</p>
+<p><strong><u>Playing An Animation</u></strong></p>
+<p>&nbsp;You&nbsp; can trigger an animation to start playing by calling the <font color="#ff0000"><strong>play</strong></font> method on&nbsp;the Animation Extender Behavior .</p>
+<pre class="csharpcode"><span class="kwrd">function</span> playAnimation() {
+            <span class="kwrd">var</span> onclkBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+            <font color="#008040"><font size="4"><strong>onclkBehavior.play();</strong></font>
+</font>        }</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong><u>Pausing An Animation</u></strong></p>
+<p>&nbsp;You&nbsp; can Pause an animation by calling the&nbsp;<font color="#ff0000"><strong>pause</strong></font> method on&nbsp;the Animation Extender Behavior .</p>
+<pre class="csharpcode"><span class="kwrd">function</span> pauseAnimation() {
+            <span class="kwrd">var</span> onclkBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+            <strong><font color="#008000" size="4">onclkBehavior.pause();</font></strong>
+        }</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong><u>Resuming a Paused Animation</u></strong></p>
+<p>You can Resume a Paused Animation by calling its <font color="#ff0000"><strong>play</strong></font> Method again :) .</p>
+<p><strong><u>Stopping A Playing&nbsp;Animation</u></strong></p>
+<p>&nbsp;You&nbsp; can Stop&nbsp;a playing animation by calling the&nbsp;<font color="#ff0000"><strong>stop </strong></font>method on&nbsp;the Animation Extender Behavior .</p>
+<pre class="csharpcode"><span class="kwrd">function</span> stopAnimation() {
+            <span class="kwrd">var</span> onclkBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+            <font color="#008040" size="4"><strong>onclkBehavior.stop();</strong></font>
+        }</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong><u>Quitting A Playing Animation</u></strong></p>
+<p>&nbsp;You&nbsp; can quit&nbsp; playing an animation by calling the&nbsp;<font color="#ff0000"><strong>quit </strong></font>method on&nbsp;the Animation Extender Behavior .</p>
+<pre class="csharpcode"><span class="kwrd">function</span> quitAnimation() {
+            <span class="kwrd">var</span> onclkBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+            <font color="#008040" size="4"><strong>onclkBehavior.quit();</strong></font>
+        }</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>&nbsp;</p>
+<p><strong><u>What's the Difference between Stop and Quit ?</u></strong></p>
+<p>Copied Text from the Remarks section of the <strong><u>Quit</u></strong> Function from AnimationBehavior.JS</p>
+<pre class="csharpcode"><span class="str">"Quit differs from the stop function which will update the final state.  The
+quit function is most useful for scenarios where you're toggling back and forth
+between two animations , like those used in OnHoverOver or OnHoverOut, and
+ you don't want to completely finish one animation if its counterpart is triggered"</span></pre>
+<pre class="csharpcode"><strong><u>Complete Sample</u></strong></pre>
+<pre class="csharpcode"><span class="asp">&lt;%@ Page Language="C#" AutoEventWireup="true"%&gt;</span>
+<span class="asp">&lt;%@ Register Assembly="AjaxControlToolkit, Version=1.0.10123.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e"
+    Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">id</span><span class="kwrd">="Head1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Controlling Animation With JavaScript<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">var</span> onclkBehavior ;
+        <span class="kwrd">function</span> pageLoad()
+        {
+            onclkBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+        }
+        <span class="kwrd">function</span> playAnimation() {
+
+            onclkBehavior.play();
+            $get(<span class="str">"lblCurrentStatus"</span>).innerText=<span class="str">"Playing.."</span>;
+        }
+        <span class="kwrd">function</span> pauseAnimation()
+        {
+
+           onclkBehavior.pause();
+           $get(<span class="str">"lblCurrentStatus"</span>).innerText=<span class="str">"Paused.."</span>;
+        }
+        <span class="kwrd">function</span> stopAnimation() {
+            onclkBehavior.stop();
+            $get(<span class="str">"lblCurrentStatus"</span>).innerText=<span class="str">"Stopped.."</span>;
+        }
+        <span class="kwrd">function</span> quitAnimation()
+        {
+            $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().quit();
+            $get(<span class="str">"lblCurrentStatus"</span>).innerText=<span class="str">"Quit.."</span>;
+        }
+    <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">="frmScripting"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">class</span><span class="kwrd">="purpleButtonClass"</span> <span class="attr">onclick</span><span class="kwrd">="playAnimation()"</span> <span class="attr">id</span><span class="kwrd">="btnPlayAnimation"</span>
+                           <span class="attr">value</span><span class="kwrd">="Play"</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">class</span><span class="kwrd">="purpleButtonClass"</span> <span class="attr">onclick</span><span class="kwrd">="pauseAnimation()"</span> <span class="attr">id</span><span class="kwrd">="btnPauseAnimation"</span>
+                           <span class="attr">value</span><span class="kwrd">="Pause"</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">class</span><span class="kwrd">="purpleButtonClass"</span> <span class="attr">onclick</span><span class="kwrd">="stopAnimation()"</span> <span class="attr">id</span><span class="kwrd">="btnStopAnimation"</span>
+                           <span class="attr">value</span><span class="kwrd">="Stop"</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">class</span><span class="kwrd">="purpleButtonClass"</span> <span class="attr">onclick</span><span class="kwrd">="quitAnimation()"</span> <span class="attr">id</span><span class="kwrd">="btnQuitAnimation"</span>
+                           <span class="attr">value</span><span class="kwrd">="Quit"</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">span</span> <span class="attr">id</span><span class="kwrd">="lblCurrentStatus"</span><span class="kwrd">&gt;&lt;/</span><span class="html">span</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="kwrd"></span>
+<span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="divMovable"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">class</span><span class="kwrd">="demoDivYellow"</span><span class="kwrd">&gt;</span>
+    I Move Away
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+
+<span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">BehaviorID</span><span class="kwrd">="controlledAnimation"</span>
+    <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="divMovable"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Length</span> <span class="attr">duration</span><span class="kwrd">="1.5"</span> <span class="attr">fps</span><span class="kwrd">="40"</span>
+                    <span class="attr">Property</span><span class="kwrd">="style"</span>  <span class="attr">PropertyKey</span><span class="kwrd">="height"</span>
+                    <span class="attr">StartValue</span><span class="kwrd">="200"</span>  <span class="attr">EndValue</span><span class="kwrd">="550"</span>
+                    <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">AnimationTarget</span><span class="kwrd">="divMovable"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AnimationExtender</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd"><font color="#000000" size="4">Hope this helps someone out there!</font></span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

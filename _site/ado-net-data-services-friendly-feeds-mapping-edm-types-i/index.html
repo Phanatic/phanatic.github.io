@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ADO.NET Data Services Friendly Feeds , Mapping EDM Types - I – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="As I mentioned in my last blog post , here are some samples of how to map your entity properties to Atom/custom markup in the atom:entry element. You can apply Friendly Feed mappings on the EDM entity types by adding attributes to the CSDL of the Entity Data Model . We will focus on the kinds of mappings and how to achieve them . 
+Pre-requisites 
+1. To edit the CSDL , you will need to open the EDM model in Xml view .To do this , right-click the EDM model (.EDMX file ) in Visual Studio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and select “Open with”-&gt;”Xml Editor” . 2. Add a reference to this namespace in the &lt;edmx:ConceptualModels&gt; node&nbsp; of the CSDL section in the EDMX file : &nbsp;&nbsp;&nbsp; ex: xmlns:m2="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+1) Mapping to ATOM elements in the atom:entry payload :&nbsp; The EntityPropertyMapping (EPM) attribute has two constructors , one which binds the property to an Atom element in the feed , and another which binds the property to a custom element . We shall discuss the former in this section. 
+For ATOM Mappings , the EPM markup has the following attributes .
+
+m2:FC_SourcePath: The m2:FC_SourcePath is used when &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) The Property you are mapping exists in a base type and not on the current type . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b) The property you are mapping exists in a complex type and not on the current type . 
+m2:FC_TargetPath : The atom:entry element to which this property has to be mapped to 
+m2:FC_ContentKind: The content-type of the mapped&nbsp; atom:entry element 
+m2:FC_KeepInContent : set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. 
+
+Lets proceed&nbsp; , using the same BlogPost&nbsp; type that we discussed last time . This is the EDM Markup for the type : 
+&lt;EntityType Name="BlogPost"&gt;
+  &lt;Key&gt;
+    &lt;PropertyRef Name="BlogPostID" /&gt;
+  &lt;/Key&gt;
+  &lt;Property Name="Lat" Type="Edm.Double" Nullable="false"/&gt;
+  &lt;Property Name="Long" Type="Edm.Double" Nullable="false"/&gt;
+  &lt;Property Name="Published" Type="Edm.DateTime" Nullable="false" /&gt;
+  &lt;Property Name="BlogPostID" Type="Edm.Int32" Nullable="false" /&gt;
+  &lt;Property Name="Title" Type="Edm.String" Nullable="true"/&gt;
+  &lt;Property Name="Body" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="Author" Type="Edm.String" Nullable="true"/&gt;
+  &lt;Property Name="PostURI" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="ContentSummary" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="IconUri" Type="Edm.String" Nullable="true"/&gt;
+&lt;/EntityType&gt;&nbsp;
+
+1. Map the “Title” property&nbsp; of the BlogPost Entity type to the entry:title element 
+When decorating EDM&nbsp; types , the markup specifying the mapping goes on the property you are mapping , ex:
+&lt;Property Name="Title" Type="Edm.String" Nullable="true"
+  m2:FC_TargetPath="SyndicationTitle"
+  m2:FC_EpmContentKind="Plaintext"
+  m2:FC_EpmKeepInContent="true" /&gt;
+
+2. Map the “Author” property to entry:author element&nbsp; 
+This is what the markup would look like :
+&lt;Property Name="Author" Type="Edm.String" Nullable="true"
+           m2:FC_TargetPath="SyndicationAuthorName"
+           m2:FC_ContentKind="Plaintext"
+           m2:FC_KeepInContent="true" /&gt;
+
+As described in&nbsp; my previous blog post , you can map an Entity’s properties to the following atom:entry elements in the payload :
+
+
+
+atom:entry Element 
+m2:FC_TargetPath 
+
+
+entry:author/email 
+SyndicationAuthorEmail
+
+
+entry:author/name
+SyndicationAuthorName
+
+
+entry:author/uri 
+SyndicationAuthorUri
+
+
+entry:published 
+SyndicationPublished
+
+
+entry:rights 
+SyndicationRights
+
+
+entry:summary 
+SyndicationRights
+
+
+entry:title 
+SyndicationTitle
+
+
+
+
+
+
+
+Content-Kind 
+m2:FC_ContentKind
+
+
+Plaintext
+Plaintext
+
+
+Html
+Html
+
+
+Xhtml
+XHtml
+
+
+Default if not specified. 
+PlainText
+
+
+
+2) Mapping to non-ATOM/custom&nbsp; elements in the atom:entry payload :&nbsp; 
+For non-ATOM/custom Mappings , the EPM markup requires the following attributes.
+
+m2:FC_SourcePath&nbsp;&nbsp; : The property of the Entity Type whose value should be mapped 
+m2:FC_TargetPath&nbsp; &nbsp; : The xml path markup which describes the path to the custom markup this property should be mapped to . 
+m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : The xml prefix for the custom element/attribute that this property is mapped to. 
+m2:FC_NsUri&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : The xml namespace to which the custom element/attribute that this property is mapped should be under. 
+m2:FC_KeepInContent : set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. 
+
+
+The Xml Path syntax for custom mappings.
+this syntax is very logical and looks like the following . Lets say that you wanted to map a property to a custom element in markup that looks like this : 
+&lt;mycustomRoot xmlns=”http://www.mycustomFormat.org”&gt;
+  &lt;customElement&gt;property value goes here&lt;/customElement&gt;
+&lt;/mycustomRoot&gt;
+
+for this example , m2:FC_TargetPath&nbsp; would be “mycustomRoot/customElement” m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; would be an empty string as this markup has no custom prefix. m2:FC_NsUri&nbsp; would be “http://www.mycustomFormat.org” m2:FC_KeepInContent is subjective to whether you want to keep the property value in the &lt;content&gt; section or not.
+and now , lets say that you wanted to map a property to a custom attribute of an element in markup that looks like this : 
+&lt;me:mycustomRoot xmlns:me="http://www.georss.org.georss"&gt;
+  &lt;me:customElement customAttribute="property value goes here"&gt;&lt;/me:customElement&gt;
+&lt;/me:mycustomRoot&gt;
+for this example , m2:FC_TargetPath&nbsp; would be “mycustomRoot/customElement/@customAttribute” m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; would be “me”. m2:FC_NsUri&nbsp; would be “http://www.mycustomFormat.org” m2:FC_KeepContent is subjective to whether you want to keep the property value in the &lt;content&gt; section or not. 
+A note , the complexity of your custom markup has a direct effect on the performance costs&nbsp; for Serialization/De-Serialization of the entity type . with this example , lets map the lat &amp; long properties to geoRss markup ,which looks like this : 
+&lt;geo:lat xmlns:geo="http://www.georss.org/georss"&gt;47.684&lt;/geo:lat&gt;
+&lt;geo:long xmlns:geo="http://www.georss.org/georss"&gt;-122.122&lt;/geo:long&gt;
+Final type definition looks like this : 
+&lt;EntityType Name="BlogPost"&gt;
+  &lt;Key&gt;
+    &lt;PropertyRef Name="BlogPostID" /&gt;
+  &lt;/Key&gt;
+  &lt;!-- map the Lat property to the &lt;geo:lat&gt; element  --&gt;
+  &lt;Property Name="Lat" Type="Edm.Double" Nullable="false"
+            m2:FC_TargetPath="lat"
+            m2:FC_NsUri="http://www.georss.org/georss"
+            m2:FC_NsPrefix="geo"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;!-- map the Long property to the &lt;geo:long&gt; element  --&gt;
+  &lt;Property Name="Long" Type="Edm.Double" Nullable="false"
+            m2:FC_TargetPath="long"
+            m2:FC_NsUri="http://www.georss.org/georss"
+            m2:FC_NsPrefix="geo"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;!-- Map the “Title” property  of the BlogPost Entity type to the entry:title element --&gt;
+  &lt;Property Name="Title" Type="Edm.String" Nullable="true"
+            m2:FC_TargetPath="EpmSyndicationTitle"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;Property Name="Body" Type="Edm.String" Nullable="true" /&gt;
+  &lt;!-- Map the “Author” property to entry:author element  --&gt;
+  &lt;Property Name="Author" Type="Edm.String" Nullable="true"
+            m2:FC_TargetPath="EpmSyndicationAuthorName"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;Property Name="BlogPostID" Type="Edm.Int32" Nullable="false" /&gt;
+  &lt;Property Name="Published" Type="Edm.DateTime" Nullable="false" /&gt;
+  &lt;Property Name="PostURI" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="ContentSummary" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="IconUri" Type="Edm.String" Nullable="true"/&gt;
+&lt;/EntityType&gt;
+
+
+Special cases 
+I . Complex type properties
+[I’ll leave the type definitions as CLR types so that its easier to visualize the relations.] 
+Consider the following model , 
+public class Address
+    {
+        public long DoorNumber { get; set; }
+        public string Street { get; set; }
+        public int ZipCode { get; set; }
+    }
+    [DataServiceKey("CustomerID")]
+    public class Customer
+    {
+        public int CustomerID { get; set; }
+        public Address myAddress { get; set; }
+    }
+
+and lets say that you wanted to map the property Street of the complex type Address when accessed through the entity type “Customer”&nbsp; to the atom:title element ,
+this can be achieved via setting the EpmSourcePath property to “Street”&nbsp; . In this case , the Epm markup would look like this :
+&lt;EntityType Name="Customer"&gt;
+  &lt;!-- Map the Street property of the Address complex type to the entry:title element --&gt;
+  &lt;Property Name="myAddress" Type="MyModelNamespace.Address"
+            me:EpmSourcePath="Street"
+            m2:FC_Atom="true"
+            m2:FC_TargetPath="EpmSyndicationTitle"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true"/&gt;
+  &lt;!-- other properties removed for brevity--&gt;
+&lt;/EntityType&gt;
+
+II Mapping properties declared&nbsp; on base type 
+Consider this data model :
+[DataServiceKey("CustomerID")]
+public class Customer
+{
+        public int CustomerID { get; set; }
+        public Address myAddress { get; set; }
+        public string BaseTypeField { get; set; }
+}
+
+public class DerivedCustomer : Customer
+{
+  public string DerivedTypeField { get; set; }
+}
+and you want to map a property declared on the Base type “Customer” on the derived type “DerivedCustomer” The EPM Markup would look like this :
+&lt;!-- Map the "BaseTypeField" property of the base type "Customer" to the entry:title element --&gt;
+&lt;EntityType Name="DerivedCustomer" BaseType="MyModelNamespace.Customer"
+            m2:FC_SourcePath="BaseTypeField"
+            m2:FC_TargetPath="EpmSyndicationAuthorName"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true"&gt;
+  &lt;!-- other properties removed for brevity--&gt;
+&lt;/EntityType&gt;
+
+Considerations for location&nbsp; of EPM markup in EDM Schema
+Use the following guidelines to decide where in the EDM Schema you should add the attribute for either ATOM or custom Mappings,
+
+
+
+Where is property defined ?
+Where do I apply the EPM attribute?
+SourcePath 
+
+
+Simple property on the Entity Type ex: “Title” property of “BlogPost” type above
+&lt;Property&gt; node in the &lt;Entitytype&gt; markup
+Not required
+
+
+Simple property on entity’s base type
+&lt;EntityType&gt; node 
+Base type property name
+
+
+Complex Property on the Entity Type
+Complex Types cannot be mapped directly 
+N/A
+
+
+Simple property defined on complex type which is a property on an Entity Type
+&lt;Property&gt; node in the &lt;EntityType&gt; 
+Complex type’s simple property name
+
+
+
+Hope you enjoyed this post about applying Friendly Feeds mappings to EDMdata models. The second part of this post will discuss more special cases in EDM Models and troubleshooting failing mappings and also a sample project for EDM Friendly Feeds Mappings.
+" />
+    <meta property="og:description" content="As I mentioned in my last blog post , here are some samples of how to map your entity properties to Atom/custom markup in the atom:entry element. You can apply Friendly Feed mappings on the EDM entity types by adding attributes to the CSDL of the Entity Data Model . We will focus on the kinds of mappings and how to achieve them . 
+Pre-requisites 
+1. To edit the CSDL , you will need to open the EDM model in Xml view .To do this , right-click the EDM model (.EDMX file ) in Visual Studio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and select “Open with”-&gt;”Xml Editor” . 2. Add a reference to this namespace in the &lt;edmx:ConceptualModels&gt; node&nbsp; of the CSDL section in the EDMX file : &nbsp;&nbsp;&nbsp; ex: xmlns:m2="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+1) Mapping to ATOM elements in the atom:entry payload :&nbsp; The EntityPropertyMapping (EPM) attribute has two constructors , one which binds the property to an Atom element in the feed , and another which binds the property to a custom element . We shall discuss the former in this section. 
+For ATOM Mappings , the EPM markup has the following attributes .
+
+m2:FC_SourcePath: The m2:FC_SourcePath is used when &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) The Property you are mapping exists in a base type and not on the current type . &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b) The property you are mapping exists in a complex type and not on the current type . 
+m2:FC_TargetPath : The atom:entry element to which this property has to be mapped to 
+m2:FC_ContentKind: The content-type of the mapped&nbsp; atom:entry element 
+m2:FC_KeepInContent : set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. 
+
+Lets proceed&nbsp; , using the same BlogPost&nbsp; type that we discussed last time . This is the EDM Markup for the type : 
+&lt;EntityType Name="BlogPost"&gt;
+  &lt;Key&gt;
+    &lt;PropertyRef Name="BlogPostID" /&gt;
+  &lt;/Key&gt;
+  &lt;Property Name="Lat" Type="Edm.Double" Nullable="false"/&gt;
+  &lt;Property Name="Long" Type="Edm.Double" Nullable="false"/&gt;
+  &lt;Property Name="Published" Type="Edm.DateTime" Nullable="false" /&gt;
+  &lt;Property Name="BlogPostID" Type="Edm.Int32" Nullable="false" /&gt;
+  &lt;Property Name="Title" Type="Edm.String" Nullable="true"/&gt;
+  &lt;Property Name="Body" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="Author" Type="Edm.String" Nullable="true"/&gt;
+  &lt;Property Name="PostURI" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="ContentSummary" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="IconUri" Type="Edm.String" Nullable="true"/&gt;
+&lt;/EntityType&gt;&nbsp;
+
+1. Map the “Title” property&nbsp; of the BlogPost Entity type to the entry:title element 
+When decorating EDM&nbsp; types , the markup specifying the mapping goes on the property you are mapping , ex:
+&lt;Property Name="Title" Type="Edm.String" Nullable="true"
+  m2:FC_TargetPath="SyndicationTitle"
+  m2:FC_EpmContentKind="Plaintext"
+  m2:FC_EpmKeepInContent="true" /&gt;
+
+2. Map the “Author” property to entry:author element&nbsp; 
+This is what the markup would look like :
+&lt;Property Name="Author" Type="Edm.String" Nullable="true"
+           m2:FC_TargetPath="SyndicationAuthorName"
+           m2:FC_ContentKind="Plaintext"
+           m2:FC_KeepInContent="true" /&gt;
+
+As described in&nbsp; my previous blog post , you can map an Entity’s properties to the following atom:entry elements in the payload :
+
+
+
+atom:entry Element 
+m2:FC_TargetPath 
+
+
+entry:author/email 
+SyndicationAuthorEmail
+
+
+entry:author/name
+SyndicationAuthorName
+
+
+entry:author/uri 
+SyndicationAuthorUri
+
+
+entry:published 
+SyndicationPublished
+
+
+entry:rights 
+SyndicationRights
+
+
+entry:summary 
+SyndicationRights
+
+
+entry:title 
+SyndicationTitle
+
+
+
+
+
+
+
+Content-Kind 
+m2:FC_ContentKind
+
+
+Plaintext
+Plaintext
+
+
+Html
+Html
+
+
+Xhtml
+XHtml
+
+
+Default if not specified. 
+PlainText
+
+
+
+2) Mapping to non-ATOM/custom&nbsp; elements in the atom:entry payload :&nbsp; 
+For non-ATOM/custom Mappings , the EPM markup requires the following attributes.
+
+m2:FC_SourcePath&nbsp;&nbsp; : The property of the Entity Type whose value should be mapped 
+m2:FC_TargetPath&nbsp; &nbsp; : The xml path markup which describes the path to the custom markup this property should be mapped to . 
+m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : The xml prefix for the custom element/attribute that this property is mapped to. 
+m2:FC_NsUri&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : The xml namespace to which the custom element/attribute that this property is mapped should be under. 
+m2:FC_KeepInContent : set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. 
+
+
+The Xml Path syntax for custom mappings.
+this syntax is very logical and looks like the following . Lets say that you wanted to map a property to a custom element in markup that looks like this : 
+&lt;mycustomRoot xmlns=”http://www.mycustomFormat.org”&gt;
+  &lt;customElement&gt;property value goes here&lt;/customElement&gt;
+&lt;/mycustomRoot&gt;
+
+for this example , m2:FC_TargetPath&nbsp; would be “mycustomRoot/customElement” m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; would be an empty string as this markup has no custom prefix. m2:FC_NsUri&nbsp; would be “http://www.mycustomFormat.org” m2:FC_KeepInContent is subjective to whether you want to keep the property value in the &lt;content&gt; section or not.
+and now , lets say that you wanted to map a property to a custom attribute of an element in markup that looks like this : 
+&lt;me:mycustomRoot xmlns:me="http://www.georss.org.georss"&gt;
+  &lt;me:customElement customAttribute="property value goes here"&gt;&lt;/me:customElement&gt;
+&lt;/me:mycustomRoot&gt;
+for this example , m2:FC_TargetPath&nbsp; would be “mycustomRoot/customElement/@customAttribute” m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; would be “me”. m2:FC_NsUri&nbsp; would be “http://www.mycustomFormat.org” m2:FC_KeepContent is subjective to whether you want to keep the property value in the &lt;content&gt; section or not. 
+A note , the complexity of your custom markup has a direct effect on the performance costs&nbsp; for Serialization/De-Serialization of the entity type . with this example , lets map the lat &amp; long properties to geoRss markup ,which looks like this : 
+&lt;geo:lat xmlns:geo="http://www.georss.org/georss"&gt;47.684&lt;/geo:lat&gt;
+&lt;geo:long xmlns:geo="http://www.georss.org/georss"&gt;-122.122&lt;/geo:long&gt;
+Final type definition looks like this : 
+&lt;EntityType Name="BlogPost"&gt;
+  &lt;Key&gt;
+    &lt;PropertyRef Name="BlogPostID" /&gt;
+  &lt;/Key&gt;
+  &lt;!-- map the Lat property to the &lt;geo:lat&gt; element  --&gt;
+  &lt;Property Name="Lat" Type="Edm.Double" Nullable="false"
+            m2:FC_TargetPath="lat"
+            m2:FC_NsUri="http://www.georss.org/georss"
+            m2:FC_NsPrefix="geo"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;!-- map the Long property to the &lt;geo:long&gt; element  --&gt;
+  &lt;Property Name="Long" Type="Edm.Double" Nullable="false"
+            m2:FC_TargetPath="long"
+            m2:FC_NsUri="http://www.georss.org/georss"
+            m2:FC_NsPrefix="geo"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;!-- Map the “Title” property  of the BlogPost Entity type to the entry:title element --&gt;
+  &lt;Property Name="Title" Type="Edm.String" Nullable="true"
+            m2:FC_TargetPath="EpmSyndicationTitle"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;Property Name="Body" Type="Edm.String" Nullable="true" /&gt;
+  &lt;!-- Map the “Author” property to entry:author element  --&gt;
+  &lt;Property Name="Author" Type="Edm.String" Nullable="true"
+            m2:FC_TargetPath="EpmSyndicationAuthorName"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true" /&gt;
+  &lt;Property Name="BlogPostID" Type="Edm.Int32" Nullable="false" /&gt;
+  &lt;Property Name="Published" Type="Edm.DateTime" Nullable="false" /&gt;
+  &lt;Property Name="PostURI" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="ContentSummary" Type="Edm.String" Nullable="true" /&gt;
+  &lt;Property Name="IconUri" Type="Edm.String" Nullable="true"/&gt;
+&lt;/EntityType&gt;
+
+
+Special cases 
+I . Complex type properties
+[I’ll leave the type definitions as CLR types so that its easier to visualize the relations.] 
+Consider the following model , 
+public class Address
+    {
+        public long DoorNumber { get; set; }
+        public string Street { get; set; }
+        public int ZipCode { get; set; }
+    }
+    [DataServiceKey("CustomerID")]
+    public class Customer
+    {
+        public int CustomerID { get; set; }
+        public Address myAddress { get; set; }
+    }
+
+and lets say that you wanted to map the property Street of the complex type Address when accessed through the entity type “Customer”&nbsp; to the atom:title element ,
+this can be achieved via setting the EpmSourcePath property to “Street”&nbsp; . In this case , the Epm markup would look like this :
+&lt;EntityType Name="Customer"&gt;
+  &lt;!-- Map the Street property of the Address complex type to the entry:title element --&gt;
+  &lt;Property Name="myAddress" Type="MyModelNamespace.Address"
+            me:EpmSourcePath="Street"
+            m2:FC_Atom="true"
+            m2:FC_TargetPath="EpmSyndicationTitle"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true"/&gt;
+  &lt;!-- other properties removed for brevity--&gt;
+&lt;/EntityType&gt;
+
+II Mapping properties declared&nbsp; on base type 
+Consider this data model :
+[DataServiceKey("CustomerID")]
+public class Customer
+{
+        public int CustomerID { get; set; }
+        public Address myAddress { get; set; }
+        public string BaseTypeField { get; set; }
+}
+
+public class DerivedCustomer : Customer
+{
+  public string DerivedTypeField { get; set; }
+}
+and you want to map a property declared on the Base type “Customer” on the derived type “DerivedCustomer” The EPM Markup would look like this :
+&lt;!-- Map the "BaseTypeField" property of the base type "Customer" to the entry:title element --&gt;
+&lt;EntityType Name="DerivedCustomer" BaseType="MyModelNamespace.Customer"
+            m2:FC_SourcePath="BaseTypeField"
+            m2:FC_TargetPath="EpmSyndicationAuthorName"
+            m2:FC_ContentKind="EpmPlaintext"
+            m2:FC_KeepContent="true"&gt;
+  &lt;!-- other properties removed for brevity--&gt;
+&lt;/EntityType&gt;
+
+Considerations for location&nbsp; of EPM markup in EDM Schema
+Use the following guidelines to decide where in the EDM Schema you should add the attribute for either ATOM or custom Mappings,
+
+
+
+Where is property defined ?
+Where do I apply the EPM attribute?
+SourcePath 
+
+
+Simple property on the Entity Type ex: “Title” property of “BlogPost” type above
+&lt;Property&gt; node in the &lt;Entitytype&gt; markup
+Not required
+
+
+Simple property on entity’s base type
+&lt;EntityType&gt; node 
+Base type property name
+
+
+Complex Property on the Entity Type
+Complex Types cannot be mapped directly 
+N/A
+
+
+Simple property defined on complex type which is a property on an Entity Type
+&lt;Property&gt; node in the &lt;EntityType&gt; 
+Complex type’s simple property name
+
+
+
+Hope you enjoyed this post about applying Friendly Feeds mappings to EDMdata models. The second part of this post will discuss more special cases in EDM Models and troubleshooting failing mappings and also a sample project for EDM Friendly Feeds Mappings.
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ADO.NET Data Services Friendly Feeds , Mapping EDM Types - I" />
+    <meta property="twitter:title" content="ADO.NET Data Services Friendly Feeds , Mapping EDM Types - I" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ADO.NET Data Services Friendly Feeds , Mapping EDM Types - I</h1>
+
+  <div class="entry">
+    <p>As I mentioned in my <a href="http://blogs.msdn.com/phaniraj/archive/2009/03/18/introducing-web-friendly-feeds-aka-friendly-feeds.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2009/03/18/introducing-web-friendly-feeds-aka-friendly-feeds.aspx">last blog post</a> , here are some samples of how to map your entity properties to Atom/custom markup in the atom:entry element. <br />You can apply Friendly Feed mappings on the EDM entity types by adding attributes to the CSDL of the Entity Data Model . <br />We will focus on the kinds of mappings and how to achieve them . </p>
+<p><strong>Pre-requisites </p>
+<p></strong>1. To edit the CSDL , you will need to open the EDM model in Xml view .To do this , right-click the EDM model (.EDMX file ) in Visual Studio <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and select “Open with”-&gt;”Xml Editor” . <br />2. Add a reference to this namespace in the <strong>&lt;edmx:ConceptualModels&gt; </strong>node&nbsp; of the CSDL section in the EDMX file : <br />&nbsp;&nbsp;&nbsp; ex: <em><strong>xmlns:m2="</strong></em><a title="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" href="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" mce_href="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"><strong>http://schemas.microsoft.com/ado/2007/08/dataservices/metadata</strong></a><em><strong>"</strong></em></p>
+<p><strong>1) Mapping to ATOM elements in the atom:entry payload :&nbsp; <br /></strong>The EntityPropertyMapping (EPM) attribute has two constructors , one which binds the property to an Atom element in the feed , <br />and another which binds the property to a custom element . We shall discuss the former in this section. </p>
+<p>For ATOM Mappings , the EPM markup has the following attributes .</p>
+<ol>
+<li><b>m2:FC_SourcePath</b>: The <b>m2:FC_SourcePath</b> is used when <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) The Property you are mapping exists in a base type and not on the current type . <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b) The property you are mapping exists in a complex type and not on the current type . </li>
+<li><b>m2:FC_TargetPath </b>: The atom:entry element to which this property has to be mapped to </li>
+<li><strong>m2:FC_ContentKind</strong>: The content-type of the mapped&nbsp; atom:entry element </li>
+<li><b>m2:FC_KeepInContent </b>: set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. </li>
+</ol>
+<p>Lets proceed&nbsp; , using the same BlogPost&nbsp; type that we <a href="http://blogs.msdn.com/phaniraj/archive/2009/03/18/introducing-web-friendly-feeds-aka-friendly-feeds.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2009/03/18/introducing-web-friendly-feeds-aka-friendly-feeds.aspx">discussed last time</a> . <br />This is the EDM Markup for the type : </p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">EntityType </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPost</span>"<span style="COLOR: blue">&gt;
+  &lt;</span><span style="COLOR: #a31515">Key</span><span style="COLOR: blue">&gt;
+    &lt;</span><span style="COLOR: #a31515">PropertyRef </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPostID</span>" <span style="COLOR: blue">/&gt;
+  &lt;/</span><span style="COLOR: #a31515">Key</span><span style="COLOR: blue">&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Lat</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Double</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>"<span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Long</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Double</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>"<span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Published</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.DateTime</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPostID</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Int32</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Title</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Body</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Author</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">PostURI</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">ContentSummary</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">IconUri</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">/&gt;
+&lt;/</span><span style="COLOR: #a31515">EntityType</span><span style="COLOR: blue">&gt;</span>&nbsp;</pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p>1. Map the “Title” property&nbsp; of the BlogPost Entity type to the entry:title element </p>
+<p>When decorating EDM&nbsp; types , the markup specifying the mapping goes on the property you are mapping , <br />ex:</p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Title</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"
+  <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">SyndicationTitle</span>"
+  <span style="COLOR: red">m2:FC_EpmContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Plaintext</span>"
+  <span style="COLOR: red">m2:FC_EpmKeepInContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;</span></pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p>2. Map the “Author” property to entry:author element&nbsp; </p>
+<p>This is what the markup would look like :</p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Author</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"
+           <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">SyndicationAuthorName</span>"
+           <span style="COLOR: red">m2:FC_ContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Plaintext</span>"
+           <span style="COLOR: red">m2:FC_KeepInContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;</span></pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p>As described in&nbsp; my previous blog post , you can map an Entity’s properties to the following atom:entry elements in the payload <strong>:</strong></p>
+<table border="0" cellspacing="0" cellpadding="2" width="512">
+<tbody>
+<tr>
+<td valign="top" width="200"><strong>atom:entry Element </strong></td>
+<td valign="top" width="310"><b>m2:FC_TargetPath </b></td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:author/email </td>
+<td valign="top" width="310">SyndicationAuthorEmail</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:author/name</td>
+<td valign="top" width="310">SyndicationAuthorName</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:author/uri </td>
+<td valign="top" width="310">SyndicationAuthorUri</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:published </td>
+<td valign="top" width="310">SyndicationPublished</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:rights </td>
+<td valign="top" width="310">SyndicationRights</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:summary </td>
+<td valign="top" width="310">SyndicationRights</td>
+</tr>
+<tr>
+<td valign="top" width="200">entry:title </td>
+<td valign="top" width="310">SyndicationTitle</td>
+</tr>
+</tbody>
+</table>
+<p></p>
+<table border="0" cellspacing="0" cellpadding="2" width="400">
+<tbody>
+<tr>
+<td valign="top" width="204"><b>Content-Kind </b></td>
+<td valign="top" width="196"><strong>m2:FC_ContentKind</strong></td>
+</tr>
+<tr>
+<td valign="top" width="204">Plaintext</td>
+<td valign="top" width="196">Plaintext</td>
+</tr>
+<tr>
+<td valign="top" width="204">Html</td>
+<td valign="top" width="196">Html</td>
+</tr>
+<tr>
+<td valign="top" width="204">Xhtml</td>
+<td valign="top" width="196">XHtml</td>
+</tr>
+<tr>
+<td valign="top" width="204">Default if not specified. </td>
+<td valign="top" width="196">PlainText</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2) Mapping to non-ATOM/custom&nbsp; elements in the atom:entry payload :&nbsp; </strong></p>
+<p>For non-ATOM/custom Mappings , the EPM markup requires the following attributes.</p>
+<ol>
+<li><b>m2:FC_SourcePath&nbsp;&nbsp; </b>: The property of the Entity Type whose value should be mapped </li>
+<li><b>m2:FC_TargetPath&nbsp; </b>&nbsp; : The xml path markup which describes the path to the custom markup this property should be mapped to . </li>
+<li><b>m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>: The xml prefix for the custom element/attribute that this property is mapped to. </li>
+<li><b>m2:FC_NsUri&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>: The xml namespace to which the custom element/attribute that this property is mapped should be under. </li>
+<li><b>m2:FC_KeepInContent </b>: set this to false if you want the entity’s property value to turn up only in the mapped atom:entry element and not in the &lt;contents&gt; section. </li>
+</ol>
+<p><strong></strong></p>
+<p><strong>The Xml Path syntax for custom mappings.</strong></p>
+<p>this syntax is very logical and looks like the following . <br />Lets say that you wanted to map a property to a custom element in markup that looks like this : </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">mycustomRoot</span> <span class="attr">xmlns</span><span class="kwrd">=”<a href="http://www.mycustomformat.org/" mce_href="http://www.mycustomFormat.org">http://www.mycustomFormat.org</a>”</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">customElement</span><span class="kwrd">&gt;</span>property value goes here<span class="kwrd">&lt;/</span><span class="html">customElement</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">mycustomRoot</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>for this example , <br /><b>m2:FC_TargetPath&nbsp; </b>would be “<span class="html">mycustomRoot</span>/<span>customElement” <br /><b>m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>would be an empty string as this markup has no custom prefix. <br /><b>m2:FC_NsUri&nbsp; </b>would be “<a href="http://www.mycustomformat.org/" mce_href="http://www.mycustomFormat.org">http://www.mycustomFormat.org</a>” <br /><b>m2:FC_KeepInContent </b>is subjective to whether you want to keep the property value in the &lt;content&gt; section or not.</span></p>
+<p>and now , lets say that you wanted to map a property to a custom attribute of an element in markup that looks like this : </p>
+<pre class="csharpcode"><span class="kwrd">&lt;me:</span><span class="html">mycustomRoot</span> <span class="attr">xmlns:me</span><span class="kwrd">="http://www.georss.org.georss"</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;me:</span><span class="html">customElement</span> <span class="attr">customAttribute</span><span class="kwrd">="property value goes here"</span><span class="kwrd">&gt;&lt;/me:</span><span class="html">customElement</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/me:</span><span class="html">mycustomRoot</span><span class="kwrd">&gt;</span></pre>
+<p>for this example , <br /><b>m2:FC_TargetPath&nbsp; </b>would be <a href="mailto:“mycustomRoot/customElement/@customAttribute" mce_href="mailto:“mycustomRoot/customElement/@customAttribute">“mycustomRoot/customElement/@customAttribute</a>” <br /><b>m2:FC_NsPrefix&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b>would be “me”. <br /><b>m2:FC_NsUri&nbsp; </b>would be “http://www.mycustomFormat.org” <br /><b>m2:FC_KeepContent </b>is subjective to whether you want to keep the property value in the &lt;content&gt; section or not. </p>
+<p>A note , the complexity of your custom markup has a direct effect on the performance costs&nbsp; for Serialization/De-Serialization of the entity type . <br />with this example , lets map the lat &amp; long properties to geoRss markup ,which looks like this : </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">geo:lat</span> <span class="attr">xmlns:geo</span><span class="kwrd">="http://www.georss.org/georss"</span><span class="kwrd">&gt;</span>47.684<span class="kwrd">&lt;/</span><span class="html">geo:lat</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">geo:long</span> <span class="attr">xmlns:geo</span><span class="kwrd">="http://www.georss.org/georss"</span><span class="kwrd">&gt;</span>-122.122<span class="kwrd">&lt;/</span><span class="html">geo:long</span><span class="kwrd">&gt;</span></pre>
+<p>Final type definition looks like this : </p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">EntityType </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPost</span>"<span style="COLOR: blue">&gt;
+  &lt;</span><span style="COLOR: #a31515">Key</span><span style="COLOR: blue">&gt;
+    &lt;</span><span style="COLOR: #a31515">PropertyRef </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPostID</span>" <span style="COLOR: blue">/&gt;
+  &lt;/</span><span style="COLOR: #a31515">Key</span><span style="COLOR: blue">&gt;
+  &lt;!-- </span><span style="COLOR: green">map the Lat property to the &lt;geo:lat&gt; element  </span><span style="COLOR: blue">--&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Lat</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Double</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>"
+            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">lat</span>"
+            <span style="COLOR: red">m2:FC_NsUri</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">http://www.georss.org/georss</span>"
+            <span style="COLOR: red">m2:FC_NsPrefix</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">geo</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;!-- </span><span style="COLOR: green">map the Long property to the &lt;geo:long&gt; element  </span><span style="COLOR: blue">--&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Long</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Double</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>"
+            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">long</span>"
+            <span style="COLOR: red">m2:FC_NsUri</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">http://www.georss.org/georss</span>"
+            <span style="COLOR: red">m2:FC_NsPrefix</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">geo</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;!-- </span><span style="COLOR: green">Map the “Title” property  of the BlogPost Entity type to the entry:title element </span><span style="COLOR: blue">--&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Title</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"
+            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmSyndicationTitle</span>"
+            <span style="COLOR: red">m2:FC_ContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmPlaintext</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Body</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;!-- </span><span style="COLOR: green">Map the “Author” property to entry:author element  </span><span style="COLOR: blue">--&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Author</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"
+            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmSyndicationAuthorName</span>"
+            <span style="COLOR: red">m2:FC_ContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmPlaintext</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BlogPostID</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.Int32</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Published</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.DateTime</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">false</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">PostURI</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">ContentSummary</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>" <span style="COLOR: blue">/&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">IconUri</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Edm.String</span>" <span style="COLOR: red">Nullable</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">/&gt;
+&lt;/</span><span style="COLOR: #a31515">EntityType</span><span style="COLOR: blue">&gt;
+</span></pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p><strong>Special cases </strong></p>
+<p><strong>I . Complex type properties</strong></p>
+<p>[I’ll leave the type definitions as CLR types so that its easier to visualize the relations.] </p>
+<p>Consider the following model , </p>
+<pre class="code"><span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">Address
+    </span>{
+        <span style="COLOR: blue">public long </span>DoorNumber { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+        <span style="COLOR: blue">public string </span>Street { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+        <span style="COLOR: blue">public int </span>ZipCode { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+    }
+    [<span style="COLOR: #2b91af">DataServiceKey</span>(<span style="COLOR: #a31515">"CustomerID"</span>)]
+    <span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">Customer
+    </span>{
+        <span style="COLOR: blue">public int </span>CustomerID { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+        <span style="COLOR: blue">public </span><span style="COLOR: #2b91af">Address </span>myAddress { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+    }</pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p>and lets say that you wanted to map the property Street of the complex type Address when accessed through the <br />entity type “Customer”&nbsp; to the atom:title element ,</p>
+<p>this can be achieved via setting the <strong>EpmSourcePath </strong>property to “Street”&nbsp; . <br />In this case , the Epm markup would look like this :</p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">EntityType </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Customer</span>"<span style="COLOR: blue">&gt;
+  &lt;!-- </span><span style="COLOR: green">Map the Street property of the Address complex type to the entry:title element </span><span style="COLOR: blue">--&gt;
+  &lt;</span><span style="COLOR: #a31515">Property </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">myAddress</span>" <span style="COLOR: red">Type</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">MyModelNamespace.Address</span>"
+<strong>            <span style="COLOR: red">me:EpmSourcePath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">Street</span>"
+</strong>            <span style="COLOR: red">m2:FC_Atom</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"
+            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmSyndicationTitle</span>"
+            <span style="COLOR: red">m2:FC_ContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmPlaintext</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">/&gt;
+  &lt;!-- </span><span style="COLOR: green">other properties removed for brevity</span><span style="COLOR: blue">--&gt;
+&lt;/</span><span style="COLOR: #a31515">EntityType</span><span style="COLOR: blue">&gt;</span></pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p><strong>II Mapping properties declared&nbsp; on base type </p>
+<p></strong>Consider this data model :</p>
+<pre class="code">[<span style="COLOR: #2b91af">DataServiceKey</span>(<span style="COLOR: #a31515">"CustomerID"</span>)]
+<span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">Customer
+</span>{
+        <span style="COLOR: blue">public int </span>CustomerID { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+        <span style="COLOR: blue">public </span><span style="COLOR: #2b91af">Address </span>myAddress { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+        <span style="COLOR: blue">public string </span>BaseTypeField { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+}
+
+<span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">DerivedCustomer </span>: <span style="COLOR: #2b91af">Customer
+</span>{
+  <span style="COLOR: blue">public string </span>DerivedTypeField { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+}</pre>
+<p>and you want to map a property declared on the Base type “Customer” on the derived type “DerivedCustomer” <br />The EPM Markup would look like this :
+<pre class="code"><span style="COLOR: blue">&lt;!-- </span><span style="COLOR: green">Map the "BaseTypeField" property of the base type "Customer" to the entry:title element </span><span style="COLOR: blue">--&gt;
+&lt;</span><span style="COLOR: #a31515">EntityType </span><span style="COLOR: red">Name</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">DerivedCustomer</span>" <span style="COLOR: red">BaseType</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">MyModelNamespace.Customer</span>"
+<strong>            <span style="COLOR: red">m2:FC_SourcePath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">BaseTypeField</span>"
+</strong>            <span style="COLOR: red">m2:FC_TargetPath</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmSyndicationAuthorName</span>"
+            <span style="COLOR: red">m2:FC_ContentKind</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">EpmPlaintext</span>"
+            <span style="COLOR: red">m2:FC_KeepContent</span><span style="COLOR: blue">=</span>"<span style="COLOR: blue">true</span>"<span style="COLOR: blue">&gt;
+  &lt;!-- </span><span style="COLOR: green">other properties removed for brevity</span><span style="COLOR: blue">--&gt;
+&lt;/</span><span style="COLOR: #a31515">EntityType</span><span style="COLOR: blue">&gt;</span></pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a><strong></strong></p>
+<p><strong>Considerations for location&nbsp; of EPM markup in EDM Schema</strong></p>
+<p>Use the following guidelines to decide where in the EDM Schema you should add the attribute for either ATOM or custom Mappings,</p>
+<table border="0" cellspacing="0" cellpadding="2" width="736">
+<tbody>
+<tr>
+<td valign="top" width="292"><strong>Where is property defined ?</strong></td>
+<td valign="top" width="305"><strong>Where do I apply the EPM attribute?</strong></td>
+<td valign="top" width="137"><strong>SourcePath </strong></td>
+</tr>
+<tr>
+<td valign="top" width="292">Simple property on the Entity Type <br />ex: <br />“Title” property of “BlogPost” type above</td>
+<td valign="top" width="305">&lt;Property&gt; node in the &lt;Entitytype&gt; markup</td>
+<td valign="top" width="137">Not required</td>
+</tr>
+<tr>
+<td valign="top" width="292">Simple property on entity’s base type</td>
+<td valign="top" width="305">&lt;EntityType&gt; node </td>
+<td valign="top" width="137">Base type property name</td>
+</tr>
+<tr>
+<td valign="top" width="292">Complex Property on the Entity Type</td>
+<td valign="top" width="305">Complex Types cannot be mapped directly </td>
+<td valign="top" width="137">N/A</td>
+</tr>
+<tr>
+<td valign="top" width="292">Simple property defined on complex type which is a property on an Entity Type</td>
+<td valign="top" width="305">&lt;Property&gt; node in the &lt;EntityType&gt; </td>
+<td valign="top" width="137">Complex type’s simple property name</td>
+</tr>
+</tbody>
+</table>
+<p>Hope you enjoyed this post about applying Friendly Feeds mappings to EDMdata models. <br />The second part of this post will discuss more special cases in EDM Models and troubleshooting failing mappings <br />and also a sample project for EDM Friendly Feeds Mappings.</p>
+
+  </div>
+
+  <div class="date">
+    Written on March 28, 2009
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

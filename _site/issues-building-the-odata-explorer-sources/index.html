@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Issues building the OData Explorer sources – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . In the meantime , here are the four issues that need to be fixed for the sources to build on your machine
+Issue&nbsp; #1 : The dependency on the Silverlight toolkit is not present in the readme.htm file.
+Solution : We will be updating the htm file to reflect this change , in the meantime You can download the &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; November release of the Silverlight toolkit here. 
+Issue #2 : The OData Explorer project will not build because of an error during compilation : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Specifically, the error is : “The name 'ErrorTextBox' does not exist in the current context” in&nbsp; the ErrorWindow.xaml.cs&nbsp;&nbsp; file. 
+Solution :&nbsp;&nbsp; In the ErrorWindow.xaml page , change the name of the textbox “txtUserMessage” to “ErrorTextBox” and rebuild.
+Issue #3 : Xap packaging will fail when building the ODataExplorer project &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Error&nbsp;&nbsp;&nbsp; 6&nbsp;&nbsp;&nbsp; Xap packaging failed. Could not find file 'ReadMe.txt' “
+Solution : When packaging the explorer sources we moved the readme to the root of the source tree and didnt update the item reference in the project. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remove the reference to the Readme.txt file by right-clicking the “readme.txt”&nbsp; icon in the ODataExplorer project&nbsp; and selecting “Exclude From Project”
+Issue #4 : The ODataExplorer Project will not build because of an error in the web.config file. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Unexpected XML declaration. The XML declaration must be the first node in the document and no white space characters are allowed to appear before it. “
+Solution : For now , Delete the “web.config” file from the ODataExplorerHost project .
+Again ,I would like to apologize to anyone who ran into these issues and spent time trying to figure out what went wrong with the sources.
+Special thanks to Darrel Miller on twitter for working through some of these issues and giving us frank feedback. 
+We will make sure that the sources on the project are updated as soon as possible and I will update this blog post to reflect the same. 
+" />
+    <meta property="og:description" content="When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . In the meantime , here are the four issues that need to be fixed for the sources to build on your machine
+Issue&nbsp; #1 : The dependency on the Silverlight toolkit is not present in the readme.htm file.
+Solution : We will be updating the htm file to reflect this change , in the meantime You can download the &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; November release of the Silverlight toolkit here. 
+Issue #2 : The OData Explorer project will not build because of an error during compilation : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Specifically, the error is : “The name 'ErrorTextBox' does not exist in the current context” in&nbsp; the ErrorWindow.xaml.cs&nbsp;&nbsp; file. 
+Solution :&nbsp;&nbsp; In the ErrorWindow.xaml page , change the name of the textbox “txtUserMessage” to “ErrorTextBox” and rebuild.
+Issue #3 : Xap packaging will fail when building the ODataExplorer project &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Error&nbsp;&nbsp;&nbsp; 6&nbsp;&nbsp;&nbsp; Xap packaging failed. Could not find file 'ReadMe.txt' “
+Solution : When packaging the explorer sources we moved the readme to the root of the source tree and didnt update the item reference in the project. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remove the reference to the Readme.txt file by right-clicking the “readme.txt”&nbsp; icon in the ODataExplorer project&nbsp; and selecting “Exclude From Project”
+Issue #4 : The ODataExplorer Project will not build because of an error in the web.config file. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Unexpected XML declaration. The XML declaration must be the first node in the document and no white space characters are allowed to appear before it. “
+Solution : For now , Delete the “web.config” file from the ODataExplorerHost project .
+Again ,I would like to apologize to anyone who ran into these issues and spent time trying to figure out what went wrong with the sources.
+Special thanks to Darrel Miller on twitter for working through some of these issues and giving us frank feedback. 
+We will make sure that the sources on the project are updated as soon as possible and I will update this blog post to reflect the same. 
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Issues building the OData Explorer sources" />
+    <meta property="twitter:title" content="Issues building the OData Explorer sources" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Issues building the OData Explorer sources</h1>
+
+  <div class="entry">
+    <p>When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. <br />We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . <br />In the meantime , here are the four issues that need to be fixed for the sources to build on your machine</p>
+<p><strong>Issue&nbsp; #1 : The dependency on the Silverlight toolkit is not present in the readme.htm file.</strong></p>
+<p>Solution : We will be updating the htm file to reflect this change , in the meantime You can download the <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; November release of the Silverlight toolkit <a href="http://silverlight.codeplex.com/releases/view/36060#DownloadId=93513" mce_href="http://silverlight.codeplex.com/releases/view/36060#DownloadId=93513">here</a>. </p>
+<p><strong>Issue #2 : The OData Explorer project will not build because of an error during compilation : <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Specifically, the error is : “The name 'ErrorTextBox' does not exist in the current context” in&nbsp; the ErrorWindow.xaml.cs&nbsp;&nbsp; file. </strong></p>
+<p>Solution :&nbsp;&nbsp; In the ErrorWindow.xaml page , change the name of the textbox “txtUserMessage” to “ErrorTextBox” and rebuild.</p>
+<p><strong>Issue #3 : Xap packaging will fail when building the ODataExplorer project <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Error&nbsp;&nbsp;&nbsp; 6&nbsp;&nbsp;&nbsp; Xap packaging failed. Could not find file 'ReadMe.txt' “</strong></p>
+<p>Solution : When packaging the explorer sources we moved the readme to the root of the source tree and didnt update the item reference in the project. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remove the reference to the Readme.txt file by right-clicking the “readme.txt”&nbsp; icon in the ODataExplorer project&nbsp; and selecting “Exclude From Project”</p>
+<p><strong>Issue #4 : The ODataExplorer Project will not build because of an error in the web.config file. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Unexpected XML declaration. The XML declaration must be the first node in the document and no white space characters are allowed to appear before it. “</strong></p>
+<p>Solution : For now , Delete the “web.config” file from the ODataExplorerHost project .</p>
+<p>Again ,I would like to apologize to anyone who ran into these issues and spent time trying to figure out what went wrong with the sources.</p>
+<p>Special thanks to <a href="http://www.bizcoder.com/" mce_href="http://www.bizcoder.com/">Darrel Miller</a> on <a href="https://twitter.com/DarrelMiller" mce_href="https://twitter.com/DarrelMiller">twitter</a> for working through some of these issues and giving us frank feedback. </p>
+<p>We will make sure that the sources on the project are updated as soon as possible and I will update this blog post to reflect the same. </p>
+
+  </div>
+
+  <div class="date">
+    Written on March 21, 2010
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

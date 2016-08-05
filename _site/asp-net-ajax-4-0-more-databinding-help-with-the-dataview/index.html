@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ASP.NET ajax 4.0 , More DataBinding help with the DataView – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="With how easy it is to write simple &amp; complicated templates, you would want to debug the template generation    or enable certain scenarios wherein you have to do complex manipulation of data using the existing data being bound.     
+Events 
+The Templating engine fires the ItemCreated event which is similar to the OnItemCreated of the ASP.NET DataGrid.     You can subscribe to the event by calling the add_itemCreated method on the instance of the DataView.
+instanceOfDataView.add_itemCreated(onItemCreated) ;
+
+function onItemCreated(sender,eventArgs) {
+      //Get the Data Item currently being bound to the template
+         var currentDataItem = eventArgs.get_dataItem();
+       //Get the current template result , the HTMLElement being bound
+         var currentElement eventArgs.get_templateResult();
+ }
+Templating Elements
+    &#160;What are these ?
+&#160;&#160;&#160; These are elements / variables available in the templates&#160; which contain information about the
+&#160;&#160;&#160; template and other elements to help you debug databinding.
+&#160;&#160; 1. $index.
+    &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; The index of the current item being bound.
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; &#160;&#160;&#160; Example of using this to color rows based on whether they are even or odd&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; 
+
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;li class=&quot;&quot;&gt;
+             
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+2. $element
+      &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This contains the current HTMLElement being created depending on your template.
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; You don’t want to mess with this one :-)
+3. $dataItem
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This element is a refernce to the dataItem being bound .
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Example of using this element to filter based on contents of the current dataItem being bound.
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+if ( $dataItem.ListTitle.indexOf('Blog') &gt; -1 ) {
+    alert('ListTitle contains Blog');
+}
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+            &lt;li&gt;  &lt;/li&gt;
+            &lt;!--*
+}
+*--&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+" />
+    <meta property="og:description" content="With how easy it is to write simple &amp; complicated templates, you would want to debug the template generation    or enable certain scenarios wherein you have to do complex manipulation of data using the existing data being bound.     
+Events 
+The Templating engine fires the ItemCreated event which is similar to the OnItemCreated of the ASP.NET DataGrid.     You can subscribe to the event by calling the add_itemCreated method on the instance of the DataView.
+instanceOfDataView.add_itemCreated(onItemCreated) ;
+
+function onItemCreated(sender,eventArgs) {
+      //Get the Data Item currently being bound to the template
+         var currentDataItem = eventArgs.get_dataItem();
+       //Get the current template result , the HTMLElement being bound
+         var currentElement eventArgs.get_templateResult();
+ }
+Templating Elements
+    &#160;What are these ?
+&#160;&#160;&#160; These are elements / variables available in the templates&#160; which contain information about the
+&#160;&#160;&#160; template and other elements to help you debug databinding.
+&#160;&#160; 1. $index.
+    &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; The index of the current item being bound.
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; &#160;&#160;&#160; Example of using this to color rows based on whether they are even or odd&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; 
+
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;li class=&quot;&quot;&gt;
+             
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+2. $element
+      &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This contains the current HTMLElement being created depending on your template.
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; You don’t want to mess with this one :-)
+3. $dataItem
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This element is a refernce to the dataItem being bound .
+&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Example of using this element to filter based on contents of the current dataItem being bound.
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+if ( $dataItem.ListTitle.indexOf('Blog') &gt; -1 ) {
+    alert('ListTitle contains Blog');
+}
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+            &lt;li&gt;  &lt;/li&gt;
+            &lt;!--*
+}
+*--&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ASP.NET ajax 4.0 , More DataBinding help with the DataView" />
+    <meta property="twitter:title" content="ASP.NET ajax 4.0 , More DataBinding help with the DataView" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ASP.NET ajax 4.0 , More DataBinding help with the DataView</h1>
+
+  <div class="entry">
+    <p>With how easy it is to write simple &amp; complicated templates, you would want to debug the template generation    <br />or enable certain scenarios wherein you have to do complex manipulation of data using the existing data being bound.     </p>
+<h5>Events </h5>
+<p>The Templating engine fires the ItemCreated event which is similar to the <a href="http://msdn.microsoft.com/en-us/library/system.web.ui.webcontrols.datagrid.onitemcreated(VS.71).aspx">OnItemCreated</a> of the ASP.NET DataGrid.     <br />You can subscribe to the event by calling the add_itemCreated method on the instance of the DataView.</p>
+<pre class="darkcsharpcode">instanceOfDataView.add_itemCreated(onItemCreated) ;
+
+<span class="kwrd">function</span> onItemCreated(sender,eventArgs) {
+      <span class="rem">//Get the Data Item currently being bound to the template</span>
+         <span class="kwrd">var</span> currentDataItem = eventArgs.get_dataItem();
+       <span class="rem">//Get the current template result , the HTMLElement being bound</span>
+         <span class="kwrd">var</span> currentElement eventArgs.get_templateResult();
+ }</pre>
+<p><strong>Templating Elements<br />
+    <br />&#160;</strong>What are these ?</p>
+<p>&#160;&#160;&#160; These are elements / variables available in the templates&#160; which contain information about the</p>
+<p>&#160;&#160;&#160; template and other elements to help you debug databinding.</p>
+<p>&#160;&#160; 1. <strong>$index.<br />
+    <br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; </strong>The index of the current item being bound.</p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <br />&#160;&#160;&#160; Example of using this to color rows based on whether they are even or odd&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; </p>
+<blockquote>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+            
+        <span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">li</span> <span class="attr">class</span><span class="kwrd">=&quot;&quot;</span><span class="kwrd">&gt;</span>
+             
+        <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<p><strong>2. $element<br />
+      <br /></strong>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This contains the current HTMLElement being created depending on your template.</p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; You don’t want to mess with this one :-)</p>
+<p><strong>3. $dataItem</strong></p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; This element is a refernce to the dataItem being bound .</p>
+<p>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Example of using this element to filter based on contents of the current dataItem being bound.</p>
+<pre class="darkcsharpcode">&lt;div id=<span class="str">&quot;listTemplate&quot;</span> <span class="kwrd">class</span>=<span class="str">&quot;sys-template&quot;</span>&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;!--*
+<span class="rem">//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element</span>
+<span class="kwrd">if</span> ( $dataItem.ListTitle.indexOf(<span class="str">'Blog'</span>) &gt; -1 ) {
+    alert(<span class="str">'ListTitle contains Blog'</span>);
+}
+<span class="kwrd">for</span>(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+            &lt;li&gt;  &lt;/li&gt;
+            &lt;!--*
+}
+*--&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;</pre>
+</blockquote>
+
+  </div>
+
+  <div class="date">
+    Written on July 27, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

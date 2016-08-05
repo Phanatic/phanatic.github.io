@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ADO.NET Data Services : Efficient Error Handling across Application Tiers – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="While developing an application that spans multiple tiers , it is important that you be able to flow error information through the tiers without losing    any context or details in the tiers. With ADO.NET Data Services , we have an error contract which guarantees that all errors thrown from the Data Service ,     wrapped inside a DataServiceException , will be represented in a standard way on the wire when we send the error down to the client.     
+For example , consider the Query Interceptor shown below . 
+[QueryInterceptor(&quot;Customers&quot;)]
+public Expression&lt;Func&lt;Customers, bool&gt;&gt; OnQueryCustomers()
+{
+        string loggedInUser = HttpContext.Current.User.Identity.Name;
+        if (UserHasAccessToSet(&quot;Customers&quot;, loggedInUser))
+        {
+            //Filter Expression goes here
+            return entity =&gt; true;
+        }
+        else //User does not have access to '/Customers' , throw AccessViolationException
+        {
+            throw new DataServiceException(403,
+                &quot;Forbidden&quot;,
+                String.Format(&quot;User '{0}' cannot request data from '{1}' table&quot;, loggedInUser, &quot;Customers&quot;),
+                &quot;en-US&quot;);
+        }
+}
+
+
+When the Astoria server runtime throws the above exception , the 403 value specified above&#160; gets turned into the response status code of the request
+  which caused this exception.
+&#160; 
+and the error message is serialized out to be in this format : 
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot; ?&gt;
+&lt;error xmlns=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;&gt;
+  &lt;code&gt;Forbidden&lt;/code&gt;
+  &lt;message xml:lang=&quot;en-US&quot;&gt;User 'NoPermissions' cannot request data from 'Customers' table&lt;/message&gt;
+&lt;/error&gt;
+At this point , the service has not lost any information that the service author intended to convey to a service consumer.
+Now , lets consider the client library and how it handles this case.
+Lets consider a query for the “Customers” set to which the currently logged-in user doesn't have permissions.
+foreach (Customers customerEntity in northwindContext.CreateQuery&lt;Customers&gt;(&quot;Customers&quot;) ) {
+ //Do something with the customerEntity here
+}
+In this case, running the above code&#160; would result in a DataServiceQueryException being thrown.
+System.Data.Services.Client.DataServiceQueryException:
+  An error occurred while processing this request. ---&gt;             System.Data.Services.Client.DataServiceClientException:
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot;?&gt;
+        &lt;error xmlns=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;&gt;
+         &lt;code&gt;Forbidden&lt;/code&gt;
+         &lt;message xml:lang=&quot;en-US&quot;&gt;User 'NoPermissions' cannot request data from 'Customers' table&lt;/message&gt;
+      &lt;/error&gt;
+Note that the DataServiceException thrown by the server is now set to the Message property of the InnerException of the DataServiceQueryException.
+  We do not de-serialize the DataServiceException into an exception type on the client side.
+By default , since the exception is now a string on the client side , you don’t have direct&#160; access to the information contained inside the Exception.
+The information is all still there , just not easily accessible anymore. Since the error contract is documented and follows a standard pattern ,
+we can easily write a visitor that de-serializes an exception object from the “Message” property&#160; of the Inner Exception.
+One such de-serializer for Error contracts is shown at the bottom of this post
+  It contains two methods :
+
+
+TryParse : which takes in an exception caused during Querying or updating via the client library and
+    returns a DataServiceException that was thrown by the Server 
+Throw : which takes in an exception caused during Querying or updating via the client library and
+    re-throws the DataServiceException that was thrown by the Server 
+
+
+  
+" />
+    <meta property="og:description" content="While developing an application that spans multiple tiers , it is important that you be able to flow error information through the tiers without losing    any context or details in the tiers. With ADO.NET Data Services , we have an error contract which guarantees that all errors thrown from the Data Service ,     wrapped inside a DataServiceException , will be represented in a standard way on the wire when we send the error down to the client.     
+For example , consider the Query Interceptor shown below . 
+[QueryInterceptor(&quot;Customers&quot;)]
+public Expression&lt;Func&lt;Customers, bool&gt;&gt; OnQueryCustomers()
+{
+        string loggedInUser = HttpContext.Current.User.Identity.Name;
+        if (UserHasAccessToSet(&quot;Customers&quot;, loggedInUser))
+        {
+            //Filter Expression goes here
+            return entity =&gt; true;
+        }
+        else //User does not have access to '/Customers' , throw AccessViolationException
+        {
+            throw new DataServiceException(403,
+                &quot;Forbidden&quot;,
+                String.Format(&quot;User '{0}' cannot request data from '{1}' table&quot;, loggedInUser, &quot;Customers&quot;),
+                &quot;en-US&quot;);
+        }
+}
+
+
+When the Astoria server runtime throws the above exception , the 403 value specified above&#160; gets turned into the response status code of the request
+  which caused this exception.
+&#160; 
+and the error message is serialized out to be in this format : 
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot; ?&gt;
+&lt;error xmlns=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;&gt;
+  &lt;code&gt;Forbidden&lt;/code&gt;
+  &lt;message xml:lang=&quot;en-US&quot;&gt;User 'NoPermissions' cannot request data from 'Customers' table&lt;/message&gt;
+&lt;/error&gt;
+At this point , the service has not lost any information that the service author intended to convey to a service consumer.
+Now , lets consider the client library and how it handles this case.
+Lets consider a query for the “Customers” set to which the currently logged-in user doesn't have permissions.
+foreach (Customers customerEntity in northwindContext.CreateQuery&lt;Customers&gt;(&quot;Customers&quot;) ) {
+ //Do something with the customerEntity here
+}
+In this case, running the above code&#160; would result in a DataServiceQueryException being thrown.
+System.Data.Services.Client.DataServiceQueryException:
+  An error occurred while processing this request. ---&gt;             System.Data.Services.Client.DataServiceClientException:
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot;?&gt;
+        &lt;error xmlns=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;&gt;
+         &lt;code&gt;Forbidden&lt;/code&gt;
+         &lt;message xml:lang=&quot;en-US&quot;&gt;User 'NoPermissions' cannot request data from 'Customers' table&lt;/message&gt;
+      &lt;/error&gt;
+Note that the DataServiceException thrown by the server is now set to the Message property of the InnerException of the DataServiceQueryException.
+  We do not de-serialize the DataServiceException into an exception type on the client side.
+By default , since the exception is now a string on the client side , you don’t have direct&#160; access to the information contained inside the Exception.
+The information is all still there , just not easily accessible anymore. Since the error contract is documented and follows a standard pattern ,
+we can easily write a visitor that de-serializes an exception object from the “Message” property&#160; of the Inner Exception.
+One such de-serializer for Error contracts is shown at the bottom of this post
+  It contains two methods :
+
+
+TryParse : which takes in an exception caused during Querying or updating via the client library and
+    returns a DataServiceException that was thrown by the Server 
+Throw : which takes in an exception caused during Querying or updating via the client library and
+    re-throws the DataServiceException that was thrown by the Server 
+
+
+  
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ADO.NET Data Services : Efficient Error Handling across Application Tiers" />
+    <meta property="twitter:title" content="ADO.NET Data Services : Efficient Error Handling across Application Tiers" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ADO.NET Data Services : Efficient Error Handling across Application Tiers</h1>
+
+  <div class="entry">
+    <p>While developing an application that spans multiple tiers , it is important that you be able to flow error information through the tiers without losing    <br />any context or details in the tiers. With ADO.NET Data Services , we have an error contract which guarantees that all errors thrown from the Data Service ,     <br />wrapped inside a <a href="http://msdn.microsoft.com/en-us/library/system.data.services.dataserviceexception.aspx">DataServiceException</a> , will be represented in a standard way on the wire when we send the error down to the client.     </p>
+<p>For example , consider the Query Interceptor shown below . </p>
+<pre class="csharpcode">[QueryInterceptor(<span class="str">&quot;Customers&quot;</span>)]
+<span class="kwrd">public</span> Expression&lt;Func&lt;Customers, <span class="kwrd">bool</span>&gt;&gt; OnQueryCustomers()
+{
+        <span class="kwrd">string</span> loggedInUser = HttpContext.Current.User.Identity.Name;
+        <span class="kwrd">if</span> (UserHasAccessToSet(<span class="str">&quot;Customers&quot;</span>, loggedInUser))
+        {
+            <span class="rem">//Filter Expression goes here</span>
+            <span class="kwrd">return</span> entity =&gt; <span class="kwrd">true</span>;
+        }
+        <span class="kwrd">else</span> <span class="rem">//User does not have access to '/Customers' , throw AccessViolationException</span>
+        {
+            <span class="kwrd">throw</span> <span class="kwrd">new</span> DataServiceException(403,
+                <span class="str">&quot;Forbidden&quot;</span>,
+                String.Format(<span class="str">&quot;User '{0}' cannot request data from '{1}' table&quot;</span>, loggedInUser, <span class="str">&quot;Customers&quot;</span>),
+                <span class="str">&quot;en-US&quot;</span>);
+        }
+}</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>When the Astoria server runtime throws the above exception , the 403 value specified above&#160; gets turned into the response status code of the request<br />
+  <br />which caused this exception.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Ado.netDataServicesEfficientErrorHandlin_A066/StatusCodeInFiddler_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Ado.netDataServicesEfficientErrorHandlin_A066/StatusCodeInFiddler_1.png"><img style="border-bottom: 0px; border-left: 0px; display: inline; border-top: 0px; border-right: 0px" title="StatusCodeInFiddler" border="0" alt="StatusCodeInFiddler" src="/assets/StatusCodeInFiddler_thumb_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Ado.netDataServicesEfficientErrorHandlin_A066/StatusCodeInFiddler_thumb_1.png" width="402" height="79" /></a>&#160; </p>
+<p>and the error message is serialized out to be in this format : </p>
+<pre class="csharpcode"><span class="kwrd">&lt;?</span><span class="html">xml</span> <span class="attr">version</span><span class="kwrd">=&quot;1.0&quot;</span> <span class="attr">encoding</span><span class="kwrd">=&quot;utf-8&quot;</span> <span class="attr">standalone</span><span class="kwrd">=&quot;yes&quot;</span> ?<span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">error</span> <span class="attr">xmlns</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">code</span><span class="kwrd">&gt;</span>Forbidden<span class="kwrd">&lt;/</span><span class="html">code</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">message</span> <span class="attr">xml:lang</span><span class="kwrd">=&quot;en-US&quot;</span><span class="kwrd">&gt;</span>User 'NoPermissions' cannot request data from 'Customers' table<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">error</span><span class="kwrd">&gt;</span></pre>
+<p>At this point , the service has not lost any information that the service author intended to convey to a service consumer.</p>
+<p>Now , lets consider the client library and how it handles this case.</p>
+<p>Lets consider a query for the “Customers” set to which the currently logged-in user doesn't have permissions.</p>
+<pre class="csharpcode"><span class="kwrd">foreach</span> (Customers customerEntity <span class="kwrd">in</span> northwindContext.CreateQuery&lt;Customers&gt;(<span class="str">&quot;Customers&quot;</span>) ) {
+ <span class="rem">//Do something with the customerEntity here</span>
+}</pre>
+<p>In this case, running the above code&#160; would result in a DataServiceQueryException being thrown.</p>
+<pre class="csharpcode">System.Data.Services.Client.DataServiceQueryException:
+  An error occurred while processing this request. ---<span class="kwrd">&gt;</span>        <br />     System.Data.Services.Client.DataServiceClientException:
+      <span class="kwrd">&lt;?</span><span class="html">xml</span> <span class="attr">version</span><span class="kwrd">=&quot;1.0&quot;</span> <span class="attr">encoding</span><span class="kwrd">=&quot;utf-8&quot;</span> <span class="attr">standalone</span><span class="kwrd">=&quot;yes&quot;</span>?<span class="kwrd">&gt;</span>
+<span class="kwrd">        &lt;</span><span class="html">error</span> <span class="attr">xmlns</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span><span class="kwrd">&gt;</span>
+         <span class="kwrd">&lt;</span><span class="html">code</span><span class="kwrd">&gt;</span>Forbidden<span class="kwrd">&lt;/</span><span class="html">code</span><span class="kwrd">&gt;</span>
+         <span class="kwrd">&lt;</span><span class="html">message</span> <span class="attr">xml:lang</span><span class="kwrd">=&quot;en-US&quot;</span><span class="kwrd">&gt;</span>User 'NoPermissions' cannot request data from 'Customers' table<span class="kwrd">&lt;/</span><span class="html">message</span><span class="kwrd">&gt;</span>
+<span class="kwrd">      &lt;/</span><span class="html">error</span><span class="kwrd">&gt;</span></pre>
+<p>Note that the DataServiceException thrown by the server is now set to the Message property of the InnerException of the DataServiceQueryException.<br />
+  <br />We do not de-serialize the DataServiceException into an exception type on the client side.</p>
+<p>By default , since the exception is now a string on the client side , you don’t have direct&#160; access to the information contained inside the Exception.</p>
+<p>The information is all still there , just not easily accessible anymore. Since the error contract is <a href="http://msdn.microsoft.com/en-us/library/dd541497(PROT.10).aspx">documented</a> and follows a standard pattern ,</p>
+<p>we can easily write a visitor that de-serializes an exception object from the “Message” property&#160; of the Inner Exception.</p>
+<p>One such de-serializer for Error contracts is shown at the bottom of this post<br />
+  <br />It contains two methods :</p>
+<p></p>
+<ol>
+<li>TryParse : which takes in an exception caused during Querying or updating via the client library and<br />
+    <br />returns a DataServiceException that was thrown by the Server </li>
+<li>Throw : which takes in an exception caused during Querying or updating via the client library and<br />
+    <br />re-throws the DataServiceException that was thrown by the Server </li>
+</ol>
+<p>
+  <br /><script src="http://gist.github.com/227246.js"></script></p>
+
+  </div>
+
+  <div class="date">
+    Written on November 14, 2009
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

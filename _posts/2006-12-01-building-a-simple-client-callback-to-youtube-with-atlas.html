@@ -1,0 +1,606 @@
+---
+layout: post
+title: Building a Simple Client Callback to YouTube with Atlas
+date: 2006-12-01 19:25:00.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- YouTube
+meta:
+  _pingme: '1'
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2006/12/02/building-a-simple-client-script-binding-control-with-atlas.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1188038'
+  orig_parent_id: '1188038'
+  orig_thread_id: '483597'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '1'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2006/12/01/building-a-simple-client-callback-to-youtube-with-atlas.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Building a Simple Client Callback to YouTube with Atlas" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2006/12/01/building-a-simple-client-callback-to-youtube-with-atlas/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="We will talk about how we can use Atlas to talk to YouTube using the REST protocol .&nbsp;1) Download Visual Web Developer , Go Here2) Download Atlas , Go Here3) Get an Application Developer ID at Youtube . Go Here &nbsp;After you are done running around the world collecting tools , you should be all..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Building a Simple Client Callback to YouTube with Atlas" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2006/12/01/building-a-simple-client-callback-to-youtube-with-atlas/" />
+    <meta name="twitter:description" content="We will talk about how we can use Atlas to talk to YouTube using the REST protocol .&nbsp;1) Download Visual Web Developer , Go Here2) Download Atlas , Go Here3) Get an Application Developer ID at Youtube . Go Here &nbsp;After you are done running around the world collecting tools , you should be all..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<pre>   <p>We will talk about how we can use Atlas to talk to YouTube using the REST protocol .</p><p mce_keep="true">&nbsp;</p><p>1) Download Visual Web Developer , Go <a href="http://msdn.microsoft.com/vstudio/express/vwd/download/" target="_blank" mce_href="http://msdn.microsoft.com/vstudio/express/vwd/download/"><font color="#669966">Here</font></a></p><p>2) Download Atlas , Go <a href="http://ajax.asp.net/default.aspx?tabid=47&amp;subtabid=471" target="_blank" mce_href="http://ajax.asp.net/default.aspx?tabid=47&amp;subtabid=471"><font color="#669966">Here</font></a></p><p>3) Get an Application Developer ID at Youtube . Go <a href="https://www.youtube.com/dev" target="_blank" mce_href="https://www.youtube.com/dev"><font color="#669966">Here</font></a> </p><p mce_keep="true">&nbsp;</p><p>After you are done  running around the world collecting tools , you should be all set to take on YouTube .</p><p mce_keep="true">&nbsp;</p><p mce_keep="true">&nbsp;</p><p>We have a WebService that talks to YouTube's REST Interface and downloads Data .</p><p>Without Getting into Discussions of using Service Bridges , we will have a wrapper over the YouTube REST-API using a </p><p>webservice on the Server-Side.</p><p mce_keep="true">&nbsp;</p><p><strong><u>The YouTube Wrapper Class</u></strong></p><p><strong><u></u></strong>&nbsp;</p><p>We have a class that wraps the Fucntionality Provided by YouTube REST APIs , lets Call it "YouTubeSearch".</p><p>It will  have a method called "SearchTags" which takes a Tagname as an input and will return results of the type "VideoRow"</p><p mce_keep="true">&nbsp;</p><p> Schema of VideoRow  Class</p><p mce_keep="true">&nbsp;</p><p><strong></strong></p>&nbsp;<pre class="csharpcode">  ClassName  : VideoRow
+  Methods    : None
+  Attributes :
+
+  Name          Description
+   Url           The Url to View the Video on
+   ThumbNailUrl  The Url to View the thumbnail of the video
+   Description   A Short Description of the video</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Signature of the SearchTags method of YouTubeSearch </p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">static</span> List&lt;VideoRow&gt; SearchVideoTags(<span class="kwrd">string</span> tagName)</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Make a WebClient Request to the RESTBased Webservice and gather the downloaded info onto a string</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">string</span> requestURL = <span class="str">"https://www.youtube.com/api2_rest?method=youtube.videos.list_by_tag&amp;dev_id="</span> +
+    youTubeAppId + <span class="str">"&amp;tag="</span> + tagName + <span class="str">"&amp;per_page=6"</span>
+WebClient restRequest = <span class="kwrd">new</span> WebClient();
+<span class="kwrd">string</span> dataDownloaded = restRequest.DownloadString(requestURL);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p mce_keep="true">&nbsp;</p>
+<p> Read the Downloaded String onto a DataSet</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode">DataSet dsResultSet = <span class="kwrd">new</span> DataSet();
+StringReader dataWriter = <span class="kwrd">new</span> StringReader(dataDownloaded);
+dsResultSet.ReadXml(dataWriter);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p mce_keep="true">&nbsp;</p>
+<p> Convert the DataRows onto VideoRows
+<p>&nbsp;<br />
+<blockquote>
+<p><strong></strong></p>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><span class="kwrd">foreach</span> (DataRow drVideoRow <span class="kwrd">in</span> dsResultSet.Tables[<span class="str">"video"</span>].Rows)
+{
+searchResults.Add(<span class="kwrd">new</span> VideoRow( drVideoRow[<span class="str">"url"</span>].ToString(),
+drVideoRow[<span class="str">"thumbnail_url"</span>].ToString(),
+drVideoRow[<span class="str">"description"</span>].ToString()));
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p mce_keep="true">&nbsp;</p>
+<p> return searchResults back to Caller</p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u>The ServerSide WebService</u></strong></p>
+<p><strong><u></u></strong>&nbsp;</p>
+<p>1) Create a WebService </p>
+<p>2) Include the Following Directive to make the Web-Service "Client Proxiable"</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">using</span> Microsoft.Web.Script.Services;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<blockquote><p mce_keep="true">&nbsp;</p>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p>3) Decorate the Webservice with the "ScriptService" attribute.</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode">[ScriptService]
+<span class="kwrd">public</span> <span class="kwrd">class</span> AjaxService : System.Web.Services.WebService </pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>4) The methods of the webservice that need to be proxied onto the client are marked as "<strong>WebMethod"</strong></p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode">[WebMethod]
+<span class="kwrd">public</span> <span class="kwrd">string</span> SearchYouTube(<span class="kwrd">string</span> tagName)</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>5) Call the <strong>SearchVideoTags </strong>method of the YouTube Wrapper class with the Parameter passed from the Client Proxy.</p>
+<p>Have the Content Formatted in the form of a Usercontrol's rendered output  .</p>
+<p>  I use a ViewManager to implement the MVC pattern here.</p>
+<p>For an explanation of the same , refer to ScottGu's blog post <a href="http://weblogs.asp.net/scottgu/archive/2006/10/22/Tip_2F00_Trick_3A00_-Cool-UI-Templating-Technique-to-use-with-ASP.NET-AJAX-for-non_2D00_UpdatePanel-scenarios.aspx" mce_href="http://weblogs.asp.net/scottgu/archive/2006/10/22/Tip_2F00_Trick_3A00_-Cool-UI-Templating-Technique-to-use-with-ASP.NET-AJAX-for-non_2D00_UpdatePanel-scenarios.aspx"><font color="#669966">Here</font></a> .</p>
+<p mce_keep="true">&nbsp;</p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u>Markup of the View</u></strong></p>
+<p><strong><u></u></strong>&nbsp;</p>
+<pre class="csharpcode">&lt;asp:DataList runat=<span class="str">"server"</span> ID=<span class="str">"grdvSearchResults"</span>
+         RepeatColumns=<span class="str">"6"</span> RepeatDirection=<span class="str">"Horizontal"</span>
+        BorderStyle=<span class="str">"None"</span> BorderWidth=<span class="str">"0px"</span>
+         GridLines=<span class="str">"none"</span> Width=<span class="str">"100%"</span>&gt;
+&lt;ItemTemplate&gt;
+&lt;a href=<span class="str">"&lt;%#DataBinder.Eval(Container.DataItem, "</span>Url<span class="str">")%&gt;"</span>&gt;
+   &lt;img  src=<span class="str">"&lt;%#DataBinder.Eval(Container.DataItem, "</span>ThumbNailUrl<span class="str">")%&gt;"</span>
+     title=<span class="str">"&lt;%#DataBinder.Eval(Container.DataItem, "</span>Description<span class="str">")%&gt;"</span>/&gt;
+  &lt;/a&gt;
+&lt;/ItemTemplate&gt;
+&lt;SeparatorTemplate&gt;   &amp;nbsp;&amp;nbsp;&amp;nbsp;   &lt;/SeparatorTemplate&gt;
+&lt;/asp:DataList&gt;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>
+6) Return the Rendered View in the form of a String back to the Client Method calling this Webmethod .</p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u> The Client Web Page </u></strong></p>
+<p mce_keep="true">&nbsp;</p>
+<p>The Following Controls will be put in ..</p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u>HTML Controls </u></strong></p>
+<p mce_keep="true">&nbsp;</p>
+<p> 1) A textbox which provides the Tag to search for. </p>
+<blockquote><p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="text"</span> <span class="attr">id</span><span class="kwrd">="searchKey"</span><span class="kwrd">/&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd"></span>&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p> 2) A button to call the  Search Function in the Webservice .</p>
+<blockquote><p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">Type</span><span class="kwrd">="button"</span> <span class="attr">id</span><span class="kwrd">="btnSearchServer"</span>
+    <span class="attr">onclick</span> <span class="kwrd">="SearchYouTube(searchKey.value)"</span>
+    <span class="attr">value</span> <span class="kwrd">="Search You Tube"</span><span class="kwrd">/&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p mce_keep="true">&nbsp;</p>
+</blockquote>
+<p> 3) A Div to show the Server Returned Markup .</p>
+<blockquote><p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="serverMarkupRecipient"</span><span class="kwrd">&gt;</span>
+     Search Results Go Here
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u>AJAX Controls</u></strong></p>
+<p>A Script Manager to Generate the proxy of the webservice and handle all Ajax Scripts </p>
+<p>We will add a Service Reference to the WebService that we want a Client proxy for ..</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="scrpManager"</span><span class="kwrd">&gt;</span>
+     <span class="kwrd">&lt;</span><span class="html">Services</span><span class="kwrd">&gt;</span>
+       <span class="kwrd">&lt;</span><span class="html">asp:ServiceReference</span> <span class="attr">Path</span><span class="kwrd">="~/Services/AjaxService.asmx"</span> <span class="kwrd">/&gt;</span>
+     <span class="kwrd">&lt;/</span><span class="html">Services</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p mce_keep="true">&nbsp;</p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong><u>Javascript Code to Call the Webservice</u></strong></p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">function</span> SearchYouTube( searchTag )
+{
+<span class="rem">// The Proxy generated enables you to do something as simple as calling a method on an object .   </span>
+<span class="rem">// the Two parameters are &lt;inputparam&gt;,&lt;OnCompleteCallback&gt;   </span>
+    AjaxService.SearchYouTube(searchTag,VideSearchCallback );
+} </pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">function</span> VideSearchCallback(returnValue)
+{
+  <span class="rem">// Microsft Ajax  enables Browser - Independent ways to wrappers To Document.getElementById as $get    //Show the Div Element   </span>
+ $get(<span class="str">"serverMarkupRecipient"</span>).style.display= <span class="str">"block"</span>
+  <span class="rem">//Inject Server Returned Markup into the DIV element    </span>
+ $get(<span class="str">"serverMarkupRecipient"</span>).innerHTML = returnValue;
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Thats it , You can download the Source of the application Here </p></p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/01/18/80/38/AjaxYouTube.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-01-18-80-38/AjaxYouTube.zip">AjaxYouTube.zip</a></p>

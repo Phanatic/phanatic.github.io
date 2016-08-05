@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ASp.net Ajax 4.0 , Master-Details View with the DataView , Part 2 – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="If you are just tuning in , you can read Part 1 here 
+
+
+
+Parent Entity
+Child Entity
+
+
+
+
+
+
+List
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListID
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListTitle
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElements
+
+
+
+
+
+
+
+
+ListElement 
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementText
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementID
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; List
+
+
+
+
+
+
+
+In the last part , we looked at using the Events from the DataView to render another template    for the inner details. Looking further , I discovered that there is a syntax for injecting code into the     template.     
+The code injected into the template looks like this ..
+&lt;!--*
+  //Code
+*--&gt;
+HTML
+&lt;!--*
+  //Code
+*--&gt;
+This looks very similar to the Inline code in aspx pages.
+  For the Master-Details example as before , the template would look like this ..
+To bind all lists and their listElements , the template would look like this ..
+
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+            &lt;li&gt; &lt;/li&gt;
+            &lt;!--*
+}
+*--&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&#160;
+And then , you are done !!!&#160; You will need the following script files .
+AJAX Client Library for ADO.NET Data Services (optional)
+ASP.NET AJAX 4.0 CodePlex Preview 1 
+Complete sample Code is below , I swapped out the DataService code for local data . 
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head id=&quot;Head1&quot; runat=&quot;server&quot;&gt;
+    &lt;title&gt;Master Details with ASP.NET AJAX 4.0&lt;/title&gt;
+    &lt;link href=&quot;../css/SoberTable.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;style&gt;
+        .sys-template
+        {
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id=&quot;form1&quot; runat=&quot;server&quot;&gt;
+    &lt;asp:ScriptManager runat=&quot;server&quot; ID=&quot;scrpManager&quot;&gt;
+        &lt;Scripts&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot; /&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot; /&gt;
+        &lt;/Scripts&gt;
+    &lt;/asp:ScriptManager&gt;
+    &lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                &lt;h3&gt;
+                    
+                &lt;/h3&gt;
+                &lt;ul&gt;
+                    &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+                    &lt;li&gt; &lt;/li&gt;
+                    &lt;!--*
+}
+*--&gt;
+                &lt;/ul&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;
+
+    var _dataServiceProxy = null;
+
+    function dataLoaded(result) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //Render the template
+        dv.initialize();
+    }
+
+    function loadData() {
+        //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+    }
+    function loadLocalData() {
+    var localData ={ 'd' : [
+    {'ListID': 1, 'ListTitle': 'Future Blog Posts to write', 'ListElements': [
+        { 'ListElementID': 2, 'ListElementText': 'Working with 1..N associations'},
+        { 'ListElementID': 3, 'ListElementText': 'Working with ServiceOps and the client'},
+        { 'ListElementID': 4, 'ListElementText': 'Data Literal Table'},
+        { 'ListElementID': 5, 'ListElementText': 'Calling Stored Procedures from ServiceOps'} ]
+      },
+    {'ListID': 2, 'ListTitle': 'My Life List',
+         'ListElements': [{'ListElementID': 64, 'ListElementText': 'Learn Spanish'}] }
+     ] };
+
+    dataLoaded(localData.d);
+}
+    function pageLoad() {
+        loadLocalData ();
+     }
+    &lt;/script&gt;
+
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" />
+    <meta property="og:description" content="If you are just tuning in , you can read Part 1 here 
+
+
+
+Parent Entity
+Child Entity
+
+
+
+
+
+
+List
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListID
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListTitle
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElements
+
+
+
+
+
+
+
+
+ListElement 
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementText
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementID
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; List
+
+
+
+
+
+
+
+In the last part , we looked at using the Events from the DataView to render another template    for the inner details. Looking further , I discovered that there is a syntax for injecting code into the     template.     
+The code injected into the template looks like this ..
+&lt;!--*
+  //Code
+*--&gt;
+HTML
+&lt;!--*
+  //Code
+*--&gt;
+This looks very similar to the Inline code in aspx pages.
+  For the Master-Details example as before , the template would look like this ..
+To bind all lists and their listElements , the template would look like this ..
+
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;h3&gt;
+            
+        &lt;/h3&gt;
+        &lt;ul&gt;
+            &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+            &lt;li&gt; &lt;/li&gt;
+            &lt;!--*
+}
+*--&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&#160;
+And then , you are done !!!&#160; You will need the following script files .
+AJAX Client Library for ADO.NET Data Services (optional)
+ASP.NET AJAX 4.0 CodePlex Preview 1 
+Complete sample Code is below , I swapped out the DataService code for local data . 
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head id=&quot;Head1&quot; runat=&quot;server&quot;&gt;
+    &lt;title&gt;Master Details with ASP.NET AJAX 4.0&lt;/title&gt;
+    &lt;link href=&quot;../css/SoberTable.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;style&gt;
+        .sys-template
+        {
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id=&quot;form1&quot; runat=&quot;server&quot;&gt;
+    &lt;asp:ScriptManager runat=&quot;server&quot; ID=&quot;scrpManager&quot;&gt;
+        &lt;Scripts&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot; /&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot; /&gt;
+        &lt;/Scripts&gt;
+    &lt;/asp:ScriptManager&gt;
+    &lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                &lt;h3&gt;
+                    
+                &lt;/h3&gt;
+                &lt;ul&gt;
+                    &lt;!--*
+//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element
+for(var index=0;index&lt; ListElements.length;index++) {
+var listElement = ListElements[index];
+*--&gt;
+                    &lt;li&gt; &lt;/li&gt;
+                    &lt;!--*
+}
+*--&gt;
+                &lt;/ul&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;
+
+    var _dataServiceProxy = null;
+
+    function dataLoaded(result) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //Render the template
+        dv.initialize();
+    }
+
+    function loadData() {
+        //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+    }
+    function loadLocalData() {
+    var localData ={ 'd' : [
+    {'ListID': 1, 'ListTitle': 'Future Blog Posts to write', 'ListElements': [
+        { 'ListElementID': 2, 'ListElementText': 'Working with 1..N associations'},
+        { 'ListElementID': 3, 'ListElementText': 'Working with ServiceOps and the client'},
+        { 'ListElementID': 4, 'ListElementText': 'Data Literal Table'},
+        { 'ListElementID': 5, 'ListElementText': 'Calling Stored Procedures from ServiceOps'} ]
+      },
+    {'ListID': 2, 'ListTitle': 'My Life List',
+         'ListElements': [{'ListElementID': 64, 'ListElementText': 'Learn Spanish'}] }
+     ] };
+
+    dataLoaded(localData.d);
+}
+    function pageLoad() {
+        loadLocalData ();
+     }
+    &lt;/script&gt;
+
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ASp.net Ajax 4.0 , Master-Details View with the DataView , Part 2" />
+    <meta property="twitter:title" content="ASp.net Ajax 4.0 , Master-Details View with the DataView , Part 2" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ASp.net Ajax 4.0 , Master-Details View with the DataView , Part 2</h1>
+
+  <div class="entry">
+    <p>If you are just tuning in , you can read Part 1 <a href="http://blogs.msdn.com/phaniraj/archive/2008/07/25/asp-net-ajax-4-0-master-details-view-with-the-dataview.aspx">here</a> </p>
+<table width="70%">
+<tbody>
+<tr>
+<td><b>Parent Entity</b></td>
+<td><b>Child Entity</b></td>
+</tr>
+<tr>
+<td>
+<table cellspacing="0" cellpadding="2" width="200" border="0">
+<tbody>
+<tr>
+<td valign="top" width="198">List</td>
+</tr>
+<tr>
+<td valign="top" width="198"><strong>Properties</strong></td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListID</td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListTitle</td>
+</tr>
+<tr>
+<td valign="top" width="198"><strong>Associations</strong></td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListElements</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table cellspacing="0" cellpadding="2" width="200" border="0">
+<tbody>
+<tr>
+<td valign="top" width="200">ListElement </td>
+</tr>
+<tr>
+<td valign="top" width="200"><strong>Properties</strong></td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; ListElementText</td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; ListElementID</td>
+</tr>
+<tr>
+<td valign="top" width="200"><strong>Associations</strong></td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; List</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>In the last part , we looked at using the Events from the DataView to render another template    <br />for the inner details. Looking further , I discovered that there is a syntax for injecting code into the     <br />template.     </p>
+<p>The code injected into the template looks like this ..</p>
+<pre class="darkcsharpcode"><span class="rem">&lt;!--*</span>
+<span class="rem">  //Code</span>
+<span class="rem">*--&gt;</span>
+HTML
+<span class="rem">&lt;!--*</span>
+<span class="rem">  //Code</span>
+<span class="rem">*--&gt;</span></pre>
+<p>This looks very similar to the Inline code in aspx pages.<br />
+  <br />For the Master-Details example as before , the template would look like this ..</p>
+<p>To bind all lists and their listElements , the template would look like this ..</p>
+<p></p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+            
+        <span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="rem">&lt;!--*</span>
+<span class="rem">//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element</span>
+<span class="rem">for(var index=0;index&lt; ListElements.length;index++) {</span>
+<span class="rem">var listElement = ListElements[index];</span>
+<span class="rem">*--&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span> <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+            <span class="rem">&lt;!--*</span>
+<span class="rem">}</span>
+<span class="rem">*--&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<h6>&#160;</h6>
+<p>And then , you are done !!!&#160; <br />You will need the following script files .</p>
+<p><a href="http://www.codeplex.com/aspnet/Release/ProjectReleases.aspx?ReleaseId=13357">AJAX Client Library for ADO.NET Data Services</a> (optional)</p>
+<p><a href="http://www.codeplex.com/aspnet/Release/ProjectReleases.aspx?ReleaseId=15511">ASP.NET AJAX 4.0 CodePlex Preview 1</a> </p>
+<h5>Complete sample Code is below , I swapped out the DataService code for local data . </h5></p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">&quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span> <span class="kwrd">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">=&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">id</span><span class="kwrd">=&quot;Head1&quot;</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Master Details with ASP.NET AJAX 4.0<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">href</span><span class="kwrd">=&quot;../css/SoberTable.css&quot;</span> <span class="attr">rel</span><span class="kwrd">=&quot;stylesheet&quot;</span> <span class="attr">type</span><span class="kwrd">=&quot;text/css&quot;</span> <span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">style</span><span class="kwrd">&gt;</span>
+        .sys-template
+        {
+        }
+    <span class="kwrd">&lt;/</span><span class="html">style</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">=&quot;form1&quot;</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span> <span class="attr">ID</span><span class="kwrd">=&quot;scrpManager&quot;</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">Scripts</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ScriptReference</span> <span class="attr">Path</span><span class="kwrd">=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot;</span> <span class="kwrd">/&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ScriptReference</span> <span class="attr">Path</span><span class="kwrd">=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot;</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">Scripts</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+                    
+                <span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+                    <span class="rem">&lt;!--*</span>
+<span class="rem">//Iterate over the ListElements , generating the &lt;li&gt; element for each List Element</span>
+<span class="rem">for(var index=0;index&lt; ListElements.length;index++) {</span>
+<span class="rem">var listElement = ListElements[index];</span>
+<span class="rem">*--&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span> <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+                    <span class="rem">&lt;!--*</span>
+<span class="rem">}</span>
+<span class="rem">*--&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">=&quot;javascript&quot;</span> <span class="attr">type</span><span class="kwrd">=&quot;text/javascript&quot;</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">var</span> _dataServiceProxy = <span class="kwrd">null</span>;
+
+    <span class="kwrd">function</span> dataLoaded(result) {
+        <span class="rem">//Get the Template for the List Results</span>
+        <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listTemplate&quot;</span>));
+        <span class="rem">//Pass the data regarding the Lists to be bound</span>
+        dv.set_data(result);
+        <span class="rem">//Render the template</span>
+        dv.initialize();
+    }
+
+    <span class="kwrd">function</span> loadData() {
+        <span class="rem">//Create a Data Service Proxy</span>
+        _dataServiceProxy  = <span class="kwrd">new</span> Sys.Data.DataService(<span class="str">&quot;ListService.svc&quot;</span>);
+        <span class="rem">//The URI of the resources to download</span>
+        <span class="kwrd">var</span> listURI = <span class="str">&quot;/Lists?$expand=ListElements&quot;</span>;
+        <span class="rem">//Query the Data Service with the URI </span>
+        _dataServiceProxy.query(
+            listURI ,   <span class="rem">/*Resource URI*/</span>
+            dataLoaded, <span class="rem">/*Success callback*/</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*Failure callback */</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*user context*/</span>
+            <span class="kwrd">null</span>);      <span class="rem">/*Web Request*/</span>
+    }
+    <span class="kwrd">function</span> loadLocalData() {
+    <span class="kwrd">var</span> localData ={ <span class="str">'d'</span> : [
+    {<span class="str">'ListID'</span>: 1, <span class="str">'ListTitle'</span>: <span class="str">'Future Blog Posts to write'</span>, <span class="str">'ListElements'</span>: [
+        { <span class="str">'ListElementID'</span>: 2, <span class="str">'ListElementText'</span>: <span class="str">'Working with 1..N associations'</span>},
+        { <span class="str">'ListElementID'</span>: 3, <span class="str">'ListElementText'</span>: <span class="str">'Working with ServiceOps and the client'</span>},
+        { <span class="str">'ListElementID'</span>: 4, <span class="str">'ListElementText'</span>: <span class="str">'Data Literal Table'</span>},
+        { <span class="str">'ListElementID'</span>: 5, <span class="str">'ListElementText'</span>: <span class="str">'Calling Stored Procedures from ServiceOps'</span>} ]
+      },
+    {<span class="str">'ListID'</span>: 2, <span class="str">'ListTitle'</span>: <span class="str">'My Life List'</span>,
+         <span class="str">'ListElements'</span>: [{<span class="str">'ListElementID'</span>: 64, <span class="str">'ListElementText'</span>: <span class="str">'Learn Spanish'</span>}] }
+     ] };
+
+    dataLoaded(localData.d);
+}
+    <span class="kwrd">function</span> pageLoad() {
+        loadLocalData ();
+     }
+    <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span></pre>
+
+  </div>
+
+  <div class="date">
+    Written on July 26, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

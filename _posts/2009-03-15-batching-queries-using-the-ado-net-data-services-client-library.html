@@ -1,0 +1,61 @@
+---
+layout: post
+title: Batching Queries using the ADO.NET Data Services CLient library
+date: 2009-03-15 17:50:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- DataServiceContext
+- Demo
+- Documentation
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2009/03/15/batching-queries-using-the-ado-net-data-services-client-library.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9479899'
+  orig_parent_id: '9479899'
+  orig_thread_id: '642050'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2009/03/15/batching-queries-using-the-ado-net-data-services-client-library.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Batching Queries using the ADO.NET Data Services CLient library" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/03/15/batching-queries-using-the-ado-net-data-services-client-library/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Did you know you could execute batch queries using the Data Services client library ? The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios. 1) Batching a set of URI Queries . The ExecuteBatch API accepts an array of DataServiceRequest objects. Consider this example , you want to batch queries to..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Batching Queries using the ADO.NET Data Services CLient library" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/03/15/batching-queries-using-the-ado-net-data-services-client-library/" />
+    <meta name="twitter:description" content="Did you know you could execute batch queries using the Data Services client library ? The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios. 1) Batching a set of URI Queries . The ExecuteBatch API accepts an array of DataServiceRequest objects. Consider this example , you want to batch queries to..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Did you know you could execute batch queries using the Data Services client library ?</p>
+<p>The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios.</p>
+<p><strong>1) Batching a set of URI Queries .</strong></p>
+<p>The ExecuteBatch API accepts an array of <a href="http://msdn.microsoft.com/en-us/library/cc646604.aspx" mce_href="http://msdn.microsoft.com/en-us/library/cc646604.aspx">DataServiceRequest</a> objects. <br />Consider this example , you want to batch queries to be sent to the “Products” and “Categories” entity sets of a northwind service.</p>
+<p><script src="http://gist.github.com/113153.js"></script></p>
+<p><strong>2) Batching Linq Queries</strong></p>
+<p>If you want to use strongly types Linq queries instead of string based URI queries , you can use the linq support to generate the linq query </p>
+<p><script src="http://gist.github.com/113154.js"></script></p>
+<p><strong>3) How do I Identify the response if I make duplicate requests with the same ElementType ?</strong></p>
+<p>Consider this situation , You make 2 requests both of type DataServiceRequest&lt;Products&gt;&nbsp; , how do you identify <br />which response is for which request ?</p>
+<p>One of the scenarios&nbsp; I can think of , is that the entity set contains multiple types related via inheritance .</p>
+<p>ex: Customers entity set contains instances of types HappyCustomers and HappierCustomers inheriting from Customers.</p>
+<p>The QueryOperationResponse type contains a <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.queryoperationresponse.query(VS.95).aspx" mce_href="http://msdn.microsoft.com/en-us/library/system.data.services.client.queryoperationresponse.query(VS.95).aspx">Query</a> property which returns the DataServiceRequest that this response corresponds to .</p>
+<p>You can pass along the requests you made in the batch as a state to the callback and then compare the Query property of the QueryOperationResponse <br />to match the response to the request.</p>
+<p>ex: </p>
+<p><script src="http://gist.github.com/113156.js"></script></p>

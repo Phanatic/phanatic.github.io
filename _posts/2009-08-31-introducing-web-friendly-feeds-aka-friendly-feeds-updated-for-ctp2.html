@@ -1,0 +1,279 @@
+---
+layout: post
+title: Introducing Web Friendly Feeds aka Friendly Feeds (Updated for CTP2)
+date: 2009-08-31 17:53:13.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2009/08/31/introducing-web-friendly-feeds-aka-friendly-feeds-updated-for-ctp2.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9889569'
+  orig_parent_id: '9889569'
+  orig_thread_id: '673911'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2009/08/31/introducing-web-friendly-feeds-aka-friendly-feeds-updated-for-ctp2.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Introducing Web Friendly Feeds aka Friendly Feeds (Updated for CTP2)" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/08/31/introducing-web-friendly-feeds-aka-friendly-feeds-updated-for-ctp2/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Hello all , with the recent release of ADO.NET Data v1.5 Services CTP 1 , we introduced a new feature called as “Web Friendly Feeds”. With the release of CTP2 , we have introduced support for 2 additional ATOM:Entry elements you can map to: entry:Summary entry:Updated What is this feature about ? This is what..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View_thumb.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Introducing Web Friendly Feeds aka Friendly Feeds (Updated for CTP2)" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/08/31/introducing-web-friendly-feeds-aka-friendly-feeds-updated-for-ctp2/" />
+    <meta name="twitter:description" content="Hello all , with the recent release of ADO.NET Data v1.5 Services CTP 1 , we introduced a new feature called as “Web Friendly Feeds”. With the release of CTP2 , we have introduced support for 2 additional ATOM:Entry elements you can map to: entry:Summary entry:Updated What is this feature about ? This is what..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View_thumb.png" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Hello all , with the recent release of ADO.NET Data v1.5 Services CTP 1 , we introduced a new feature called as “Web Friendly Feeds”.    <br />With the release of CTP2 , we have introduced support for 2 additional ATOM:Entry elements you can map to:</p>
+<ol>
+<li>entry:Summary </li>
+<li>entry:Updated </li>
+</ol>
+<p><strong>What is this feature about ?</strong></p>
+<p>This is what the markup for one of the the resources of Customers looks like in ADO.NET Data Services v1 .</p>
+<pre class="csharpcode"><span class="kwrd">&lt;?</span><span class="html">xml</span> <span class="attr">version</span><span class="kwrd">=&quot;1.0&quot;</span> <span class="attr">encoding</span><span class="kwrd">=&quot;utf-8&quot;</span> <span class="attr">standalone</span><span class="kwrd">=&quot;yes&quot;</span> ?<span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">entry</span>
+<span class="attr">xml:base</span><span class="kwrd">=<a href="http://localhost:26503/northwind.svc/" mce_href="http://localhost:26503/northwind.svc/">http://localhost:26503/northwind.svc/</a></span> <br /><span class="attr"><br />xmlns:d</span><span class="kwrd">=<a href="http://schemas.microsoft.com/ado/2007/08/dataservices" mce_href="http://schemas.microsoft.com/ado/2007/08/dataservices">http://schemas.microsoft.com/ado/2007/08/dataservices</a></span> <br /><span class="attr">xmlns:m</span><span class="kwrd">=<a href="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" mce_href="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">http://schemas.microsoft.com/ado/2007/08/dataservices/metadata</a></span> <br /><span class="attr">xmlns</span><span class="kwrd">=&quot;http://www.w3.org/2005/Atom&quot;</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">id</span><span class="kwrd">&gt;</span>http://localhost:26503/northwind.svc/Customers('ALFKI')<span class="kwrd">&lt;/</span><span class="html">id</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">title</span> <span class="attr">type</span><span class="kwrd">=&quot;text&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">updated</span><span class="kwrd">&gt;</span>2009-03-18T20:30:20Z<span class="kwrd">&lt;/</span><span class="html">updated</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">name</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">author</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">category</span> <span class="attr">term</span><span class="kwrd">=&quot;NorthwindModel.Customers&quot;</span> <span class="attr">scheme</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> <span class="kwrd">/&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">content</span> <span class="attr">type</span><span class="kwrd">=&quot;application/xml&quot;</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>ALFKI<span class="kwrd">&lt;/</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>Alfreds Futterkiste<span class="kwrd">&lt;/</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:ContactName</span><span class="kwrd">&gt;</span>Maria Anders<span class="kwrd">&lt;/</span><span class="html">d:ContactName</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:ContactTitle</span><span class="kwrd">&gt;</span>Sales Representative<span class="kwrd">&lt;/</span><span class="html">d:ContactTitle</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>Obere Str. 57<span class="kwrd">&lt;/</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:City</span><span class="kwrd">&gt;</span>Berlin<span class="kwrd">&lt;/</span><span class="html">d:City</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Region</span> <span class="attr">m:null</span><span class="kwrd">=&quot;true&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>12209<span class="kwrd">&lt;/</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>Germany<span class="kwrd">&lt;/</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>030-0074321<span class="kwrd">&lt;/</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>030-0076545<span class="kwrd">&lt;/</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">content</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">entry</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>In the markup above , a couple of things are missing </p>
+<p>1) The &lt;title&gt; element is empty </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">title</span> <span class="attr">type</span><span class="kwrd">=&quot;text&quot;</span> <span class="kwrd">/&gt;</span></pre>
+<p>2) The author/name element is empty </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">author</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">name</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">author</span><span class="kwrd">&gt;</span></pre>
+<p>In v 1.5 , through Friendly Feeds , we will now be able to assign a property of the “Customers” entity type to turn up in these element locations in the atom:entry payload.</p>
+<p>Now , let’s say that we wanted to map the “ContactName” as the author name element of the entry element and Title to be “ContactTitle” as the title of the entry element.<br />
+  <br />Then , the payload would look like this :</p>
+<p></p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">entry</span> <span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">id</span><span class="kwrd">&gt;</span>http://localhost:26503/northwind.svc/Customers('ALFKI')<span class="kwrd">&lt;/</span><span class="html">id</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">title</span> <span class="attr">type</span><span class="kwrd">=&quot;text&quot;</span><span class="kwrd">&gt;</span>Sales Representative<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">updated</span><span class="kwrd">&gt;</span>2009-03-18T20:46:42Z<span class="kwrd">&lt;/</span><span class="html">updated</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">name</span><span class="kwrd">&gt;</span>Maria Anders<span class="kwrd">&lt;/</span><span class="html">name</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">author</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">category</span> <span class="attr">term</span><span class="kwrd">=&quot;NorthwindModel.Customers&quot;</span> <span class="attr">scheme</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> <span class="kwrd">/&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">content</span> <span class="attr">type</span><span class="kwrd">=&quot;application/xml&quot;</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>ALFKI<span class="kwrd">&lt;/</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>Alfreds Futterkiste<span class="kwrd">&lt;/</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:ContactName</span><span class="kwrd">&gt;</span>Maria Anders<span class="kwrd">&lt;/</span><span class="html">d:ContactName</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:ContactTitle</span><span class="kwrd">&gt;</span>Sales Representative<span class="kwrd">&lt;/</span><span class="html">d:ContactTitle</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>Obere Str. 57<span class="kwrd">&lt;/</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:City</span><span class="kwrd">&gt;</span>Berlin<span class="kwrd">&lt;/</span><span class="html">d:City</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Region</span> <span class="attr">m:null</span><span class="kwrd">=&quot;true&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>12209<span class="kwrd">&lt;/</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>Germany<span class="kwrd">&lt;/</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>030-0074321<span class="kwrd">&lt;/</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>030-0076545<span class="kwrd">&lt;/</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">content</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">entry</span><span class="kwrd">&gt;</span></pre>
+<p>This also means , that IE now displays the Title &amp; author Name elements when you browse to the “Customers” entity set .</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View.png" mce_href="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="AStoria_Feed_Reading_View" border="0" alt="AStoria_Feed_Reading_View" src="{{ site.baseurl }}/assets/AStoria_Feed_Reading_View_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View_thumb.png" width="644" height="322" mce_src="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/AStoria_Feed_Reading_View_thumb.png" /></a></p>
+<p><strong>Which elements in the atom:entry element can I map to an entity type properties ?</strong></p>
+<ol>
+<li>entry:author/email </li>
+<li>entry:author/name </li>
+<li>entry:author/uri </li>
+<li>entry:published </li>
+<li>entry:rights </li>
+<li>entry:summary </li>
+<li>entry:title </li>
+<li>entry:updated </li>
+<li>entry:summary </li>
+</ol>
+<p><strong>Once a property is mapped , if keeping the value of the property&#160; in the entry:contents section doesn’t make sense,can I remove it ?<br />
+    <br /></strong>Yes , absolutely , in the above case , we can remove the ContactName &amp; ContactTitle elements from being repeated in the &lt;contents&gt; section.</p>
+<p>Ex:</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">entry</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">id</span><span class="kwrd">&gt;</span>http://localhost:26503/northwind.svc/Customers('ALFKI')<span class="kwrd">&lt;/</span><span class="html">id</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">title</span> <span class="attr">type</span><span class="kwrd">=&quot;text&quot;</span><span class="kwrd">&gt;</span>Sales Representative<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">updated</span><span class="kwrd">&gt;</span>2009-03-18T21:04:20Z<span class="kwrd">&lt;/</span><span class="html">updated</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">name</span><span class="kwrd">&gt;</span>Maria Anders<span class="kwrd">&lt;/</span><span class="html">name</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">category</span> <span class="attr">term</span><span class="kwrd">=&quot;NorthwindModel.Customers&quot;</span> <span class="attr">scheme</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> <span class="kwrd">/&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">content</span> <span class="attr">type</span><span class="kwrd">=&quot;application/xml&quot;</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>ALFKI<span class="kwrd">&lt;/</span><span class="html">d:CustomerID</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>Alfreds Futterkiste<span class="kwrd">&lt;/</span><span class="html">d:CompanyName</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>Obere Str. 57<span class="kwrd">&lt;/</span><span class="html">d:Address</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:City</span><span class="kwrd">&gt;</span>Berlin<span class="kwrd">&lt;/</span><span class="html">d:City</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Region</span> <span class="attr">m:null</span><span class="kwrd">=&quot;true&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>12209<span class="kwrd">&lt;/</span><span class="html">d:PostalCode</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>Germany<span class="kwrd">&lt;/</span><span class="html">d:Country</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>030-0074321<span class="kwrd">&lt;/</span><span class="html">d:Phone</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>030-0076545<span class="kwrd">&lt;/</span><span class="html">d:Fax</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">content</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">entry</span><span class="kwrd">&gt;</span></pre>
+<p><strong>Great , what else can I do with this new feature ?<br />
+    <br /></strong>Well, did I mention you can <font size="4">embed your own markup in the &lt;entry&gt; element for an entity type !!!</font></p>
+<p>consider the following entity type , BlogPost , which looks like this </p>
+<pre class="code"><span style="color: blue">public class </span><span style="color: #2b91af">BlogPost </span>{
+        <span style="color: blue">public double </span>Lat { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public double </span>Long { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public int </span>BlogPostID { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public string </span>Title { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public string </span>Body { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public string </span>Author { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public string </span>PostURI { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+        <span style="color: blue">public string </span>ContentSummary{get;set;}
+}</pre>
+<p>This type represents the entry for a blog post , and also contains the Geographical location information about where the post was made ( Lat /Long)<br />
+  <br />and also the author information. Now , if this data was exposed via a Data Service, the payload would contain the Lat/Long/Published fields as part of&#160; <br />the entry:content element and wouldn’t have any special meaning.</p>
+<p>The author element should be the Author field of the atom:entry , and the Published field to be the atom:published.</p>
+<p>the Lat &amp; Long fields should be a georss element that shows the location at which the Blog Post was made.</p>
+<p>In short , it should look like this :</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">entry</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">id</span><span class="kwrd">&gt;</span>http://localhost/AstoriaBoard/Services/BlogSvc.svc/Posts(1)<span class="kwrd">&lt;/</span><span class="html">id</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">title</span> <span class="attr">type</span><span class="kwrd">=&quot;text&quot;</span><span class="kwrd">&gt;</span>Entities, How many ways do I count thee ?<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">summary</span> <span class="attr">type</span><span class="kwrd">=&quot;html&quot;</span><span class="kwrd">&gt;<br />          &lt;</span><span class="html">img</span> <span class="attr">class</span><span class="kwrd">='imgClass'</span> <span class="attr">width</span><span class="kwrd">='150px'</span> <span class="attr">height</span><span class="kwrd">='150px'</span> <span class="attr">src</span><span class="kwrd">='/AStoriaBoard/mug.jpg'</span><span class="kwrd">/&gt;&lt;</span><span class="html">br</span><span class="kwrd">/&gt;</span>Its a common ask that we introduce aggregatin<br />   <span class="kwrd">&lt;/</span><span class="html">summary</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">published</span><span class="kwrd">&gt;</span>2009-03-18T14:29:43-07:00<span class="kwrd">&lt;/</span><span class="html">published</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">updated</span><span class="kwrd">&gt;</span>2009-03-18T21:29:43Z<span class="kwrd">&lt;/</span><span class="html">updated</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">name</span><span class="kwrd">&gt;</span>Phani Raj<span class="kwrd">&lt;/</span><span class="html">name</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">rel</span><span class="kwrd">=&quot;edit&quot;</span> <span class="attr">title</span><span class="kwrd">=&quot;BlogPost&quot;</span> <span class="attr">href</span><span class="kwrd">=&quot;Posts(1)&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">category</span> <span class="attr">term</span><span class="kwrd">=&quot;Blogs.BlogPost&quot;</span> <span class="attr">scheme</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/scheme&quot;</span> <span class="kwrd">/&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">content</span> <span class="attr">type</span><span class="kwrd">=&quot;application/xml&quot;</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:BlogPostID</span> <span class="attr">m:type</span><span class="kwrd">=&quot;Edm.Int32&quot;</span><span class="kwrd">&gt;</span>1<span class="kwrd">&lt;/</span><span class="html">d:BlogPostID</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Body</span><span class="kwrd">&gt;</span>Its a common ask that we introduce aggregating mechanisms in Data services <br />          so that one can do a Count of the number of entities present in an EntitySet easily. <br />          In this blog post , I will outline one method of implementing a “Count” method that works for you. <br />          The interface to the count method will be<span class="kwrd">&lt;/</span><span class="html">d:Body</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:Author</span><span class="kwrd">&gt;</span>Phani Raj<span class="kwrd">&lt;/</span><span class="html">d:Author</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">d:PostURI</span> <span class="attr">m:null</span><span class="kwrd">=&quot;true&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">content</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">geo</span> <span class="attr">xmlns</span><span class="kwrd">=&quot;http://www.georss.org/georss&quot;</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;</span><span class="html">long</span><span class="kwrd">&gt;</span>-80.244445<span class="kwrd">&lt;/</span><span class="html">long</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;</span><span class="html">lat</span><span class="kwrd">&gt;</span>25.730752<span class="kwrd">&lt;/</span><span class="html">lat</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;/</span><span class="html">geo</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;/</span><span class="html">entry</span><span class="kwrd">&gt;</span></pre>
+<p>Now that we got this markup , I feel like we should do something with it . How about showing this information on a MAP ?<br />
+  <br />I know !! We have a mapping solution , Virtual Earth , lets try and see if we can feed this feed to Virtual Earth and make it see our GeoRss markup.</p>
+<p>Recently , ( November 2008 ), the Live team released the Map control as an asp.net control . Download it here :<a title="http://dev.live.com/tools/" href="http://dev.live.com/tools/" mce_href="http://dev.live.com/tools/">http://dev.live.com/tools/</a></p>
+<p>Add this control to an aspx page in the same website as the Data Service .</p>
+<pre class="code"><span style="background: #ffee62">&lt;%</span><span style="color: blue">@ </span><span style="color: #a31515">Page </span><span style="color: red">Language</span><span style="color: blue">=&quot;C#&quot; </span><span style="color: red">AutoEventWireup</span><span style="color: blue">=&quot;true&quot; </span><span style="color: red">CodeFile</span><span style="color: blue">=&quot;Default.aspx.cs&quot; </span><span style="color: red">Inherits</span><span style="color: blue">=&quot;_Default&quot; </span><span style="background: #ffee62">%&gt;
+
+</span><span style="color: blue">&lt;!</span><span style="color: #a31515">DOCTYPE </span><span style="color: red">html PUBLIC </span><span style="color: blue">&quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;</span><span style="color: #a31515">html </span><span style="color: red">xmlns</span><span style="color: blue">=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;</span><span style="color: #a31515">head </span><span style="color: red">runat</span><span style="color: blue">=&quot;server&quot;&gt;
+    &lt;</span><span style="color: #a31515">title</span><span style="color: blue">&gt;&lt;/</span><span style="color: #a31515">title</span><span style="color: blue">&gt;
+    &lt;</span><span style="color: #a31515">style</span><span style="color: blue">&gt;
+        </span><span style="color: #a31515">.imgClass</span>{
+            <span style="color: red">border</span>: <span style="color: blue">solid 2px #99ccff</span>;}
+    <span style="color: blue">&lt;/</span><span style="color: #a31515">style</span><span style="color: blue">&gt;
+&lt;/</span><span style="color: #a31515">head</span><span style="color: blue">&gt;
+&lt;</span><span style="color: #a31515">body</span><span style="color: blue">&gt;
+    &lt;</span><span style="color: #a31515">form </span><span style="color: red">id</span><span style="color: blue">=&quot;form1&quot; </span><span style="color: red">runat</span><span style="color: blue">=&quot;server&quot;&gt;
+    &lt;</span><span style="color: #a31515">script </span><span style="color: red">language</span><span style="color: blue">=&quot;javascript&quot;&gt;
+        function </span>pageLoad() {
+            HookUpWorkAround();
+        }
+    <span style="color: blue">&lt;/</span><span style="color: #a31515">script</span><span style="color: blue">&gt;
+    &lt;</span><span style="color: #a31515">div </span><span style="color: red">id</span><span style="color: blue">=&quot;mapContainer&quot;&gt;
+        <strong>&lt;</strong></span><strong><span style="color: #a31515">ve</span><span style="color: blue">:</span><span style="color: #a31515">Map </span><span style="color: red">ID</span><span style="color: blue">=&quot;geoRssMap&quot; </span><span style="color: red">runat</span><span style="color: blue">=&quot;server&quot; </span><span style="color: red">Height</span><span style="color: blue">=&quot;600px&quot; </span><span style="color: red">Width</span><span style="color: blue">=&quot;75%&quot; </span><span style="color: red">ZoomLevel</span></strong><span style="color: blue"><strong>=&quot;4&quot; /&gt;
+</strong>    &lt;/</span><span style="color: #a31515">div</span><span style="color: blue">&gt;
+    &lt;</span><span style="color: #a31515">asp</span><span style="color: blue">:</span><span style="color: #a31515">ScriptManager </span><span style="color: red">ID</span><span style="color: blue">=&quot;scrpManager&quot; </span><span style="color: red">runat</span><span style="color: blue">=&quot;server&quot;&gt;
+        &lt;</span><span style="color: #a31515">Scripts</span><span style="color: blue">&gt;
+            &lt;</span><span style="color: #a31515">asp</span><span style="color: blue">:</span><span style="color: #a31515">ScriptReference </span><span style="color: red">Path</span><span style="color: blue">=&quot;~/Scripts/VEWorkAround.js&quot; /&gt;
+        &lt;/</span><span style="color: #a31515">Scripts</span><span style="color: blue">&gt;
+    &lt;/</span><span style="color: #a31515">asp</span><span style="color: blue">:</span><span style="color: #a31515">ScriptManager</span><span style="color: blue">&gt;
+    &lt;/</span><span style="color: #a31515">form</span><span style="color: blue">&gt;
+&lt;/</span><span style="color: #a31515">body</span><span style="color: blue">&gt;
+&lt;/</span><span style="color: #a31515">html</span><span style="color: blue">&gt;
+</span></pre>
+<p>In the code-behind file , </p>
+<pre class="code"><span style="color: blue">using </span>System;
+<span style="color: blue">using </span>Microsoft.Live.ServerControls.VE;
+
+<span style="color: blue">public partial class </span><span style="color: #2b91af">_Default </span>: System.Web.UI.<span style="color: #2b91af">Page
+</span>{
+    <span style="color: blue">protected void </span>Page_Load(<span style="color: blue">object </span>sender, <span style="color: #2b91af">EventArgs </span>e)
+    {
+        <span style="color: green">//Clear out any mapped locations
+        </span>geoRssMap.Clear();
+        <span style="color: green">//Create a new shapelayer to import
+        </span><span style="color: #2b91af">ShapeLayer </span>geoRssLayer = <span style="color: blue">new </span><span style="color: #2b91af">ShapeLayer</span>();
+        <span style="color: green">//Point the shape layer at the data source returning the mapping information
+        </span><span style="color: #2b91af">ShapeSourceSpecification </span>georssSpec = <span style="color: blue">new </span><span style="color: #2b91af">ShapeSourceSpecification</span>(
+                    <span style="color: #2b91af">DataType</span>.GeoRSS, <span style="color: #a31515">&quot;Services/BlogSvc.svc/Posts&quot;</span>, geoRssLayer
+                    );
+        <span style="color: green">//Bind the feed to the map
+        </span>geoRssMap.ImportShapeLayerData(georssSpec, <span style="color: blue">null</span>, <span style="color: blue">false</span>);
+    }
+}</pre>
+<p><a href="http://11011.net/software/vspaste" mce_href="http://11011.net/software/vspaste"></a></p>
+<p>You might be wondering why we need the HookUpWorkAround() function and what it does , I’ll explain that in a later blog post .<br />
+  <br />After this , set the web page as the startup page and browse to the page in <strong><em><u>FireFox , </u></em></strong>I’ll explain why Firefox in a later blog post .</p>
+<p>And voila !! This is what the page looks like :</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/FF_Ve_Firefox_2.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/FF_Ve_Firefox_2.png" mce_href="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/FF_Ve_Firefox_2.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="FF_Ve_Firefox" border="0" alt="FF_Ve_Firefox" src="{{ site.baseurl }}/assets/FF_Ve_Firefox_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/FF_Ve_Firefox_thumb.png" width="613" height="484" mce_src="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/IntroducingWebFriendlyFeeds_BB40/FF_Ve_Firefox_thumb.png" /></a></p>
+<p>You can download the&#160; sample project that demonstrates this feature by clicking on the link at the bottom of this post</p>
+<p>All this demonstrates the <strong>what </strong>and not the <strong>how </strong>, we shall discuss the <strong>how </strong>in future blog posts.</p>
+<p>In the meantime ,enjoy this sample app and try out your own mashups.</p>

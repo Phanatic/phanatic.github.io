@@ -1,0 +1,202 @@
+---
+layout: post
+title: 'Howto: Detect if IIS7 is installed on a Vista Machine'
+date: 2007-04-17 09:35:04.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- IIS 7
+- VISTA
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/04/17/howto-detect-if-iis7-is-installed-on-a-vista-machine.aspx
+  orig_site_id: '7524'
+  orig_post_id: '2163263'
+  orig_parent_id: '2163263'
+  orig_thread_id: '507481'
+  _wds_ratings_users: '1'
+  _wds_ratings_score: '5'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/04/17/howto-detect-if-iis7-is-installed-on-a-vista-machine.aspx
+  _wds_ratings_average: '5'
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Howto: Detect if IIS7 is installed on a Vista Machine" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/04/17/howto-detect-if-iis7-is-installed-on-a-vista-machine/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS. There are many ways to do this . I will describe one of the Easiest ways to do this . When IIS is installed on a Vista Machine , it creates..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Howto: Detect if IIS7 is installed on a Vista Machine" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/04/17/howto-detect-if-iis7-is-installed-on-a-vista-machine/" />
+    <meta name="twitter:description" content="Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS. There are many ways to do this . I will describe one of the Easiest ways to do this . When IIS is installed on a Vista Machine , it creates..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS.</p>
+<p>There are many ways to do this .</p>
+<p>I will describe one of the Easiest ways to do this .</p>
+<p>When IIS is installed on a Vista Machine , it creates a Registry Key under the Node.</p>
+<p><strong>HKLM\Software\Microsoft\InetStp</strong></p>
+<p>The Optional Modules that are selected are specified under the Registry key .</p>
+<p><strong>HKLM\Software\Microsoft\InetStp\Components</strong></p>
+<p>We will write a small code snippet that reads the registry and reports if IIS is installed on a Vista Machine.</p>
+<p>1) Include the Microsoft.Win32 Namespace to include the Functions&nbsp; to access the Windows Registry .</p>
+<pre class="csharpcode"><span class="kwrd">using</span> Microsoft.Win32;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">2) <span class="rem">Function To Find out if IIS Is installed on a machine</span></pre>
+<pre class="csharpcode"><strong><u><span class="rem"></span>
+</u></strong><span class="kwrd">public</span> <span class="kwrd">bool</span> IsIISInstalled(){</pre>
+<pre class="csharpcode"><span class="kwrd">bool</span> IISIsInstalled = <span class="kwrd">false</span>;</pre>
+<pre class="csharpcode"><span class="rem">//Try to Open the Registry Key</span>
+RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp"</span>);</pre>
+<pre class="csharpcode"><span class="rem">//If the Registry Key exists, then IIS is Installed on Vista</span>
+IISIsInstalled = softwareKey == <span class="kwrd">null</span> ? <span class="kwrd">false</span> : <span class="kwrd">true</span>;</pre>
+<pre class="csharpcode"><span class="rem">//Return Existance to calling Function</span>
+<span class="kwrd">return</span> IISIsInstalled;</pre>
+<pre class="csharpcode">
+}</pre>
+<pre class="csharpcode">3) Function To Find all the Optional Components that are installed with IIS .</pre>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">string</span>[] GetOptionalIISComponentsInstalled()  {
+<span class="rem">//The Optional Components are Values  in the Registry Subkey Specified above</span>
+<span class="kwrd">string</span>[] optionalComponents = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp\Components"</span>).GetValueNames();
+<span class="rem">//Return the String Array to the calling function</span>
+<span class="kwrd">return</span> optionalComponents;
+}</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">Please  note that the code Snippet provided is <u>only for Demonstration Purposes </u>and does not claim to be optimised for any of the below.</pre>
+<pre class="csharpcode"> a) Performance</pre>
+<pre class="csharpcode"> b) Security </pre>
+<pre class="csharpcode"> c) Scalabality</pre>
+<pre class="csharpcode"><u><strong>Use the  Code snippet  at your own risk</strong></u></pre>
+<pre class="csharpcode"><strong><u>Complete Example:</u></strong></pre>
+<pre class="csharpcode"><span class="kwrd">using</span> System;
+<span class="kwrd">using</span> System.Reflection;
+<span class="kwrd">using</span> System.IO;
+<span class="kwrd">using</span> System.Collections.Generic;
+<span class="kwrd">using</span> System.Text;
+<span class="kwrd">using</span> Microsoft.Win32;
+<span class="kwrd">namespace</span> DetectIIS
+{
+    <span class="kwrd">class</span> Program{</pre>
+<pre class="csharpcode">       <span class="kwrd">public</span> <span class="kwrd">string</span>[] GetOptionalIISComponentsInstalled(){
+            <span class="kwrd">string</span>[] optionalComponents = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp\Components"</span>).GetValueNames();
+            <span class="kwrd">return</span> optionalComponents;
+        }</pre>
+<pre class="csharpcode">        <span class="kwrd">public</span> <span class="kwrd">bool</span> IsIISInstalled(){
+            <span class="kwrd">bool</span> IISIsInstalled = <span class="kwrd">false</span>;
+            RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp"</span>);
+            IISIsInstalled = softwareKey == <span class="kwrd">null</span> ? <span class="kwrd">false</span> : <span class="kwrd">true</span>;
+            <span class="kwrd">return</span> IISIsInstalled;
+        }
+
+        <span class="kwrd">static</span> <span class="kwrd">void</span> Main(<span class="kwrd">string</span>[] args)
+        {
+            <span class="kwrd">try</span>
+            {
+                Program anInstance = <span class="kwrd">new</span> Program();</pre>
+<pre class="csharpcode">                <span class="kwrd">if</span> (anInstance.IsIISInstalled())
+                {
+                    <span class="kwrd">string</span>[] installedComponents = anInstance.GetOptionalIISComponentsInstalled();
+                    <span class="kwrd">foreach</span> (<span class="kwrd">string</span> component <span class="kwrd">in</span> installedComponents)
+                    {
+                        Console.WriteLine(component);
+                    }
+
+                }
+                Console.Read();
+            }
+            <span class="kwrd">catch</span> (AccessViolationException aceExcep)
+            {
+                Console.WriteLine(<span class="str">"You do not have sufficient access to the Registry , please run under elevated mode"</span>);
+
+            }
+        }
+    }
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Howto: Detect if IIS7 is installed on a Vista Machine – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS.
+There are many ways to do this .
+I will describe one of the Easiest ways to do this .
+When IIS is installed on a Vista Machine , it creates a Registry Key under the Node.
+HKLM\Software\Microsoft\InetStp
+The Optional Modules that are selected are specified under the Registry key .
+HKLM\Software\Microsoft\InetStp\Components
+We will write a small code snippet that reads the registry and reports if IIS is installed on a Vista Machine.
+1) Include the Microsoft.Win32 Namespace to include the Functions&nbsp; to access the Windows Registry .
+using Microsoft.Win32;
+&nbsp;
+2) Function To Find out if IIS Is installed on a machine
+
+public bool IsIISInstalled(){
+bool IISIsInstalled = false;
+//Try to Open the Registry Key
+RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp");
+//If the Registry Key exists, then IIS is Installed on Vista
+IISIsInstalled = softwareKey == null ? false : true;
+//Return Existance to calling Function
+return IISIsInstalled;
+
+}
+3) Function To Find all the Optional Components that are installed with IIS .
+public string[] GetOptionalIISComponentsInstalled()  {
+//The Optional Components are Values  in the Registry Subkey Specified above
+string[] optionalComponents = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp\Components").GetValueNames();
+//Return the String Array to the calling function
+return optionalComponents;
+}
+&nbsp;
+Please  note that the code Snippet provided is only for Demonstration Purposes and does not claim to be optimised for any of the below.
+ a) Performance
+ b) Security 
+ c) Scalabality
+Use the  Code snippet  at your own risk
+Complete Example:
+using System;
+using System.Reflection;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.Win32;
+namespace DetectIIS
+{
+    class Program{
+       public string[] GetOptionalIISComponentsInstalled(){
+            string[] optionalComponents = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp\Components").GetValueNames();
+            return optionalComponents;
+        }
+        public bool IsIISInstalled(){
+            bool IISIsInstalled = false;
+            RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp");
+            IISIsInstalled = softwareKey == null ? false : true;
+            return IISIsInstalled;
+        }
+
+        static void Main(string[] args)
+        {
+            try
+            {
+                Program anInstance = new Program();
+                if (anInstance.IsIISInstalled())
+                {
+                    string[] installedComponents = anInstance.GetOptionalIISComponentsInstalled();
+                    foreach (string component in installedComponents)
+                    {
+                        Console.WriteLine(component);
+                    }
+
+                }
+                Console.Read();
+            }
+            catch (AccessViolationException aceExcep)
+            {
+                Console.WriteLine("You do not have sufficient access to the Registry , please run under elevated mode");
+
+            }
+        }
+    }
+}
+
+&nbsp;
+
+
+" />
+    <meta property="og:description" content="Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS.
+There are many ways to do this .
+I will describe one of the Easiest ways to do this .
+When IIS is installed on a Vista Machine , it creates a Registry Key under the Node.
+HKLM\Software\Microsoft\InetStp
+The Optional Modules that are selected are specified under the Registry key .
+HKLM\Software\Microsoft\InetStp\Components
+We will write a small code snippet that reads the registry and reports if IIS is installed on a Vista Machine.
+1) Include the Microsoft.Win32 Namespace to include the Functions&nbsp; to access the Windows Registry .
+using Microsoft.Win32;
+&nbsp;
+2) Function To Find out if IIS Is installed on a machine
+
+public bool IsIISInstalled(){
+bool IISIsInstalled = false;
+//Try to Open the Registry Key
+RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp");
+//If the Registry Key exists, then IIS is Installed on Vista
+IISIsInstalled = softwareKey == null ? false : true;
+//Return Existance to calling Function
+return IISIsInstalled;
+
+}
+3) Function To Find all the Optional Components that are installed with IIS .
+public string[] GetOptionalIISComponentsInstalled()  {
+//The Optional Components are Values  in the Registry Subkey Specified above
+string[] optionalComponents = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp\Components").GetValueNames();
+//Return the String Array to the calling function
+return optionalComponents;
+}
+&nbsp;
+Please  note that the code Snippet provided is only for Demonstration Purposes and does not claim to be optimised for any of the below.
+ a) Performance
+ b) Security 
+ c) Scalabality
+Use the  Code snippet  at your own risk
+Complete Example:
+using System;
+using System.Reflection;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.Win32;
+namespace DetectIIS
+{
+    class Program{
+       public string[] GetOptionalIISComponentsInstalled(){
+            string[] optionalComponents = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp\Components").GetValueNames();
+            return optionalComponents;
+        }
+        public bool IsIISInstalled(){
+            bool IISIsInstalled = false;
+            RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey("Software\Microsoft\InetStp");
+            IISIsInstalled = softwareKey == null ? false : true;
+            return IISIsInstalled;
+        }
+
+        static void Main(string[] args)
+        {
+            try
+            {
+                Program anInstance = new Program();
+                if (anInstance.IsIISInstalled())
+                {
+                    string[] installedComponents = anInstance.GetOptionalIISComponentsInstalled();
+                    foreach (string component in installedComponents)
+                    {
+                        Console.WriteLine(component);
+                    }
+
+                }
+                Console.Read();
+            }
+            catch (AccessViolationException aceExcep)
+            {
+                Console.WriteLine("You do not have sufficient access to the Registry , please run under elevated mode");
+
+            }
+        }
+    }
+}
+
+&nbsp;
+
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Howto: Detect if IIS7 is installed on a Vista Machine" />
+    <meta property="twitter:title" content="Howto: Detect if IIS7 is installed on a Vista Machine" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Howto: Detect if IIS7 is installed on a Vista Machine</h1>
+
+  <div class="entry">
+    <p>Quite Often we come across a Need to find out if IIS 7 is installed before we install any software thats dependent on IIS.</p>
+<p>There are many ways to do this .</p>
+<p>I will describe one of the Easiest ways to do this .</p>
+<p>When IIS is installed on a Vista Machine , it creates a Registry Key under the Node.</p>
+<p><strong>HKLM\Software\Microsoft\InetStp</strong></p>
+<p>The Optional Modules that are selected are specified under the Registry key .</p>
+<p><strong>HKLM\Software\Microsoft\InetStp\Components</strong></p>
+<p>We will write a small code snippet that reads the registry and reports if IIS is installed on a Vista Machine.</p>
+<p>1) Include the Microsoft.Win32 Namespace to include the Functions&nbsp; to access the Windows Registry .</p>
+<pre class="csharpcode"><span class="kwrd">using</span> Microsoft.Win32;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">2) <span class="rem">Function To Find out if IIS Is installed on a machine</span></pre>
+<pre class="csharpcode"><strong><u><span class="rem"></span>
+</u></strong><span class="kwrd">public</span> <span class="kwrd">bool</span> IsIISInstalled(){</pre>
+<pre class="csharpcode"><span class="kwrd">bool</span> IISIsInstalled = <span class="kwrd">false</span>;</pre>
+<pre class="csharpcode"><span class="rem">//Try to Open the Registry Key</span>
+RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp"</span>);</pre>
+<pre class="csharpcode"><span class="rem">//If the Registry Key exists, then IIS is Installed on Vista</span>
+IISIsInstalled = softwareKey == <span class="kwrd">null</span> ? <span class="kwrd">false</span> : <span class="kwrd">true</span>;</pre>
+<pre class="csharpcode"><span class="rem">//Return Existance to calling Function</span>
+<span class="kwrd">return</span> IISIsInstalled;</pre>
+<pre class="csharpcode">
+}</pre>
+<pre class="csharpcode">3) Function To Find all the Optional Components that are installed with IIS .</pre>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">string</span>[] GetOptionalIISComponentsInstalled()  {
+<span class="rem">//The Optional Components are Values  in the Registry Subkey Specified above</span>
+<span class="kwrd">string</span>[] optionalComponents = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp\Components"</span>).GetValueNames();
+<span class="rem">//Return the String Array to the calling function</span>
+<span class="kwrd">return</span> optionalComponents;
+}</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">Please  note that the code Snippet provided is <u>only for Demonstration Purposes </u>and does not claim to be optimised for any of the below.</pre>
+<pre class="csharpcode"> a) Performance</pre>
+<pre class="csharpcode"> b) Security </pre>
+<pre class="csharpcode"> c) Scalabality</pre>
+<pre class="csharpcode"><u><strong>Use the  Code snippet  at your own risk</strong></u></pre>
+<pre class="csharpcode"><strong><u>Complete Example:</u></strong></pre>
+<pre class="csharpcode"><span class="kwrd">using</span> System;
+<span class="kwrd">using</span> System.Reflection;
+<span class="kwrd">using</span> System.IO;
+<span class="kwrd">using</span> System.Collections.Generic;
+<span class="kwrd">using</span> System.Text;
+<span class="kwrd">using</span> Microsoft.Win32;
+<span class="kwrd">namespace</span> DetectIIS
+{
+    <span class="kwrd">class</span> Program{</pre>
+<pre class="csharpcode">       <span class="kwrd">public</span> <span class="kwrd">string</span>[] GetOptionalIISComponentsInstalled(){
+            <span class="kwrd">string</span>[] optionalComponents = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp\Components"</span>).GetValueNames();
+            <span class="kwrd">return</span> optionalComponents;
+        }</pre>
+<pre class="csharpcode">        <span class="kwrd">public</span> <span class="kwrd">bool</span> IsIISInstalled(){
+            <span class="kwrd">bool</span> IISIsInstalled = <span class="kwrd">false</span>;
+            RegistryKey softwareKey = Registry.LocalMachine.OpenSubKey(<span class="str">"Software\Microsoft\InetStp"</span>);
+            IISIsInstalled = softwareKey == <span class="kwrd">null</span> ? <span class="kwrd">false</span> : <span class="kwrd">true</span>;
+            <span class="kwrd">return</span> IISIsInstalled;
+        }
+
+        <span class="kwrd">static</span> <span class="kwrd">void</span> Main(<span class="kwrd">string</span>[] args)
+        {
+            <span class="kwrd">try</span>
+            {
+                Program anInstance = <span class="kwrd">new</span> Program();</pre>
+<pre class="csharpcode">                <span class="kwrd">if</span> (anInstance.IsIISInstalled())
+                {
+                    <span class="kwrd">string</span>[] installedComponents = anInstance.GetOptionalIISComponentsInstalled();
+                    <span class="kwrd">foreach</span> (<span class="kwrd">string</span> component <span class="kwrd">in</span> installedComponents)
+                    {
+                        Console.WriteLine(component);
+                    }
+
+                }
+                Console.Read();
+            }
+            <span class="kwrd">catch</span> (AccessViolationException aceExcep)
+            {
+                Console.WriteLine(<span class="str">"You do not have sufficient access to the Registry , please run under elevated mode"</span>);
+
+            }
+        }
+    }
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+
+  </div>
+
+  <div class="date">
+    Written on April 17, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

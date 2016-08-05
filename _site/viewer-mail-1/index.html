@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Viewer Mail , #1 – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Disclaimer&#160; : These are my thoughts and opinions , although I work on the Astoria team , I am not the voice of the team.The team has its own voice and can be heard here : Project Astoria Team Blog
+Hola ! 
+I am interrupting my regularly scheduled blog post to&#160; answer some really interesting questions about one of my blog posts , i.e Working with Associations in ADO.NET Data Services.&#160; These questions are from the comments on the post and     also the public forums.     
+Vince says :      ”Hi,
+I find bad to be forced to use the Addlink to allow us to save relational object in the DB.
+We have a pretty full object model but the Addlink method needs string argument. As each entity knows all navigation properties, why to not have something like entity.NavigationObject rather than string SourceProperty. At least, myObject.MyNavigationProperty.Name or ToStringName would be better. 
+Thanks
+Nice blogs
+Regards
+-Vince”
+e    Thank you Vince for the compliment and let me try to explain the reason we built the client this way.     
+For V1 , we wanted to give you POCO access to the data classes. Although we could infer the relation based on the type of the navigation property , this would break scenarios where we have more than 1 navigation properties of the same type and belonging to the same entity Set.
+Consider this entity ,
+public class Customer {
+public List&lt;Orders&gt; CashPurchases{get;set;}
+public List&lt;Orders&gt; CreditCardPurchases{get;set;}
+ }
+If you do an AddLink with just an instance of Orders, we would have to guess which navigation property we have to add the link to .
+Customer newCustomer = new Customer();
+Orders cashPurchase = new Orders();
+Orders creditCardPurchase = new Orders();
+context.AddLink( newCustomer , &quot;??&quot;, cashPurchase);
+In the above case , trying to guess the name of the association will land us in hot water as we don't know which navigation property you intended .
+we cant go the other way around and try to use the instance of Orders to guess the name of the association
+  as we Orders may have other associations of type Customers and we dont know which one you intended.
+If you do not wish to use the string to remember the association name , you can move that to a separate resource file and have all your strings localized in one place.
+Consider this ..
+public class StoreConstants{
+public static string Customers_To_CashPurchases  =&quot;CashPurchases&quot;;
+public static string Customers_To_CreditCardPurchases  =&quot;CreditCardPurchases&quot;;
+}
+and then in your code ,
+Customer newCustomer = new Customer();
+Orders cashPurchase = new Orders();
+Orders creditCardPurchase = new Orders();
+context.AddLink( newCustomer , StoreConstants.Customers_To_CashPurchases , cashPurchase);
+context.AddLink( newCustomer , StoreConstants.Customers_To_CreditCardPurchases , creditCardPurchase);
+Simon says :
+    
+”Hi Phani,
+Nice clear exposition of the topic.
+However, I would think that, given that we are working with a client-side proxy, the separation of object tracking and association tracking is a bit too abstract for the most common scenarios where this client class may be used, ie with out-of-the-box databinding to UI components etc.
+I understand the nice separation of concerns etc, but surely if the Customer or Contact properties are set in code, the user intends them to be set.I guess it is about user intentions and usability. Could you provide an overload such as 
+Context.AddObject( String property,Object value, Boolean shouldTrackAssociations)
+Just a thought/suggestion.
+
+Cheers,
+  Simon”
+Thanks Simon for the compliment and lets explore this further,
+I agree that the concept of treating associations as first class resources is somewhat new to the application scenarios where the client library is being used.
+At the same time , we dont want to make assumptions on how the relation exists on the server as the client does not have enough information about the server schema. 
+Sure , we have the CLR types reflect the associations on the server i.e Reference for 1..1 relations and Collection types for 1..N relations.
+But we really dont want to make assumptions about this.
+Associations are first class resources on the server too , which means that any changes to associations should happen as separate requests or as part of another request. That making the assumption of a given relation causes an additional HTTP Request&#160; , which uses bandwidth you will be paying for .
+Even if we added some magic to cause 
+newProduct.Categories.Add(newCategory) ;
+to be 
+Context.AddLink(newProduct,&quot;Categories&quot;,newCategory);
+then the entity classes Products and Category would have to know about the DataServiceContext ,
+newProduct.Context = myDataServiceContext;
+and this would just look ugly&#160; ,IMHO.
+Now , that was just me explaining how things are and why we cant do this today .
+Let me share my thoughts of how this should be done and see how this sits with you .
+If an entity has only one navigation property of a specify type .
+ex: Customers has only one Navigation property of type Address.
+    Regardless of whether it is a Reference property or a Collection property,
+updating the CLR property on the entity should setup the link
+ex:
+Address newAddress = new Address(){
+City=’Bellevue’,
+State=’WA’
+};
+newCustomer.Address = newAddress;
+should automatically set this relation up in this way ,
+context.SetLink(newCustomer,”Address”,newAddress);
+To achieve this , without letting the entities know about the context ,the entities would have to notify the context that they have navigation properties and the context should listen for changes to the navigation properties.
+But when should the context hook itself up to the afore-mentioned events ?
+when the source entity is modified in some way perhaps ?
+ex : 
+context.AddObject(“Customers”,newCustomer);
+//pseudo code for AddObject
+public void AddObject(string entitySetName,object entity) {
+   ICanHazNavigationProperties navProps = entity as ICanHazNavigationProperties ;
+    if( navProps !=null) {
+    navProps.RegisterHandler(HandleNavPropChange);
+  }// do something here
+}
+
+private void HandleNavPropChange(object source,string associationName,               object target,Multiplicity associationMultiplicity,NavPropAction action) {
+  switch(action)
+  {
+    case ( NavPropAction.AddLink ) :
+                switch(associationMultiplicity) {
+                         case Multiplicity.One :
+                           this.SetLink(source,associationName,target);
+                          break;
+               }
+    break;       //Other cases skipped for brevity
+    }
+  }
+
+}
+Now , if we go with this approach, the entity types themselves cannot be pure POCO objects if you want automatic
+  link tracking.&#160; For auto generated types using DataSvcUtil.exe or “Add Service Reference” this is no big deal.
+But what about cases where one has to hand-craft the entity types by hand ?
+Well, this was me just thinking out loud. If you agree/disagree , leave a comment and get featured in the next
+“Viewer Mail”.
+
+A data geek joke , just like associations are first class resources , comments are first class material for blog posts :)
+" />
+    <meta property="og:description" content="Disclaimer&#160; : These are my thoughts and opinions , although I work on the Astoria team , I am not the voice of the team.The team has its own voice and can be heard here : Project Astoria Team Blog
+Hola ! 
+I am interrupting my regularly scheduled blog post to&#160; answer some really interesting questions about one of my blog posts , i.e Working with Associations in ADO.NET Data Services.&#160; These questions are from the comments on the post and     also the public forums.     
+Vince says :      ”Hi,
+I find bad to be forced to use the Addlink to allow us to save relational object in the DB.
+We have a pretty full object model but the Addlink method needs string argument. As each entity knows all navigation properties, why to not have something like entity.NavigationObject rather than string SourceProperty. At least, myObject.MyNavigationProperty.Name or ToStringName would be better. 
+Thanks
+Nice blogs
+Regards
+-Vince”
+e    Thank you Vince for the compliment and let me try to explain the reason we built the client this way.     
+For V1 , we wanted to give you POCO access to the data classes. Although we could infer the relation based on the type of the navigation property , this would break scenarios where we have more than 1 navigation properties of the same type and belonging to the same entity Set.
+Consider this entity ,
+public class Customer {
+public List&lt;Orders&gt; CashPurchases{get;set;}
+public List&lt;Orders&gt; CreditCardPurchases{get;set;}
+ }
+If you do an AddLink with just an instance of Orders, we would have to guess which navigation property we have to add the link to .
+Customer newCustomer = new Customer();
+Orders cashPurchase = new Orders();
+Orders creditCardPurchase = new Orders();
+context.AddLink( newCustomer , &quot;??&quot;, cashPurchase);
+In the above case , trying to guess the name of the association will land us in hot water as we don't know which navigation property you intended .
+we cant go the other way around and try to use the instance of Orders to guess the name of the association
+  as we Orders may have other associations of type Customers and we dont know which one you intended.
+If you do not wish to use the string to remember the association name , you can move that to a separate resource file and have all your strings localized in one place.
+Consider this ..
+public class StoreConstants{
+public static string Customers_To_CashPurchases  =&quot;CashPurchases&quot;;
+public static string Customers_To_CreditCardPurchases  =&quot;CreditCardPurchases&quot;;
+}
+and then in your code ,
+Customer newCustomer = new Customer();
+Orders cashPurchase = new Orders();
+Orders creditCardPurchase = new Orders();
+context.AddLink( newCustomer , StoreConstants.Customers_To_CashPurchases , cashPurchase);
+context.AddLink( newCustomer , StoreConstants.Customers_To_CreditCardPurchases , creditCardPurchase);
+Simon says :
+    
+”Hi Phani,
+Nice clear exposition of the topic.
+However, I would think that, given that we are working with a client-side proxy, the separation of object tracking and association tracking is a bit too abstract for the most common scenarios where this client class may be used, ie with out-of-the-box databinding to UI components etc.
+I understand the nice separation of concerns etc, but surely if the Customer or Contact properties are set in code, the user intends them to be set.I guess it is about user intentions and usability. Could you provide an overload such as 
+Context.AddObject( String property,Object value, Boolean shouldTrackAssociations)
+Just a thought/suggestion.
+
+Cheers,
+  Simon”
+Thanks Simon for the compliment and lets explore this further,
+I agree that the concept of treating associations as first class resources is somewhat new to the application scenarios where the client library is being used.
+At the same time , we dont want to make assumptions on how the relation exists on the server as the client does not have enough information about the server schema. 
+Sure , we have the CLR types reflect the associations on the server i.e Reference for 1..1 relations and Collection types for 1..N relations.
+But we really dont want to make assumptions about this.
+Associations are first class resources on the server too , which means that any changes to associations should happen as separate requests or as part of another request. That making the assumption of a given relation causes an additional HTTP Request&#160; , which uses bandwidth you will be paying for .
+Even if we added some magic to cause 
+newProduct.Categories.Add(newCategory) ;
+to be 
+Context.AddLink(newProduct,&quot;Categories&quot;,newCategory);
+then the entity classes Products and Category would have to know about the DataServiceContext ,
+newProduct.Context = myDataServiceContext;
+and this would just look ugly&#160; ,IMHO.
+Now , that was just me explaining how things are and why we cant do this today .
+Let me share my thoughts of how this should be done and see how this sits with you .
+If an entity has only one navigation property of a specify type .
+ex: Customers has only one Navigation property of type Address.
+    Regardless of whether it is a Reference property or a Collection property,
+updating the CLR property on the entity should setup the link
+ex:
+Address newAddress = new Address(){
+City=’Bellevue’,
+State=’WA’
+};
+newCustomer.Address = newAddress;
+should automatically set this relation up in this way ,
+context.SetLink(newCustomer,”Address”,newAddress);
+To achieve this , without letting the entities know about the context ,the entities would have to notify the context that they have navigation properties and the context should listen for changes to the navigation properties.
+But when should the context hook itself up to the afore-mentioned events ?
+when the source entity is modified in some way perhaps ?
+ex : 
+context.AddObject(“Customers”,newCustomer);
+//pseudo code for AddObject
+public void AddObject(string entitySetName,object entity) {
+   ICanHazNavigationProperties navProps = entity as ICanHazNavigationProperties ;
+    if( navProps !=null) {
+    navProps.RegisterHandler(HandleNavPropChange);
+  }// do something here
+}
+
+private void HandleNavPropChange(object source,string associationName,               object target,Multiplicity associationMultiplicity,NavPropAction action) {
+  switch(action)
+  {
+    case ( NavPropAction.AddLink ) :
+                switch(associationMultiplicity) {
+                         case Multiplicity.One :
+                           this.SetLink(source,associationName,target);
+                          break;
+               }
+    break;       //Other cases skipped for brevity
+    }
+  }
+
+}
+Now , if we go with this approach, the entity types themselves cannot be pure POCO objects if you want automatic
+  link tracking.&#160; For auto generated types using DataSvcUtil.exe or “Add Service Reference” this is no big deal.
+But what about cases where one has to hand-craft the entity types by hand ?
+Well, this was me just thinking out loud. If you agree/disagree , leave a comment and get featured in the next
+“Viewer Mail”.
+
+A data geek joke , just like associations are first class resources , comments are first class material for blog posts :)
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Viewer Mail , #1" />
+    <meta property="twitter:title" content="Viewer Mail , #1" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Viewer Mail , #1</h1>
+
+  <div class="entry">
+    <p><em>Disclaimer&#160; : These are my thoughts and opinions , although I work on the Astoria team , I am not the voice of the team.The team has its own voice and can be heard here : </em><a target="_blank" href="http://blogs.msdn.com/astoriateam/"><em>Project Astoria Team Blog</em></a></p>
+<p>Hola ! </p>
+<p>I am interrupting my regularly scheduled blog post to&#160; answer some really interesting questions about one of my blog posts , i.e <a target="_blank" href="http://blogs.msdn.com/phaniraj/archive/2008/07/02/working-with-relations-in-ado-net-data-services-beta-1.aspx" rel="nofollow">Working with Associations in ADO.NET Data Services</a>.&#160; These questions are from the comments on the post and     <br />also the public forums.     </p>
+<p><strong>Vince says :      <br /></strong>”Hi,</p>
+<p>I find bad to be forced to use the Addlink to allow us to save relational object in the DB.</p>
+<p>We have a pretty full object model but the Addlink method needs string argument. As each entity knows all navigation properties, why to not have something like entity.NavigationObject rather than string SourceProperty. At least, myObject.MyNavigationProperty.Name or ToStringName would be better. </p>
+<p>Thanks</p>
+<p>Nice blogs</p>
+<p>Regards</p>
+<p>-Vince”</p>
+<p>e    <br />Thank you Vince for the compliment and let me try to explain the reason we built the client this way.     </p>
+<p>For V1 , we wanted to give you POCO access to the data classes. Although we could infer the relation based on the type of the navigation property , this would break scenarios where we have more than 1 navigation properties of the same type and belonging to the same entity Set.</p>
+<p>Consider this entity ,</p>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">class</span> Customer {
+<span class="kwrd">public</span> List&lt;Orders&gt; CashPurchases{get;set;}
+<span class="kwrd">public</span> List&lt;Orders&gt; CreditCardPurchases{get;set;}
+ }</pre>
+<p>If you do an AddLink with just an instance of Orders, we would have to guess which navigation property we have to add the link to .</p>
+<pre class="csharpcode">Customer newCustomer = <span class="kwrd">new</span> Customer();
+Orders cashPurchase = <span class="kwrd">new</span> Orders();
+Orders creditCardPurchase = <span class="kwrd">new</span> Orders();
+context.AddLink( newCustomer , <span class="str">&quot;<strong>??</strong>&quot;</span>, cashPurchase);</pre>
+<p>In the above case , trying to guess the name of the association will land us in hot water as we <strong>don't know which navigation property you intended </strong>.</p>
+<p>we cant go the other way around and try to use the instance of Orders to guess the name of the association<br />
+  <br />as we Orders may have other associations of type Customers and we dont know which one you intended.</p>
+<p>If you do not wish to use the string to remember the association name , you can move that to a separate resource file and have all your strings localized in one place.</p>
+<p>Consider this ..</p>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">class</span> StoreConstants{
+<span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">string</span> Customers_To_CashPurchases  =<span class="str">&quot;CashPurchases&quot;</span>;
+<span class="kwrd">public</span> <span class="kwrd">static</span> <span class="kwrd">string</span> Customers_To_CreditCardPurchases  =<span class="str">&quot;CreditCardPurchases&quot;</span>;
+}</pre>
+<p>and then in your code ,</p>
+<pre class="csharpcode">Customer newCustomer = <span class="kwrd">new</span> Customer();
+Orders cashPurchase = <span class="kwrd">new</span> Orders();
+Orders creditCardPurchase = <span class="kwrd">new</span> Orders();
+context.AddLink( newCustomer , StoreConstants.Customers_To_CashPurchases , cashPurchase);
+context.AddLink( newCustomer , StoreConstants.Customers_To_CreditCardPurchases , creditCardPurchase);</pre>
+<p><strong>Simon says :<br />
+    <br /></strong></p>
+<p>”Hi Phani,</p>
+<p>Nice clear exposition of the topic.</p>
+<p>However, I would think that, given that we are working with a client-side proxy, the separation of object tracking and association tracking is a bit too abstract for the most common scenarios where this client class may be used, ie with out-of-the-box databinding to UI components etc.</p>
+<p>I understand the nice separation of concerns etc, but surely if the Customer or Contact properties are set in code, the user intends them to be set.I guess it is about user intentions and usability. Could you provide an overload such as </p>
+<p>Context.AddObject( String property,Object value, Boolean shouldTrackAssociations)</p>
+<p>Just a thought/suggestion.</p>
+<p></p>
+<p>Cheers,<br />
+  <br />Simon”</p>
+<p>Thanks Simon for the compliment and lets explore this further,</p>
+<p>I agree that the concept of treating associations as first class resources is somewhat new to the application scenarios where the client library is being used.</p>
+<p>At the same time , we dont want to make assumptions on how the relation exists on the server as the client does not have enough information about the server schema. </p>
+<p>Sure , we have the CLR types reflect the associations on the server i.e Reference for 1..1 relations and Collection types for 1..N relations.</p>
+<p>But we really dont want to make assumptions about this.</p>
+<p>Associations are first class resources on the server too , which means that any changes to associations should happen as separate requests or as part of another request. That making the assumption of a given relation causes an additional HTTP Request&#160; , which uses bandwidth you will be paying for .</p>
+<p>Even if we added some magic to cause </p>
+<p>newProduct.Categories.Add(newCategory) ;</p>
+<p>to be </p>
+<p>Context.AddLink(newProduct,&quot;Categories&quot;,newCategory);</p>
+<p>then the entity classes Products and Category would have to know about the DataServiceContext ,</p>
+<p>newProduct.Context = myDataServiceContext;</p>
+<p>and this would just look ugly&#160; ,IMHO.</p>
+<p>Now , that was just me explaining how things are and why we cant do this <strong><em>today </em></strong>.</p>
+<p>Let me share my thoughts of how this should be done and see how this sits with you .</p>
+<p>If an entity has only one navigation property of a specify type .</p>
+<p><em>ex: Customers has only one Navigation property of type Address.<br />
+    <br /></em>Regardless of whether it is a Reference property or a Collection property,</p>
+<p>updating the CLR property on the entity should setup the link</p>
+<p>ex:</p>
+<p>Address newAddress = new Address(){</p>
+<p>City=’Bellevue’,</p>
+<p>State=’WA’</p>
+<p>};</p>
+<p>newCustomer.Address = newAddress;</p>
+<p>should automatically set this relation up in this way ,</p>
+<p>context.SetLink(newCustomer,”Address”,newAddress);</p>
+<p>To achieve this ,<em> without letting the entities know about the context </em>,the entities would have to notify the context that they have navigation properties and the context should listen for changes to the navigation properties.</p>
+<p>But when should the context hook itself up to the afore-mentioned events ?</p>
+<p>when the source entity is modified in some way perhaps ?</p>
+<p>ex : </p>
+<pre class="csharpcode">context.AddObject(“Customers”,newCustomer);<br />
+//pseudo code <span class="kwrd">for</span> AddObject<br />
+<span class="kwrd">public</span> <span class="kwrd">void</span> AddObject(<span class="kwrd">string</span> entitySetName,<span class="kwrd">object</span> entity) {
+   ICanHazNavigationProperties navProps = entity <span class="kwrd">as</span> ICanHazNavigationProperties ;
+    <span class="kwrd">if</span>( navProps !=<span class="kwrd">null</span>) {
+    navProps.RegisterHandler(HandleNavPropChange);
+  }<br />// do something here
+}
+
+<span class="kwrd">private</span> <span class="kwrd">void</span> HandleNavPropChange(<span class="kwrd">object</span> source,<span class="kwrd">string</span> associationName,<br />               <span class="kwrd">object</span> target,Multiplicity associationMultiplicity,NavPropAction action) <br />{
+<span class="kwrd">  switch</span>(action)
+  {
+    <span class="kwrd">case</span> ( NavPropAction.AddLink ) :
+                <span class="kwrd">switch</span>(associationMultiplicity) {
+                         <span class="kwrd">case</span> Multiplicity.One :
+                           <span class="kwrd">this</span>.SetLink(source,associationName,target);
+                          <span class="kwrd">break</span>;
+               }
+    <span class="kwrd">break</span>;      <br /> //Other cases skipped for brevity
+    }
+  }
+
+}</pre>
+<p>Now , if we go with this approach, the entity types themselves cannot be pure POCO objects if you want automatic<br />
+  <br />link tracking.&#160; For auto generated types using DataSvcUtil.exe or “Add Service Reference” this is no big deal.</p>
+<p>But what about cases where one has to <strong>hand-craft the entity types by hand ?</strong></p>
+<p>Well, this was me just thinking out loud. If you agree/disagree , leave a comment and get featured in the next</p>
+<p>“Viewer Mail”.</p>
+<p></p>
+<p>A data geek joke , just like associations are first class resources , comments are first class material for blog posts :)</p>
+
+  </div>
+
+  <div class="date">
+    Written on October 16, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

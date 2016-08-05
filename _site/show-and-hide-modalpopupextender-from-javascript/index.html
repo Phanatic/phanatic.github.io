@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Show and Hide ModalPopupExtender from JavaScript – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="1) Assign a BehaviourID to the ModalPopupExtender using the BehaviourID attribute.
+BehaviorID ="ModalBehaviour"
+
+
+
+2) Use the $find method to get a handle to the Modal Popup Behaviour .
+$find ("ModalBehaviour").
+
+
+
+3) Call your hide and show methods on the acquired handle.
+4) The Javascript would look like this.
+&nbsp;
+&lt;script language="javascript"&gt;
+
+function ShowModalPopup()
+{
+  $find("ModalBehaviour").show();
+}
+
+function HideModalPopup()
+{
+ $find("ModalBehaviour").hide();
+}
+
+&lt;/script&gt;
+
+
+
+
+
+" />
+    <meta property="og:description" content="1) Assign a BehaviourID to the ModalPopupExtender using the BehaviourID attribute.
+BehaviorID ="ModalBehaviour"
+
+
+
+2) Use the $find method to get a handle to the Modal Popup Behaviour .
+$find ("ModalBehaviour").
+
+
+
+3) Call your hide and show methods on the acquired handle.
+4) The Javascript would look like this.
+&nbsp;
+&lt;script language="javascript"&gt;
+
+function ShowModalPopup()
+{
+  $find("ModalBehaviour").show();
+}
+
+function HideModalPopup()
+{
+ $find("ModalBehaviour").hide();
+}
+
+&lt;/script&gt;
+
+
+
+
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Show and Hide ModalPopupExtender from JavaScript" />
+    <meta property="twitter:title" content="Show and Hide ModalPopupExtender from JavaScript" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Show and Hide ModalPopupExtender from JavaScript</h1>
+
+  <div class="entry">
+    <p>1) Assign a BehaviourID to the ModalPopupExtender using the BehaviourID attribute.</p>
+<blockquote><pre class="csharpcode">BehaviorID =<span class="str">"ModalBehaviour"</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p>2) Use the $find method to get a handle to the Modal Popup Behaviour .</p>
+<blockquote><pre class="csharpcode">$find (<span class="str">"ModalBehaviour"</span>).</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p>3) Call your hide and show methods on the acquired handle.</p>
+<p>4) The Javascript would look like this.</p>
+<p mce_keep="true">&nbsp;</p>
+<blockquote><pre class="csharpcode">&lt;script language=<span class="str">"javascript"</span>&gt;
+
+<span class="kwrd">function</span> ShowModalPopup()
+{
+  $find(<span class="str">"ModalBehaviour"</span>).show();
+}
+
+<span class="kwrd">function</span> HideModalPopup()
+{
+ $find(<span class="str">"ModalBehaviour"</span>).hide();
+}
+
+&lt;/script&gt;
+</pre>
+</blockquote>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><script type="text/javascript"><br />
+    if (typeof window.Delicious == "undefined") window.Delicious = {};<br />
+    Delicious.BLOGBADGE_DEFAULT_CLASS = 'delicious-blogbadge-line';<br />
+</script></p>
+<p><script src="http://images.del.icio.us/static/js/blogbadge.js" mce_src="http://images.del.icio.us/static/js/blogbadge.js"></script></p></p></p>
+
+  </div>
+
+  <div class="date">
+    Written on February 20, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

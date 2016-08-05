@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ASp.net Ajax 4.0 , Master-Details View with the DataView – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="By now , you must have heard about the new JavaScript templating engine with the release of ASP.NET AJAX 4.0 CodePlex Preview 1     This post will show you how to use the built-in control DataView to build a master details view.     As an addition , I will use an astoria service to serve the data and the Ajax Library to retrieve the data.     
+Consider the following model.. 
+
+
+
+Parent Entity
+Child Entity
+
+
+
+
+
+
+List
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListID
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListTitle
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElements
+
+
+
+
+
+
+
+
+ListElement 
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementText
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementID
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; List
+
+
+
+
+
+
+
+The properties of the entity you are binding are represented in a syntax similar to this ..         
+To bind all lists , the template would look like this ..
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+   &lt;ul&gt;
+       &lt;li&gt;
+            
+       &lt;/li&gt;
+   &lt;/ul&gt;
+&lt;/div&gt;
+Retrieve data using Astoria Ajax Client Library 
+function loadData() {
+    //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+}
+Bind the data to the template
+    function dataLoaded(result,context) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //Render the template
+        dv.render();
+    }
+This is cool , but what about ListElements ? Why not bind the ListElements in the same template?
+  In short , why not do this ? 
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+   &lt;ul&gt;
+       &lt;li&gt;
+            
+             &lt;ul&gt;
+                &lt;li&gt; &lt;/li&gt;
+             &lt;/ul&gt;
+       &lt;/li&gt;
+   &lt;/ul&gt;
+&lt;/div&gt;
+
+Well, it doesn’t work .
+  From what I can surmise ( from looking at the script code and the readme that came along with it ) , the control doesn’t allow you to bind collection properties which are complex types .
+In English , this means that for the type Lists , you can’t just write a template
+that binds all Lists, the ListElements for each List and bind Lists and ListElements at one shot.
+How about we have a separate template for the ListElements ?
+Something that looks like this …
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+  &lt;ul&gt;
+     &lt;li&gt;
+        &lt;h3&gt;&lt;/h3&gt;
+        &lt;ul id=&quot;'listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+               &lt;li&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+
+When will I bind the internal template ?
+well, it turns out that there is an event called “ItemCreated” fired by the DataView when the item is rendered.
+you can add a handler to be notified of this event by calling add_itemCreated with the handler function
+as a parameter. The event handler is called with the usual parameters as your .net Event Handlers.
+
+function onItemCreated(sender,eventArgs) {
+//Function body
+}
+
+sender is the DataView which is being bound ,eventArgs is of type : Sys.Preview.UI.DataViewItemEventArgs.
+call eventArgs.get_dataItem() to get the data being bound to the DataView.
+call eventArgs.get_templateResult() to get the template result , i.e the template with the data filled in for the bindings.
+So,&#160; the dataLoaded function would change to be :
+
+function dataLoaded(result,context) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //add a handler to listen to the ItemCreated Event
+        dv.add_itemCreated(onItemCreated);
+        //Render the template
+        dv.render();
+    }
+
+function onItemCreated(sender,eventArgs) {
+   var currentList = eventArgs.get_dataItem();
+   //Get the Child Template for the parent List Template
+   var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;));
+   //Bind the Template to the ListElements for the current List
+   dv.set_data(currentList.ListElements);
+   //Render the template
+   dv.render();
+}
+
+Well, this still doesn’t work !There is just one copy of the internal listElementsTemplate for multiple copies of the
+  Parent template for Lists being bound .The first one works , the second one shows us this ..
+
+“Sys.InvalidOperationException: A control is already associated with the element”.
+Which means that we need one copy of the internal listElementsTemplate for each copy of the ListTemplate.
+So, we change the template to be :
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+    &lt;ul&gt;
+        &lt;li&gt;
+            &lt;h3&gt;&lt;/h3&gt;
+             &lt;ul id=&quot;listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+                  &lt;li&gt;&lt;/li&gt;
+             &lt;/ul&gt;
+         &lt;/li&gt;
+      &lt;/ul&gt;
+&lt;/div&gt;
+
+And the function to bind the listElements changes to be :
+  
+function onItemCreated(sender,eventArgs) {
+  var currentList = eventArgs.get_dataItem();
+  //Get the Child Template for the parent List Template
+  var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;+currentList.ListID ));
+  //Bind the Template to the ListElements for the current List
+  dv.set_data(currentList.ListElements);
+  //Render the template
+  dv.render();
+}
+
+And then , you are done !!! 
+Tip to debug Template Generation with IE 7 ..
+  Install IE 7 Pro and you get this neat context-menu , “View Generated Source”.
+Which lets you see the html that is generated after binding the data.
+
+
+Complete sample Code is below , I swapped out the DataService code for local data .
+You will need the following script files .
+AJAX Client Library for ADO.NET Data Services (optional)
+ASP.NET AJAX 4.0 CodePlex Preview 1
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head id=&quot;Head1&quot; runat=&quot;server&quot;&gt;
+    &lt;title&gt;Master Details with ASP.NET AJAX 4.0&lt;/title&gt;
+    &lt;link href=&quot;../css/SoberTable.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;style&gt;
+        .sys-template
+        {
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id=&quot;form1&quot; runat=&quot;server&quot;&gt;
+    &lt;asp:ScriptManager runat=&quot;server&quot; ID=&quot;scrpManager&quot;&gt;
+        &lt;Scripts&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot; /&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot; /&gt;
+        &lt;/Scripts&gt;
+    &lt;/asp:ScriptManager&gt;
+    &lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                &lt;h3&gt;
+                    
+                &lt;/h3&gt;
+                &lt;ul id=&quot;listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+                    &lt;li&gt; &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;
+
+    var _dataServiceProxy = null;
+
+   function onItemCreated(sender,eventArgs) {
+        var currentList = eventArgs.get_dataItem();
+        //Get the Child Template for the parent List Template
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;+currentList.ListID ));
+        //Bind the Template to the ListElements for the current List
+        dv.set_data(currentList.ListElements);
+        //Render the template
+        dv.render();
+     }
+
+    function dataLoaded(result) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //add a handler to listen to the ItemCreated Event
+        dv.add_itemCreated(onItemCreated);
+        //Render the template
+        dv.render();
+    }
+
+    function loadData() {
+        //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+    }
+
+function loadLocalData() {
+    var localData ={ 'd' : [
+    {'ListID': 1, 'ListTitle': 'Future Blog Posts to write', 'ListElements': [
+        { 'ListElementID': 2, 'ListElementText': 'Working with 1..N associations'},
+        { 'ListElementID': 3, 'ListElementText': 'Working with ServiceOps and the client'},
+        { 'ListElementID': 4, 'ListElementText': 'Data Literal Table'},
+        { 'ListElementID': 5, 'ListElementText': 'Calling Stored Procedures from ServiceOps'} ]
+      },
+    {'ListID': 2, 'ListTitle': 'My Life List',
+         'ListElements': [{'ListElementID': 64, 'ListElementText': 'Learn Spanish'}] }
+     ] };
+
+    dataLoaded(localData.d);
+    }
+
+        function pageLoad() {
+        loadLocalData ();
+     }
+    &lt;/script&gt;
+
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+" />
+    <meta property="og:description" content="By now , you must have heard about the new JavaScript templating engine with the release of ASP.NET AJAX 4.0 CodePlex Preview 1     This post will show you how to use the built-in control DataView to build a master details view.     As an addition , I will use an astoria service to serve the data and the Ajax Library to retrieve the data.     
+Consider the following model.. 
+
+
+
+Parent Entity
+Child Entity
+
+
+
+
+
+
+List
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListID
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListTitle
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElements
+
+
+
+
+
+
+
+
+ListElement 
+
+
+Properties
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementText
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; ListElementID
+
+
+Associations
+
+
+&#160;&#160;&#160;&#160;&#160;&#160; List
+
+
+
+
+
+
+
+The properties of the entity you are binding are represented in a syntax similar to this ..         
+To bind all lists , the template would look like this ..
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+   &lt;ul&gt;
+       &lt;li&gt;
+            
+       &lt;/li&gt;
+   &lt;/ul&gt;
+&lt;/div&gt;
+Retrieve data using Astoria Ajax Client Library 
+function loadData() {
+    //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+}
+Bind the data to the template
+    function dataLoaded(result,context) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //Render the template
+        dv.render();
+    }
+This is cool , but what about ListElements ? Why not bind the ListElements in the same template?
+  In short , why not do this ? 
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+   &lt;ul&gt;
+       &lt;li&gt;
+            
+             &lt;ul&gt;
+                &lt;li&gt; &lt;/li&gt;
+             &lt;/ul&gt;
+       &lt;/li&gt;
+   &lt;/ul&gt;
+&lt;/div&gt;
+
+Well, it doesn’t work .
+  From what I can surmise ( from looking at the script code and the readme that came along with it ) , the control doesn’t allow you to bind collection properties which are complex types .
+In English , this means that for the type Lists , you can’t just write a template
+that binds all Lists, the ListElements for each List and bind Lists and ListElements at one shot.
+How about we have a separate template for the ListElements ?
+Something that looks like this …
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+  &lt;ul&gt;
+     &lt;li&gt;
+        &lt;h3&gt;&lt;/h3&gt;
+        &lt;ul id=&quot;'listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+               &lt;li&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+
+When will I bind the internal template ?
+well, it turns out that there is an event called “ItemCreated” fired by the DataView when the item is rendered.
+you can add a handler to be notified of this event by calling add_itemCreated with the handler function
+as a parameter. The event handler is called with the usual parameters as your .net Event Handlers.
+
+function onItemCreated(sender,eventArgs) {
+//Function body
+}
+
+sender is the DataView which is being bound ,eventArgs is of type : Sys.Preview.UI.DataViewItemEventArgs.
+call eventArgs.get_dataItem() to get the data being bound to the DataView.
+call eventArgs.get_templateResult() to get the template result , i.e the template with the data filled in for the bindings.
+So,&#160; the dataLoaded function would change to be :
+
+function dataLoaded(result,context) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //add a handler to listen to the ItemCreated Event
+        dv.add_itemCreated(onItemCreated);
+        //Render the template
+        dv.render();
+    }
+
+function onItemCreated(sender,eventArgs) {
+   var currentList = eventArgs.get_dataItem();
+   //Get the Child Template for the parent List Template
+   var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;));
+   //Bind the Template to the ListElements for the current List
+   dv.set_data(currentList.ListElements);
+   //Render the template
+   dv.render();
+}
+
+Well, this still doesn’t work !There is just one copy of the internal listElementsTemplate for multiple copies of the
+  Parent template for Lists being bound .The first one works , the second one shows us this ..
+
+“Sys.InvalidOperationException: A control is already associated with the element”.
+Which means that we need one copy of the internal listElementsTemplate for each copy of the ListTemplate.
+So, we change the template to be :
+&lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+    &lt;ul&gt;
+        &lt;li&gt;
+            &lt;h3&gt;&lt;/h3&gt;
+             &lt;ul id=&quot;listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+                  &lt;li&gt;&lt;/li&gt;
+             &lt;/ul&gt;
+         &lt;/li&gt;
+      &lt;/ul&gt;
+&lt;/div&gt;
+
+And the function to bind the listElements changes to be :
+  
+function onItemCreated(sender,eventArgs) {
+  var currentList = eventArgs.get_dataItem();
+  //Get the Child Template for the parent List Template
+  var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;+currentList.ListID ));
+  //Bind the Template to the ListElements for the current List
+  dv.set_data(currentList.ListElements);
+  //Render the template
+  dv.render();
+}
+
+And then , you are done !!! 
+Tip to debug Template Generation with IE 7 ..
+  Install IE 7 Pro and you get this neat context-menu , “View Generated Source”.
+Which lets you see the html that is generated after binding the data.
+
+
+Complete sample Code is below , I swapped out the DataService code for local data .
+You will need the following script files .
+AJAX Client Library for ADO.NET Data Services (optional)
+ASP.NET AJAX 4.0 CodePlex Preview 1
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head id=&quot;Head1&quot; runat=&quot;server&quot;&gt;
+    &lt;title&gt;Master Details with ASP.NET AJAX 4.0&lt;/title&gt;
+    &lt;link href=&quot;../css/SoberTable.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;style&gt;
+        .sys-template
+        {
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id=&quot;form1&quot; runat=&quot;server&quot;&gt;
+    &lt;asp:ScriptManager runat=&quot;server&quot; ID=&quot;scrpManager&quot;&gt;
+        &lt;Scripts&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot; /&gt;
+            &lt;asp:ScriptReference Path=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot; /&gt;
+        &lt;/Scripts&gt;
+    &lt;/asp:ScriptManager&gt;
+    &lt;div id=&quot;listTemplate&quot; class=&quot;sys-template&quot;&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                &lt;h3&gt;
+                    
+                &lt;/h3&gt;
+                &lt;ul id=&quot;listElementsTemplate&quot; class=&quot;sys-template&quot;&gt;
+                    &lt;li&gt; &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+
+    &lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot;&gt;
+
+    var _dataServiceProxy = null;
+
+   function onItemCreated(sender,eventArgs) {
+        var currentList = eventArgs.get_dataItem();
+        //Get the Child Template for the parent List Template
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listElementsTemplate&quot;+currentList.ListID ));
+        //Bind the Template to the ListElements for the current List
+        dv.set_data(currentList.ListElements);
+        //Render the template
+        dv.render();
+     }
+
+    function dataLoaded(result) {
+        //Get the Template for the List Results
+        var dv = new Sys.Preview.UI.DataView($get(&quot;listTemplate&quot;));
+        //Pass the data regarding the Lists to be bound
+        dv.set_data(result);
+        //add a handler to listen to the ItemCreated Event
+        dv.add_itemCreated(onItemCreated);
+        //Render the template
+        dv.render();
+    }
+
+    function loadData() {
+        //Create a Data Service Proxy
+        _dataServiceProxy  = new Sys.Data.DataService(&quot;ListService.svc&quot;);
+        //The URI of the resources to download
+        var listURI = &quot;/Lists?$expand=ListElements&quot;;
+        //Query the Data Service with the URI 
+        _dataServiceProxy.query(
+            listURI ,   /*Resource URI*/
+            dataLoaded, /*Success callback*/
+            null,       /*Failure callback */
+            null,       /*user context*/
+            null);      /*Web Request*/
+    }
+
+function loadLocalData() {
+    var localData ={ 'd' : [
+    {'ListID': 1, 'ListTitle': 'Future Blog Posts to write', 'ListElements': [
+        { 'ListElementID': 2, 'ListElementText': 'Working with 1..N associations'},
+        { 'ListElementID': 3, 'ListElementText': 'Working with ServiceOps and the client'},
+        { 'ListElementID': 4, 'ListElementText': 'Data Literal Table'},
+        { 'ListElementID': 5, 'ListElementText': 'Calling Stored Procedures from ServiceOps'} ]
+      },
+    {'ListID': 2, 'ListTitle': 'My Life List',
+         'ListElements': [{'ListElementID': 64, 'ListElementText': 'Learn Spanish'}] }
+     ] };
+
+    dataLoaded(localData.d);
+    }
+
+        function pageLoad() {
+        loadLocalData ();
+     }
+    &lt;/script&gt;
+
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ASp.net Ajax 4.0 , Master-Details View with the DataView" />
+    <meta property="twitter:title" content="ASp.net Ajax 4.0 , Master-Details View with the DataView" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ASp.net Ajax 4.0 , Master-Details View with the DataView</h1>
+
+  <div class="entry">
+    <p>By now , you must have heard about the new JavaScript templating engine with the release of <a href="http://weblogs.asp.net/bleroy/archive/2008/07/21/asp-net-ajax-4-0-codeplex-preview-1-available.aspx">ASP.NET AJAX 4.0 CodePlex Preview 1</a>     <br />This post will show you how to use the built-in control DataView to build a master details view.     <br />As an addition , I will use an astoria service to serve the data and the <a href="http://www.codeplex.com/aspnet/Release/ProjectReleases.aspx?ReleaseId=13357">Ajax Library</a> to retrieve the data.     </p>
+<p>Consider the following model.. </p>
+<table width="70%">
+<tbody>
+<tr>
+<td><b>Parent Entity</b></td>
+<td><b>Child Entity</b></td>
+</tr>
+<tr>
+<td>
+<table cellspacing="0" cellpadding="2" width="200" border="0">
+<tbody>
+<tr>
+<td valign="top" width="198">List</td>
+</tr>
+<tr>
+<td valign="top" width="198"><strong>Properties</strong></td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListID</td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListTitle</td>
+</tr>
+<tr>
+<td valign="top" width="198"><strong>Associations</strong></td>
+</tr>
+<tr>
+<td valign="top" width="198">&#160;&#160;&#160;&#160;&#160;&#160; ListElements</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table cellspacing="0" cellpadding="2" width="200" border="0">
+<tbody>
+<tr>
+<td valign="top" width="200">ListElement </td>
+</tr>
+<tr>
+<td valign="top" width="200"><strong>Properties</strong></td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; ListElementText</td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; ListElementID</td>
+</tr>
+<tr>
+<td valign="top" width="200"><strong>Associations</strong></td>
+</tr>
+<tr>
+<td valign="top" width="200">&#160;&#160;&#160;&#160;&#160;&#160; List</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The properties of the entity you are binding are represented in a syntax similar to this ..    <br />     </p>
+<p>To bind all lists , the template would look like this ..</p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+       <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+            
+       <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<h6>Retrieve data using Astoria Ajax Client Library </h6>
+<pre class="darkcsharpcode"><span class="kwrd">function</span> loadData() {
+    <span class="rem">//Create a Data Service Proxy</span>
+        _dataServiceProxy  = <span class="kwrd">new</span> Sys.Data.DataService(<span class="str">&quot;ListService.svc&quot;</span>);
+        <span class="rem">//The URI of the resources to download</span>
+        <span class="kwrd">var</span> listURI = <span class="str">&quot;/Lists?$expand=ListElements&quot;</span>;
+        <span class="rem">//Query the Data Service with the URI </span>
+        _dataServiceProxy.query(
+            listURI ,   <span class="rem">/*Resource URI*/</span>
+            dataLoaded, <span class="rem">/*Success callback*/</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*Failure callback */</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*user context*/</span>
+            <span class="kwrd">null</span>);      <span class="rem">/*Web Request*/</span>
+}<br /></pre>
+<h6>Bind the data to the template</h6>
+<pre class="darkcsharpcode">    <span class="kwrd">function</span> dataLoaded(result,context) {
+        <span class="rem">//Get the Template for the List Results</span>
+        <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listTemplate&quot;</span>));
+        <span class="rem">//Pass the data regarding the Lists to be bound</span>
+        dv.set_data(result);
+        <span class="rem">//Render the template</span>
+        dv.render();
+    }</pre>
+<p>This is cool , but what about ListElements ? Why not bind the ListElements in the same template?<br />
+  <br />In short , why not do this ? </p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+       <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+            
+             <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span> <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+             <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+       <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #cc9393; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<p>Well, it doesn’t work .<br />
+  <br />From what I can surmise ( from looking at the script code and the readme that came along with it ) , the control doesn’t allow you to bind collection properties which are complex types .</p>
+<p>In English , this means that for the type Lists , you can’t just write a template</p>
+<p>that binds all Lists, the ListElements for each List and bind Lists and ListElements at one shot.</p>
+<p>How about we have a separate template for the ListElements ?</p>
+<p>Something that looks like this …</p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+     <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span><span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ul</span> <span class="attr">id</span><span class="kwrd">=&quot;'listElementsTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+               <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span><span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+          <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style></p></p>
+<h6>When will I bind the internal template ?</h6>
+<p>well, it turns out that there is an event called “ItemCreated” fired by the DataView when the item is rendered.</p>
+<p>you can add a handler to be notified of this event by calling add_itemCreated with the handler function</p>
+<p>as a parameter. The event handler is called with the usual parameters as your .net Event Handlers.</p>
+<p></p>
+<pre class="darkcsharpcode"><span class="kwrd">function</span> onItemCreated(sender,eventArgs) {
+<span class="rem">//Function body</span>
+}</pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<p>sender is the DataView which is being bound ,eventArgs is of type : Sys.Preview.UI.DataViewItemEventArgs.</p>
+<p>call eventArgs.get_dataItem() to get the data being bound to the DataView.</p>
+<p>call eventArgs.get_templateResult() to get the template result , i.e the template with the data filled in for the bindings.</p>
+<p>So,&#160; the dataLoaded function would change to be :</p>
+<p></p>
+<pre class="darkcsharpcode"><span class="kwrd">function</span> dataLoaded(result,context) {
+        <span class="rem">//Get the Template for the List Results</span>
+        <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listTemplate&quot;</span>));
+        <span class="rem">//Pass the data regarding the Lists to be bound</span>
+        dv.set_data(result);
+        <span class="rem">//add a handler to listen to the ItemCreated Event</span>
+        dv.add_itemCreated(onItemCreated);
+        <span class="rem">//Render the template</span>
+        dv.render();
+    }</pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<pre class="darkcsharpcode">function onItemCreated(sender,eventArgs) {
+   var currentList = eventArgs.get_dataItem();
+   <span class="rem">//Get the Child Template for the parent List Template</span>
+   var dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listElementsTemplate&quot;</span>));
+   <span class="rem">//Bind the Template to the ListElements for the current List</span>
+   dv.set_data(currentList.ListElements);
+   <span class="rem">//Render the template</span>
+   dv.render();
+}</pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<p>Well, this still doesn’t work !There is just one copy of the internal listElementsTemplate for multiple copies of the<br />
+  <br />Parent template for Lists being bound .The first one works , the second one shows us this ..</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/error_Bind_Again_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/error_Bind_Again_2.jpg"><img title="error_Bind_Again" style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="232" alt="error_Bind_Again" src="/assets/error_Bind_Again_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/error_Bind_Again_thumb.jpg" width="481" border="0" /></a></p>
+<p>“Sys.InvalidOperationException: A control is already associated with the element”.</p>
+<p>Which means that we need one copy of the internal listElementsTemplate for each copy of the ListTemplate.</p>
+<p>So, we change the template to be :</p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span><span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+             <span class="kwrd">&lt;</span><span class="html">ul</span> <span class="attr">id</span><span class="kwrd">=&quot;listElementsTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+                  <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span><span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+             <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+         <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<p>And the function to bind the listElements changes to be :<br />
+  </p>
+<pre class="darkcsharpcode"><span class="kwrd">function</span> onItemCreated(sender,eventArgs) {
+  <span class="kwrd">var</span> currentList = eventArgs.get_dataItem();
+  <span class="rem">//Get the Child Template for the parent List Template</span>
+  <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listElementsTemplate&quot;</span>+currentList.ListID ));
+  <span class="rem">//Bind the Template to the ListElements for the current List</span>
+  dv.set_data(currentList.ListElements);
+  <span class="rem">//Render the template</span>
+  dv.render();
+}</pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<p>And then , you are done !!! </p>
+<p>Tip to debug Template Generation with IE 7 ..<br />
+  <br />Install <a href="http://www.ie7pro.com/">IE 7 Pro</a> and you get this neat context-menu , “View Generated Source”.</p>
+<p>Which lets you see the html that is generated after binding the data.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/IE7PRO_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/IE7PRO_2.jpg"><img title="IE7PRO" style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="240" alt="IE7PRO" src="/assets/IE7PRO_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/ASp.netAjax4.0_10C3E/IE7PRO_thumb.jpg" width="189" border="0" /></a></p>
+<p></p>
+<p>Complete sample Code is below , I swapped out the DataService code for local data .</p>
+<p>You will need the following script files .</p>
+<p><a href="http://www.codeplex.com/aspnet/Release/ProjectReleases.aspx?ReleaseId=13357">AJAX Client Library for ADO.NET Data Services</a> (optional)</p>
+<p><a href="http://www.codeplex.com/aspnet/Release/ProjectReleases.aspx?ReleaseId=15511">ASP.NET AJAX 4.0 CodePlex Preview 1</a></p></p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">&quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;</span> <span class="kwrd">&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">=&quot;http://www.w3.org/1999/xhtml&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">id</span><span class="kwrd">=&quot;Head1&quot;</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Master Details with ASP.NET AJAX 4.0<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">href</span><span class="kwrd">=&quot;../css/SoberTable.css&quot;</span> <span class="attr">rel</span><span class="kwrd">=&quot;stylesheet&quot;</span> <span class="attr">type</span><span class="kwrd">=&quot;text/css&quot;</span> <span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">style</span><span class="kwrd">&gt;</span>
+        .sys-template
+        {
+        }
+    <span class="kwrd">&lt;/</span><span class="html">style</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">=&quot;form1&quot;</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">runat</span><span class="kwrd">=&quot;server&quot;</span> <span class="attr">ID</span><span class="kwrd">=&quot;scrpManager&quot;</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">Scripts</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ScriptReference</span> <span class="attr">Path</span><span class="kwrd">=&quot;~/AjaxTemplate/Scripts/MicrosoftAjaxTemplates.debug.js&quot;</span> <span class="kwrd">/&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ScriptReference</span> <span class="attr">Path</span><span class="kwrd">=&quot;~/AjaxTemplate/Scripts/DataService.debug.js&quot;</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">Scripts</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">=&quot;listTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+                    
+                <span class="kwrd">&lt;/</span><span class="html">h3</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">ul</span> <span class="attr">id</span><span class="kwrd">=&quot;listElementsTemplate&quot;</span> <span class="attr">class</span><span class="kwrd">=&quot;sys-template&quot;</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">li</span><span class="kwrd">&gt;</span> <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">li</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ul</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">=&quot;javascript&quot;</span> <span class="attr">type</span><span class="kwrd">=&quot;text/javascript&quot;</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">var</span> _dataServiceProxy = <span class="kwrd">null</span>;
+
+   <span class="kwrd">function</span> onItemCreated(sender,eventArgs) {
+        <span class="kwrd">var</span> currentList = eventArgs.get_dataItem();
+        <span class="rem">//Get the Child Template for the parent List Template</span>
+        <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listElementsTemplate&quot;</span>+currentList.ListID ));
+        <span class="rem">//Bind the Template to the ListElements for the current List</span>
+        dv.set_data(currentList.ListElements);
+        <span class="rem">//Render the template</span>
+        dv.render();
+     }
+
+    <span class="kwrd">function</span> dataLoaded(result) {
+        <span class="rem">//Get the Template for the List Results</span>
+        <span class="kwrd">var</span> dv = <span class="kwrd">new</span> Sys.Preview.UI.DataView($get(<span class="str">&quot;listTemplate&quot;</span>));
+        <span class="rem">//Pass the data regarding the Lists to be bound</span>
+        dv.set_data(result);
+        <span class="rem">//add a handler to listen to the ItemCreated Event</span>
+        dv.add_itemCreated(onItemCreated);
+        <span class="rem">//Render the template</span>
+        dv.render();
+    }
+
+    <span class="kwrd">function</span> loadData() {
+        <span class="rem">//Create a Data Service Proxy</span>
+        _dataServiceProxy  = <span class="kwrd">new</span> Sys.Data.DataService(<span class="str">&quot;ListService.svc&quot;</span>);
+        <span class="rem">//The URI of the resources to download</span>
+        <span class="kwrd">var</span> listURI = <span class="str">&quot;/Lists?$expand=ListElements&quot;</span>;
+        <span class="rem">//Query the Data Service with the URI </span>
+        _dataServiceProxy.query(
+            listURI ,   <span class="rem">/*Resource URI*/</span>
+            dataLoaded, <span class="rem">/*Success callback*/</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*Failure callback */</span>
+            <span class="kwrd">null</span>,       <span class="rem">/*user context*/</span>
+            <span class="kwrd">null</span>);      <span class="rem">/*Web Request*/</span>
+    }
+<br /></pre>
+<pre class="darkcsharpcode"><span class="kwrd">function</span> loadLocalData() {
+    <span class="kwrd">var</span> localData ={ <span class="str">'d'</span> : [
+    {<span class="str">'ListID'</span>: 1, <span class="str">'ListTitle'</span>: <span class="str">'Future Blog Posts to write'</span>, <span class="str">'ListElements'</span>: [
+        { <span class="str">'ListElementID'</span>: 2, <span class="str">'ListElementText'</span>: <span class="str">'Working with 1..N associations'</span>},
+        { <span class="str">'ListElementID'</span>: 3, <span class="str">'ListElementText'</span>: <span class="str">'Working with ServiceOps and the client'</span>},
+        { <span class="str">'ListElementID'</span>: 4, <span class="str">'ListElementText'</span>: <span class="str">'Data Literal Table'</span>},
+        { <span class="str">'ListElementID'</span>: 5, <span class="str">'ListElementText'</span>: <span class="str">'Calling Stored Procedures from ServiceOps'</span>} ]
+      },
+    {<span class="str">'ListID'</span>: 2, <span class="str">'ListTitle'</span>: <span class="str">'My Life List'</span>,
+         <span class="str">'ListElements'</span>: [{<span class="str">'ListElementID'</span>: 64, <span class="str">'ListElementText'</span>: <span class="str">'Learn Spanish'</span>}] }
+     ] };
+
+    dataLoaded(localData.d);
+    }</pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.darkcsharpcode pre { margin: 0em; }<br />
+.darkcsharpcode .rem { color: #008000; }<br />
+.darkcsharpcode .kwrd { color: #0000ff; }<br />
+.darkcsharpcode .str { color: #006080; }<br />
+.darkcsharpcode .op { color: #0000c0; }<br />
+.darkcsharpcode .preproc { color: #cc6633; }<br />
+.darkcsharpcode .asp { background-color: #ffff00; }<br />
+.darkcsharpcode .html { color: #800000; }<br />
+.darkcsharpcode .attr { color: #ff0000; }<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum { color: #606060; }</style>
+<pre class="darkcsharpcode">    <br />    <span class="kwrd">function</span> pageLoad() {
+        loadLocalData ();
+     }
+    <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+padding-top :10px;<br />
+	font-size: small;<br />
+	color: #d2d200;<br />
+	font-family: consolas, "Courier New" , courier, monospace;<br />
+	background-color: #2e2e2e; /*white-space: pre;*/<br />
+	padding-bottom :10px;<br />
+	padding-left :15px;<br />
+}<br />
+.darkcsharpcode pre<br />
+{<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .rem<br />
+{<br />
+	color: #00ff00;<br />
+}<br />
+.darkcsharpcode .kwrd<br />
+{<br />
+	color: #eaeaac;<br />
+	font-size: 11;<br />
+	font-weight: bold;<br />
+}<br />
+.darkcsharpcode .str<br />
+{<br />
+	color: #cc9393;<br />
+}<br />
+.darkcsharpcode .op<br />
+{<br />
+	color: #0000c0;<br />
+}<br />
+.darkcsharpcode .preproc<br />
+{<br />
+	color: #cc6633;<br />
+}<br />
+.darkcsharpcode .asp<br />
+{<br />
+	background-color: #ffff00;<br />
+}<br />
+.darkcsharpcode .html<br />
+{<br />
+	color: #efefef;<br />
+}<br />
+.darkcsharpcode .attr<br />
+{<br />
+	color: #dfdfbf;<br />
+}<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum<br />
+{<br />
+	color: #606060;<br />
+}</style>
+
+  </div>
+
+  <div class="date">
+    Written on July 25, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sys.Preview.Timer Control - A Client Side Timer – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="We have quite often come across&nbsp; scenarios where-in we need to execute certain client-Side code at certain intervals .
+What we often ended up doing is to use the&nbsp;window.setTimeOut() and the&nbsp;window.setInterval functions of IE to execute an expression 
+at certain intervals of time .
+&nbsp;
+The Sys.Preview.Timer Provides an abstraction over these functions and makes it easier to define Functions to be Executed at certain 
+Time Intervals.
+&nbsp;
+You need to include the Script file "PreviewScript.js" to&nbsp; have access to the Timer Control .
+&lt;script src="Scripts/PreviewScript.js" type="text/javascript"&gt;&lt;/script&gt;
+
+&nbsp;
+Instantiating the Timer control :
+var clientSideTimer = new Sys.Preview.Timer();
+By default , once instatiated , the Timer is disabled .
+Enable The Timer
+clientSideTimer.set_enabled( true ); 
+&nbsp;
+Set the Interval for the timer :
+The Interval is measured in milliseconds 
+clientSideTimer.set_interval( 1000 );
+Add a function to be called at the interval
+You add the function to be called at the interval by running 
+clientSideTimer.add_tick( OnTimerTick );
+&nbsp;
+The Parameter "OnTimerTick" is a function that is executed at the Interval specified.
+You can add multiple Functions to be callled at the interval.
+The functions are executed at the interval in the same order that they are added using add_tick.
+Stop the Timer 
+Disable the Timer to stop the  Timer Entirely.
+clientSideTimer.set_enabled( false ); 
+Alternatively , you can stop certain functions being called by calling the "remove_tick" Method on the Timer.
+clientSideTimer.remove_tick( OnTimerTick );
+&nbsp;
+Check out the  Sample attached to get a view of how the control works and how you can use it .
+Whats Missing :
+The main pain point I see in using the Timer Control is that I cannot pass a context to the Functions called at the "Tick" event.
+The reason this happens is because ..
+The Function that returns the callback to the "Tick" event passes "Sys.EventArgs.Empty"  to the callback.
+
+You can customize the Script to enable the functionality of passing a context to the Timer Callback.
+We will discuss that in a future post .
+&nbsp;
+&nbsp;
+
+Client Side Timer.zip
+" />
+    <meta property="og:description" content="We have quite often come across&nbsp; scenarios where-in we need to execute certain client-Side code at certain intervals .
+What we often ended up doing is to use the&nbsp;window.setTimeOut() and the&nbsp;window.setInterval functions of IE to execute an expression 
+at certain intervals of time .
+&nbsp;
+The Sys.Preview.Timer Provides an abstraction over these functions and makes it easier to define Functions to be Executed at certain 
+Time Intervals.
+&nbsp;
+You need to include the Script file "PreviewScript.js" to&nbsp; have access to the Timer Control .
+&lt;script src="Scripts/PreviewScript.js" type="text/javascript"&gt;&lt;/script&gt;
+
+&nbsp;
+Instantiating the Timer control :
+var clientSideTimer = new Sys.Preview.Timer();
+By default , once instatiated , the Timer is disabled .
+Enable The Timer
+clientSideTimer.set_enabled( true ); 
+&nbsp;
+Set the Interval for the timer :
+The Interval is measured in milliseconds 
+clientSideTimer.set_interval( 1000 );
+Add a function to be called at the interval
+You add the function to be called at the interval by running 
+clientSideTimer.add_tick( OnTimerTick );
+&nbsp;
+The Parameter "OnTimerTick" is a function that is executed at the Interval specified.
+You can add multiple Functions to be callled at the interval.
+The functions are executed at the interval in the same order that they are added using add_tick.
+Stop the Timer 
+Disable the Timer to stop the  Timer Entirely.
+clientSideTimer.set_enabled( false ); 
+Alternatively , you can stop certain functions being called by calling the "remove_tick" Method on the Timer.
+clientSideTimer.remove_tick( OnTimerTick );
+&nbsp;
+Check out the  Sample attached to get a view of how the control works and how you can use it .
+Whats Missing :
+The main pain point I see in using the Timer Control is that I cannot pass a context to the Functions called at the "Tick" event.
+The reason this happens is because ..
+The Function that returns the callback to the "Tick" event passes "Sys.EventArgs.Empty"  to the callback.
+
+You can customize the Script to enable the functionality of passing a context to the Timer Callback.
+We will discuss that in a future post .
+&nbsp;
+&nbsp;
+
+Client Side Timer.zip
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Sys.Preview.Timer Control - A Client Side Timer" />
+    <meta property="twitter:title" content="Sys.Preview.Timer Control - A Client Side Timer" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Sys.Preview.Timer Control - A Client Side Timer</h1>
+
+  <div class="entry">
+    <p>We have quite often come across&nbsp; scenarios where-in we need to execute certain client-Side code at certain intervals .</p>
+<p>What we often ended up doing is to use the&nbsp;<a href="http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/methods/settimeout.asp">window.setTimeOut()</a> and the&nbsp;<a href="http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/methods/setinterval.asp">window.setInterval</a> functions of IE to execute an expression </p>
+<p>at certain intervals of time .</p>
+<p>&nbsp;</p>
+<p>The Sys.Preview.Timer Provides an abstraction over these functions and makes it easier to define Functions to be Executed at certain </p>
+<p>Time Intervals.</p>
+<pre class="csharpcode">&nbsp;</pre>
+<p>You need to include the Script file "<font face="cali" color="#ff0000">PreviewScript.js<font color="#000000">" to&nbsp; have access to the Timer Control .</font></font></p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">src</span><span class="kwrd">="Scripts/PreviewScript.js"</span> <span class="attr">type</span><span class="kwrd">="text/javascript"</span><span class="kwrd">&gt;&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>&nbsp;</p>
+<p><strong><u>Instantiating the Timer control :</u></strong></p>
+<pre class="csharpcode"><strong><span class="kwrd">var</span> clientSideTimer = <span class="kwrd">new</span> Sys.Preview.Timer();</strong></pre>
+<pre class="csharpcode"><font face="Treb">By default , once instatiated , the Timer is disabled .</font></pre>
+<pre class="csharpcode"><strong><u>Enable The Timer</u></strong></pre>
+<pre class="csharpcode"><strong>clientSideTimer.set_enabled( <span class="kwrd">true</span> ); </strong></pre>
+<pre class="csharpcode"><strong></strong>&nbsp;</pre>
+<pre class="csharpcode"><u><strong>Set the Interval for the timer :</strong></u></pre>
+<pre class="csharpcode">The Interval is measured in milliseconds </pre>
+<pre class="csharpcode"><strong>clientSideTimer.set_interval( 1000 );</strong></pre>
+<pre class="csharpcode"><strong><u>Add a function to be called at the interval</u></strong></pre>
+<pre class="csharpcode">You add the function to be called at the interval by running </pre>
+<pre class="csharpcode"><strong>clientSideTimer.add_tick( OnTimerTick );</strong></pre>
+<pre class="csharpcode"><font face="tRE"></font>&nbsp;</pre>
+<pre class="csharpcode"><font face="tRE">The Parameter "OnTimerTick" is a function that is executed at the Interval specified.</font></pre>
+<pre class="csharpcode"><font face="tRE">You can add multiple Functions to be callled at the interval.</font></pre>
+<pre class="csharpcode"><font face="tRE">The functions are executed at the interval in the <u>same order that they are added using add_tick</u>.</font></pre>
+<pre class="csharpcode"><strong><u>Stop the Timer </u></strong></pre>
+<pre class="csharpcode">Disable the Timer to stop the  Timer Entirely.</pre>
+<pre class="csharpcode"><strong>clientSideTimer.set_enabled( <span class="kwrd">false</span> ); </strong></pre>
+<pre class="csharpcode">Alternatively , you can stop certain functions being called by calling the "<font color="#ff0000"><strong>remove_tick</strong><font color="#000000"><strong>" </strong>Method on the Timer.</font></font></pre>
+<pre class="csharpcode"><strong>clientSideTimer.remove_tick( OnTimerTick );</strong></pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">Check out the  Sample attached to get a view of how the control works and how you can use it .</pre>
+<pre class="csharpcode"><strong><u>Whats Missing :</u></strong></pre>
+<pre class="csharpcode">The main pain point I see in using the Timer Control is that <u>I cannot pass a context to the Functions called at the "Tick" event.</u></pre>
+<pre class="csharpcode">The reason this happens is because ..</pre>
+<blockquote><pre class="csharpcode">The Function that returns the callback to the "Tick" event passes "Sys.EventArgs.Empty"  to the callback.</pre>
+</blockquote>
+<pre class="csharpcode">You can customize the Script to enable the functionality of passing a context to the Timer Callback.</pre>
+<pre class="csharpcode">We will discuss that in a future post .</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/01/88/52/99/Client%20Side%20Timer.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-01-88-52-99/Client-Side-Timer.zip">Client Side Timer.zip</a></p>
+
+  </div>
+
+  <div class="date">
+    Written on March 15, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

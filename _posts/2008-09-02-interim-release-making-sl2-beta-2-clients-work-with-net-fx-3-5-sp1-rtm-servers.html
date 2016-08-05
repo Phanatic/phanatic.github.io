@@ -1,0 +1,82 @@
+---
+layout: post
+title: 'Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers'
+date: 2008-09-02 19:27:36.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- Silverlight
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/09/03/interim-release-making-sl2-beta-2-clients-work-with-net-fx-3-5-sp1-rtm-servers.aspx
+  orig_site_id: '7524'
+  orig_post_id: '8920950'
+  orig_parent_id: '8920950'
+  orig_thread_id: '603863'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/09/02/interim-release-making-sl2-beta-2-clients-work-with-net-fx-3-5-sp1-rtm-servers.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/09/02/interim-release-making-sl2-beta-2-clients-work-with-net-fx-3-5-sp1-rtm-servers/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Cross-posted from here : Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers As an offshoot of the feedback we got from different channels , ( Blogs , Direct emails to team members , our discussion forums, etc) we are releasing an “interim build” of the data services&#160; Silverlight..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/09/02/interim-release-making-sl2-beta-2-clients-work-with-net-fx-3-5-sp1-rtm-servers/" />
+    <meta name="twitter:description" content="Cross-posted from here : Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers As an offshoot of the feedback we got from different channels , ( Blogs , Direct emails to team members , our discussion forums, etc) we are releasing an “interim build” of the data services&#160; Silverlight..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Cross-posted from here : <a href="http://blogs.msdn.com/astoriateam/archive/2008/09/02/interim-release-making-sl2-beta-2-clients-work-with-net-fx-3-5-sp1-rtm-servers.aspx">Interim Release: Making SL2 Beta 2 Clients Work With .NET Fx 3.5 SP1 RTM Servers</a>    </p>
+<p>As an offshoot of the feedback we got from different channels , ( Blogs , Direct emails to team members , our discussion forums, etc) we are releasing an “interim build” of the data services&#160; Silverlight client which works with the&#160; Silverlight 2 Beta 2 runtime ,and works with the RTM ADO.NET Data Services Server released as part of .Net Framework 3.5 SP1 RTM. </p>
+<p>Download Location : <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=CF8F88C3-D869-46DE-A7BF-FB7712C791B7&amp;displaylang=en">ADO.NET Data Services Silverlight 2 B2 Client Refresh</a></p>
+<p><b></b></p>
+<p><b>How did we get here ? </b></p>
+<p>We have different ship vehicles for the client and the server components. </p>
+<p>When the Silverlight 2 Beta 2 Client shipped , the ADO.NET Data Services&#160; Server which was available was the one from .NET Framework 3.5 SP1 Beta1 and we made the SL client library work with the Server which was available when SL2 Beta 2 shipped. </p>
+<p>When the RTM of .NET Framework 3.5 SP1 was released, the Silverlight Client library was still the one from the SL2 Beta 2 release. </p>
+<p>The original plan was to ship a Silverlight Client Library for ADO.NET Data Services when Silverlight 2 RTMs.&#160; This meant that for a certain period of time , between when 3.5 SP1 RTM and SL2.0 RTM,&#160; users would have a Silverlight Client Library for ADO.NET Data Services which would not work with the RTM Server. </p>
+<p>You can read more about this here :&#160; <a href="http://blogs.msdn.com/ADO.NET%20Data%20Servicesteam/archive/2008/08/12/compat-note-silverlight-beta-2-client-net-framework-3-5-sp1-server-components.aspx">Compat Note: Silverlight Beta 2 Client &amp; .NET Framework 3.5 SP1 Server Components</a></p>
+<p><b></b></p>
+<p><b>What is this release about ? </b></p>
+<p>We took the Silverlight Client Library code that was going be released as part of the SL 2.0 RTM SDK (or almost, you never know when you’re set and won’t touch the bits again) and built it against the SL 2 Beta 2 Runtime and SDK components.This new downloadable assembly will allow your Silverlight applications built against Silverlight 2 Beta 2 to talk to Data Services servers built with the .NET 3.5 SP1 RTM release </p>
+<p><b></b></p>
+<p><b>Should everyone upgrade to this release of the client library ?</b></p>
+<p>If your client applications are built on SL2 Beta 2 SDK and talk&#160; to the ADO.NET Data Services Server released as part of <b>.NET Framework 3.5 SP1 Beta1</b> , then upgrading to this Assembly will <b>break your client applications.&#160; </b><b>Don’t upgrade unless the Data Services Server is from .NET Framework 3.5 SP1 RTM.</b></p>
+<p>If you want your Silverlight applications built on SL2 Beta 2 SDK to talk to the Astoria Server released as part of the <b>.NET Framework 3.5 SP1 RTM</b>, then you should upgrade to this version of the System.Data.Services.Client Library. </p>
+<p><b></b></p>
+<p><b>Are there any gotchas to be aware of ? </b></p>
+<p>Yes -- <strong>Don’t depend on this “interim release” for your production applications.</strong></p>
+<p>Wait until Silverlight 2.0 RTMs to deploy any Silverlight applications that use the System.Data.Services.Client library. </p>
+<p><b></b></p>
+<p><b>How different is this from the RTM library ? </b></p>
+<p>Well, most of the code is the same as will be shipped in the Silverlight RTM SDK.&#160; The difference being that we have to depend on the SL2 Beta 2 Runtime for certain core functionality.&#160; So , consider this an early look at something close to what will come later on.&#160; Any feedback you give us will only help make the RTM library that much better. </p>
+<p><b></b></p>
+<p><b>Using the new Assembly</b></p>
+<p>Download the new Silverlight Client Assembly from here : <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=CF8F88C3-D869-46DE-A7BF-FB7712C791B7&amp;displaylang=en">ADO.NET Data Services Silverlight 2 B2 Client Refresh</a></p>
+<p><b></b></p>
+<p><b>Installing the New Silverlight Client Assembly</b></p>
+<p>1.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Go to the %ProgramFiles%\Microsoft SDKs\Silverlight\v2.0\Libraries\Client folder </p>
+<p>2.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Backup the older System.Data.Services.Client.dll </p>
+<p>3.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Replace the older assembly with the new one. </p>
+<p><b></b></p>
+<p><b>Upgrading your applications to use the new SL Client Assembly</b></p>
+<p>1.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Remove any references to the older SL client library in your applications . </p>
+<p>2.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Compile to make sure that the build fails . </p>
+<p>3.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Add a reference to the newer SL Client assembly . </p>
+<p>4.&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; Compile again to make sure that the build succeeds . </p>
+<p>Phani Raj    <br />ADO.NET Data Services Test Team</p>

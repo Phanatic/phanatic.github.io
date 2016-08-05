@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>HowTo : Change Visible Tab Using JavaScript in the MS AJAX TabControl – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="I have seen this in the forums a lot ..
+"How do I change the Visible Tab in the MS AJAX TabControl on the Client-Side using Javascript ?"
+Well, I have posted it several times and I think Its time I'd rather point people to a link than write the same piece again and again :-).
+So, here you go .....
+1) Consider that you have a TabControl on your page by the name of "MyTabs" . 
+&lt;ajaxToolKit:TabContainer ID="MyTabs" runat="server"&gt;
+//blah blah blah
+&lt;/ajaxToolKit:TabContainer&gt;
+
+2) You can access the Methods exposed by the TabControl by accessing its  behavior.
+   The Behavior is not accessible easily . 
+   The  TabControl has a property called as "control" that provides a way to access the Client-Side Methods of the 
+   TabControl.
+   EX: var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control; 
+3) once you have a handle to the Tabbehavior , you can use the "set_activeTab" method to set the Active Tab of the TabControl.
+   EX:tabBehavior.set_activeTabIndex(1); 
+4)  You are Done !!
+&nbsp;
+Complete  Code for the ChangeTab Function :
+&lt;script language="javascript"&gt;
+
+function changeTab( tabIndex ){
+var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control;
+tabBehavior.set_activeTabIndex(tabIndex);
+}
+&lt;/script&gt;
+
+The Complete Example is posted below :
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Select Tabs By Script&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmAccessAccordion" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+        function changeTab(){
+        //Get The Index of the Current Selected Index in the DropDownList
+        var tabIndex = parseInt( $get('&lt;%=dlTabindex.ClientID%&gt;').value );
+        //Get a Handle to the Tab Behavior 
+        var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control;
+        //Set the Currently Visible Tab 
+        tabBehavior.set_activeTabIndex(tabIndex);
+        }
+        &lt;/script&gt;
+        Select Tab To Show :
+        &lt;asp:DropDownList runat="server" ID="dlTabindex"&gt;
+            &lt;asp:ListItem Text="One" Value="0"&gt;&lt;/asp:ListItem&gt;
+            &lt;asp:ListItem Text="Two" Value="1"&gt;&lt;/asp:ListItem&gt;
+            &lt;asp:ListItem Text="Three" Value="2"&gt;&lt;/asp:ListItem&gt;
+        &lt;/asp:DropDownList&gt;
+        &lt;asp:Button ID="btnDynamicAnimate" runat="server" Text="Button" OnClientClick="changeTab();return false;" /&gt;
+        &lt;asp:ScriptManager runat="server" ID="scrpManager" EnablePartialRendering="true"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;ajaxToolKit:TabContainer ID="MyTabs" runat="server"&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabOne"&gt;
+                &lt;HeaderTemplate&gt;
+                    One
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab One
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabTwo"&gt;
+                &lt;HeaderTemplate&gt;
+                    Two
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab Two
+                    &lt;asp:Button runat="server" ID="btnServer" Text="Submit" /&gt;
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabThree"&gt;
+                &lt;HeaderTemplate&gt;
+                    Three
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab Three
+                    &lt;asp:Button runat="server" ID="Button1" Text="Submit" /&gt;
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+        &lt;/ajaxToolKit:TabContainer&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+
+
+&nbsp;
+
+" />
+    <meta property="og:description" content="I have seen this in the forums a lot ..
+"How do I change the Visible Tab in the MS AJAX TabControl on the Client-Side using Javascript ?"
+Well, I have posted it several times and I think Its time I'd rather point people to a link than write the same piece again and again :-).
+So, here you go .....
+1) Consider that you have a TabControl on your page by the name of "MyTabs" . 
+&lt;ajaxToolKit:TabContainer ID="MyTabs" runat="server"&gt;
+//blah blah blah
+&lt;/ajaxToolKit:TabContainer&gt;
+
+2) You can access the Methods exposed by the TabControl by accessing its  behavior.
+   The Behavior is not accessible easily . 
+   The  TabControl has a property called as "control" that provides a way to access the Client-Side Methods of the 
+   TabControl.
+   EX: var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control; 
+3) once you have a handle to the Tabbehavior , you can use the "set_activeTab" method to set the Active Tab of the TabControl.
+   EX:tabBehavior.set_activeTabIndex(1); 
+4)  You are Done !!
+&nbsp;
+Complete  Code for the ChangeTab Function :
+&lt;script language="javascript"&gt;
+
+function changeTab( tabIndex ){
+var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control;
+tabBehavior.set_activeTabIndex(tabIndex);
+}
+&lt;/script&gt;
+
+The Complete Example is posted below :
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Select Tabs By Script&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmAccessAccordion" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+        function changeTab(){
+        //Get The Index of the Current Selected Index in the DropDownList
+        var tabIndex = parseInt( $get('&lt;%=dlTabindex.ClientID%&gt;').value );
+        //Get a Handle to the Tab Behavior 
+        var tabBehavior = $get('&lt;%=MyTabs.ClientID%&gt;').control;
+        //Set the Currently Visible Tab 
+        tabBehavior.set_activeTabIndex(tabIndex);
+        }
+        &lt;/script&gt;
+        Select Tab To Show :
+        &lt;asp:DropDownList runat="server" ID="dlTabindex"&gt;
+            &lt;asp:ListItem Text="One" Value="0"&gt;&lt;/asp:ListItem&gt;
+            &lt;asp:ListItem Text="Two" Value="1"&gt;&lt;/asp:ListItem&gt;
+            &lt;asp:ListItem Text="Three" Value="2"&gt;&lt;/asp:ListItem&gt;
+        &lt;/asp:DropDownList&gt;
+        &lt;asp:Button ID="btnDynamicAnimate" runat="server" Text="Button" OnClientClick="changeTab();return false;" /&gt;
+        &lt;asp:ScriptManager runat="server" ID="scrpManager" EnablePartialRendering="true"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;ajaxToolKit:TabContainer ID="MyTabs" runat="server"&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabOne"&gt;
+                &lt;HeaderTemplate&gt;
+                    One
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab One
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabTwo"&gt;
+                &lt;HeaderTemplate&gt;
+                    Two
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab Two
+                    &lt;asp:Button runat="server" ID="btnServer" Text="Submit" /&gt;
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+            &lt;ajaxToolKit:TabPanel runat="server" ID="tabThree"&gt;
+                &lt;HeaderTemplate&gt;
+                    Three
+                &lt;/HeaderTemplate&gt;
+                &lt;ContentTemplate&gt;
+                    Tab Three
+                    &lt;asp:Button runat="server" ID="Button1" Text="Submit" /&gt;
+                &lt;/ContentTemplate&gt;
+            &lt;/ajaxToolKit:TabPanel&gt;
+        &lt;/ajaxToolKit:TabContainer&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+
+
+&nbsp;
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="HowTo : Change Visible Tab Using JavaScript in the MS AJAX TabControl" />
+    <meta property="twitter:title" content="HowTo : Change Visible Tab Using JavaScript in the MS AJAX TabControl" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>HowTo : Change Visible Tab Using JavaScript in the MS AJAX TabControl</h1>
+
+  <div class="entry">
+    <p>I have seen this in the forums a lot ..</p>
+<p>"How do I change the Visible Tab in the MS AJAX TabControl on the Client-Side using Javascript ?"</p>
+<p>Well, I have posted it several times and I think Its time I'd rather point people to a link than write the same piece again and again :-).</p>
+<p>So, here you go .....</p>
+<p>1) Consider that you have a TabControl on your page by the name of "MyTabs" . </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolKit:TabContainer</span> <span class="attr">ID</span><span class="kwrd">="MyTabs"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+//blah blah blah
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:TabContainer</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">2) <font face="tre">You can access the Methods exposed by the TabControl by accessing its  behavior.</font></pre>
+<pre class="csharpcode"><font face="tre">   The Behavior is not accessible easily . </font></pre>
+<pre class="csharpcode"><font face="tre">   The  TabControl has a property called as "control" that provides a way to access the Client-Side Methods of the </font></pre>
+<pre class="csharpcode"><font face="tre">   TabControl.</font></pre>
+<pre class="csharpcode"><span class="kwrd">   EX: var</span> tabBehavior = $get(<span class="str">'&lt;%=MyTabs.ClientID%&gt;'</span>).control; </pre>
+<pre class="csharpcode"><font face="tre">3) once you have a handle to the Tabbehavior , you can use the "set_activeTab" method to set the Active Tab of the TabControl.</font></pre>
+<pre class="csharpcode">   EX:tabBehavior.set_activeTabIndex(1); </pre>
+<pre class="csharpcode">4)  You are Done !!</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">Complete  Code for the ChangeTab Function :</pre>
+<pre class="csharpcode">&lt;script language=<span class="str">"javascript"</span>&gt;
+
+<span class="kwrd">function</span> changeTab( tabIndex ){
+<span class="kwrd">var</span> tabBehavior = $get(<span class="str">'&lt;%=MyTabs.ClientID%&gt;'</span>).control;
+tabBehavior.set_activeTabIndex(tabIndex);
+}</pre>
+<pre class="csharpcode">&lt;/script&gt;
+</pre>
+<pre class="csharpcode">The Complete Example is posted below :</pre>
+<blockquote><pre class="csharpcode"><span class="asp">&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolKit" %&gt;</span>
+<span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="kwrd">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">="http://www.w3.org/1999/xhtml"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Select Tabs By Script<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">="frmAccessAccordion"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+
+        <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">function</span> changeTab(){
+        <span class="rem">//Get The Index of the Current Selected Index in the DropDownList</span>
+        <span class="kwrd">var</span> tabIndex = parseInt( $get(<span class="str">'&lt;%=dlTabindex.ClientID%&gt;'</span>).value );
+        <span class="rem">//Get a Handle to the Tab Behavior </span>
+        <span class="kwrd">var</span> tabBehavior = $get(<span class="str">'&lt;%=MyTabs.ClientID%&gt;'</span>).control;
+        <span class="rem">//Set the Currently Visible Tab </span>
+        tabBehavior.set_activeTabIndex(tabIndex);
+        }
+        <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+        Select Tab To Show :
+        <span class="kwrd">&lt;</span><span class="html">asp:DropDownList</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="dlTabindex"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="One"</span> <span class="attr">Value</span><span class="kwrd">="0"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="Two"</span> <span class="attr">Value</span><span class="kwrd">="1"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="Three"</span> <span class="attr">Value</span><span class="kwrd">="2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">asp:DropDownList</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">ID</span><span class="kwrd">="btnDynamicAnimate"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">Text</span><span class="kwrd">="Button"</span> <span class="attr">OnClientClick</span><span class="kwrd">="changeTab();return false;"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="scrpManager"</span> <span class="attr">EnablePartialRendering</span><span class="kwrd">="true"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ajaxToolKit:TabContainer</span> <span class="attr">ID</span><span class="kwrd">="MyTabs"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">ajaxToolKit:TabPanel</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="tabOne"</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                    One
+                <span class="kwrd">&lt;/</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+                    Tab One
+                <span class="kwrd">&lt;/</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:TabPanel</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">ajaxToolKit:TabPanel</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="tabTwo"</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                    Two
+                <span class="kwrd">&lt;/</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+                    Tab Two
+                    <span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnServer"</span> <span class="attr">Text</span><span class="kwrd">="Submit"</span> <span class="kwrd">/&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:TabPanel</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">ajaxToolKit:TabPanel</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="tabThree"</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                    Three
+                <span class="kwrd">&lt;/</span><span class="html">HeaderTemplate</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+                    Tab Three
+                    <span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="Button1"</span> <span class="attr">Text</span><span class="kwrd">="Submit"</span> <span class="kwrd">/&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">ContentTemplate</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:TabPanel</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:TabContainer</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span></pre>
+</blockquote>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+
+  </div>
+
+  <div class="date">
+    Written on April 16, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

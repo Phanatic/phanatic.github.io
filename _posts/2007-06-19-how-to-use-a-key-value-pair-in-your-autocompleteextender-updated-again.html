@@ -1,0 +1,245 @@
+---
+layout: post
+title: 'How to : Use a Key Value Pair in your AutoCompleteExtender ( updated again...
+  )'
+date: 2007-06-19 09:50:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AutoCompleteExtender
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/06/19/how-to-use-a-key-value-pair-in-your-autocompleteextender.aspx
+  orig_site_id: '7524'
+  orig_post_id: '3406114'
+  orig_parent_id: '3406114'
+  orig_thread_id: '520309'
+  _wds_ratings_users: '2'
+  _wds_ratings_score: '10'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/06/19/how-to-use-a-key-value-pair-in-your-autocompleteextender-updated-again.aspx
+  _wds_ratings_average: '5'
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="How to : Use a Key Value Pair in your AutoCompleteExtender ( updated again&#8230; )" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/06/19/how-to-use-a-key-value-pair-in-your-autocompleteextender-updated-again/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="&nbsp; Hi all, This has come up time and again on the asp.net&nbsp; Ajax&nbsp; forums and has become the Top Voted issue for the AutoCompleteExtender Work Items . I had some time the other day and set upon to write a fix for this . How do you use&nbsp;&nbsp; it? &nbsp;1) Attach a handler to..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="How to : Use a Key Value Pair in your AutoCompleteExtender ( updated again&#8230; )" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/06/19/how-to-use-a-key-value-pair-in-your-autocompleteextender-updated-again/" />
+    <meta name="twitter:description" content="&nbsp; Hi all, This has come up time and again on the asp.net&nbsp; Ajax&nbsp; forums and has become the Top Voted issue for the AutoCompleteExtender Work Items . I had some time the other day and set upon to write a fix for this . How do you use&nbsp;&nbsp; it? &nbsp;1) Attach a handler to..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>&nbsp;</p>
+<p><font size="2">Hi all,</font></p>
+<p><font size="2">This has come up time and again on the asp.net&nbsp; Ajax&nbsp; forums and has become the Top Voted issue for the AutoCompleteExtender Work Items . I had some time the other day and set upon to write a fix for this .</font></p>
+<p><strong><u>How do you use&nbsp;&nbsp; it?</u></strong></p>
+<p>&nbsp;<font size="2">1) Attach a handler to the itemSelected Event using the OnClientItemSelected property in&nbsp; the ACE markup </font></p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AutoCompleteExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span>
+            <span class="attr">BehaviorID</span><span class="kwrd">="AutoCompleteEx"</span> <span class="attr">ID</span><span class="kwrd">="autoComplete1"</span>
+            <span class="attr">TargetControlID</span><span class="kwrd">="myTextBox"</span> <span class="attr">ServicePath</span><span class="kwrd">="~/Services/AutoComplete.asmx"</span>
+            <span class="attr">ServiceMethod</span><span class="kwrd">="GetCompletionListKeyValuePair"</span>
+            ......
+            <font size="4"><span class="attr">OnClientItemSelected</span> <span class="kwrd">="IAmSelected"</span>
+        </font><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AutoCompleteExtender</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd">function</span> IAmSelected( source, eventArgs ) {
+   alert( <span class="str">" Key : "</span>+ eventArgs.get_text() +<span class="str">"  Value :  "</span>+eventArgs.get_value());
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>
+<p><font size="2">2) The Server-Side Method :</font></p>
+<p><font size="2">The Server-Side Method will return an array of strings as before ,</font></p>
+<p><font size="2">You create KeyValue Pairs by calling the method :</font></p>
+<pre class="csharpcode">AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem(&lt;key&gt;,&lt;<span class="kwrd">value</span>&gt;);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><font size="2">EX:</font>&nbsp; </p>
+<pre class="csharpcode">[WebMethod]
+
+        <span class="kwrd">public</span> <span class="kwrd">string</span>[] GetCompletionList(<span class="kwrd">string</span> prefixText, <span class="kwrd">int</span> count)
+        {
+
+            <span class="kwrd">if</span> (count == 0)
+            {
+
+                count = 10;
+
+            }
+
+            <span class="kwrd">if</span> (prefixText.Equals(<span class="str">"xyz"</span>))
+            {
+
+                <span class="kwrd">return</span> <span class="kwrd">new</span> <span class="kwrd">string</span>[0];
+
+            }
+
+            Random random = <span class="kwrd">new</span> Random();
+
+            List&lt;<span class="kwrd">string</span>&gt; items = <span class="kwrd">new</span> List&lt;<span class="kwrd">string</span>&gt;(count);
+
+            <span class="kwrd">for</span> (<span class="kwrd">int</span> i = 0; i &lt; count; i++)
+            {
+
+                <span class="kwrd">char</span> c1 = (<span class="kwrd">char</span>)random.Next(65, 90);
+
+                <span class="kwrd">char</span> c2 = (<span class="kwrd">char</span>)random.Next(97, 122);
+
+                <span class="kwrd">char</span> c3 = (<span class="kwrd">char</span>)random.Next(97, 122);
+
+                items.Add(<font color="#ff0000" size="4">AjaxControlToolkit.AutoCompleteExtender.CreateAutoCompleteItem</font>(prefixText + c1 + c2 + c3, i.ToString()));
+
+            }
+
+            <span class="kwrd">return</span> items.ToArray();
+
+        }
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">The Display of the ACE does not change , it still remains the same :</pre>
+<pre class="csharpcode">Once you select an item from the DropDown of the ACE , you get an alert which shows you the value of the selectedItem.</pre>
+<pre class="csharpcode">In Your applications , instead of the Alert , process some business logic as per your requirements.</pre>
+<pre class="csharpcode">Hope this is an useful Addition.</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<p>Download the Latest AjaxControlToolkit from :</p>
+<p><a title="http://www.codeplex.com/AtlasControlToolkit/Release/ProjectReleases.aspx?ReleaseId=4941" href="http://www.codeplex.com/AtlasControlToolkit/Release/ProjectReleases.aspx?ReleaseId=4941" mce_href="http://www.codeplex.com/AtlasControlToolkit/Release/ProjectReleases.aspx?ReleaseId=4941">http://www.codeplex.com/AtlasControlToolkit/Release/ProjectReleases.aspx?ReleaseId=4941</a></p>
+<p mce_keep="true">&nbsp;</p>
+<p><strong>[Update ]</strong></p>
+<p>You don't need to specify the UseKeyValuepairs attibute anymore ( in fact , its been removed :) ).</p>
+<p>The ACE script is intelligent enough to realize when Key/Value pairs are returned automatically.</p>
+<p>And also , the method CreateKeyvaluePair has been changed to CreateAutoCompleteItem.</p>
+<p mce_keep="true">&nbsp;</p>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>

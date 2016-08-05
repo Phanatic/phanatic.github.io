@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MS AJAX AnimationExtender : How Many Ways Do I Play thee ? ( Updated ) – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="We will discuss the various ways&nbsp; in which one can animate a visual element using the MS AJAX Animation.
+The Example would be to resize a div named "queryReply" to have a height of 100px and width of 200px On&nbsp;Click of the&nbsp; Div&nbsp;.
+1) The Simplest Way&nbsp; , Markup 
+&lt;ajaxToolkit:AnimationExtender runat="server" ID="animateReplyPanes"
+        TargetControlID="queryReply" BehaviorID="animateReplyPanesBehavior"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                       &lt;Resize Height="100" FPS="25" Width="200" duration="0.3" unit="px"/&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolkit:AnimationExtender&gt;
+
+
+This would be the easiest way to&nbsp;attach &nbsp;an animation (&nbsp;ReSize ) to a control&nbsp; ( QueryReply )&nbsp;on an Event ( OnClick ) .
+When the Div &nbsp;is clicked , the Control "queryReply" is resized to have a height of 100 px and a width of 200px.
+2) The "Not So Simple" Ways via javascript
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) Call the Static PLAY Method &nbsp;of the Animation Framework to Animate the Control .
+
+
+&lt;!--AjaxControlToolkit.Animation.ResizeAnimation.play(target, duration, fps, width, height, unit);--&gt;
+
+
+
+//Play the Animation by calling its static methods
+AjaxControlToolkit.Animation.ResizeAnimation.play( $get("queryReply") , 0.3 , 25 , 100 , 300 , "px" );
+
+
+
+
+The Animation will play immediately after this line.
+b) Create an Instance of the Client-Side Animation Extenders to Animate the Control .
+&lt;!--Constructor: new AjaxControlToolkit.Animation.ResizeAnimation(target, duration, fps, width, height, unit); --&gt;
+
+
+//Create an instance of the ReSize Animation
+var resizeAnimation = new AjaxControlToolkit.Animation.ResizeAnimation( $get("queryReply") , 0.3 , 25 , 100 , 300 , "px");
+//Play the Animation just created
+resizeAnimation.play(); 
+
+c) Selectively playing the Animation Already defined in Markup for an AnimationExtender on the Page.
+&nbsp;
+Lets say that you already have animation defined on your page in markup and you want to trigger the animation using Script .
+You achieve this by :
+&nbsp;&nbsp; 1) Get a handle to the AnimationExtender's Behavior by using the "$find" method.
+//Get a handle to the Animation Behavior
+var behaveYourself       = $find("animateReplyPanesBehavior");
+
+
+&nbsp;&nbsp; 2) Based on where the animation is defined ( Onload , OnClick , OnHover&nbsp;, whatever&nbsp;), get a handle to the child Animation Definition.&nbsp;&nbsp;&nbsp; 
+//Get the Animation to be played onClick of the TargetControl 
+var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+//Get the Animation to be played onLoad of the TargetControl 
+var onLoadAnimation     = behaveYourself.get_OnLoadBehavior();
+//Get the Animation to be played onHover of the TargetControl 
+var onHoverAnimation     = behaveYourself.get_OnHoverBehavior();
+
+&nbsp;&nbsp; 3) Call the "Play" method on the&nbsp; required Animations Definition.
+&nbsp;
+//Play the Animation defined  onClick of the TargetControl 
+onClickAnimation.play();
+//Play the Animation defined  onLoad of the TargetControl 
+onLoadAnimation.play();
+//Play the Animation defined  onHover of the TargetControl 
+onHoverAnimation.play();
+
+&nbsp;
+
+
+d) Set the JSON String for an existing Animation Extender 
+Once you declare the Markup as above, you can access the animations that are assigned to the Extender by using the "get_&lt;Event&gt;" Methods on the Behavior .
+EX:
+
+//Get a handle to the Animation Behavior
+var behaveYourself       = $find("animateReplyPanesBehavior");
+//Get the Animation to be played onClick of the TargetControl 
+var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+&nbsp;
+
+Once you have the respective Animation Behavior , you can use the "set_&lt;EVENT&gt;" method to set the Animation JSON String .
+The Json String is constucted like this :
+"{
+     "AnimationName":"ReSize",
+     "Height":"100px",
+     "width":"200px",
+     "unit":"px",
+     "duration":"0.3",
+     "AnimationTarget":"queryReply",
+     "AnimationChildren":[]
+ }"
+The AnimationName is the Name of the Animation that you want run .
+The AnimationChildren is supposed to be an array of child animations .
+The ReSize animation cannot have Child Animations, so the array is empty.
+So, once you have the JSON String, we use the "Set_&lt;Event&gt;" function to set the JSON property of the animation.
+
+//Construct the JSON String
+var jsonAnimationString ="{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "+
+"\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1" +
+"\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}";
+//Set the JSON of the AnimationExtender to be the JSON String
+behaveYourself.set_OnClick( jsonAnimationString );
+//Play the Animation
+onClickAnimation.play();
+
+
+
+
+
+&nbsp;
+Complete Example :
+&nbsp;
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Ways to Call Animations&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmAnimations" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+
+            function callStaticMethods(){
+            //Play the Animation by calling its static methods
+            AjaxControlToolkit.Animation.ResizeAnimation.play( $get("queryReply") , 0.2 , 45 , 200 , 100 , "px" );
+            }
+
+            function createInstanceAndPlay(){
+            //Create an instance of the ReSize Animation
+            var resizeAnimation = new AjaxControlToolkit.Animation.ResizeAnimation( $get("queryReply") , 0.2 , 45 , 200 , 100 , "px");
+            //Play the Animation just created
+            resizeAnimation.play();
+            }
+
+            function SetJSONStringThenPlay(){
+            //Get a handle to the Animation Behavior
+            var behaveYourself       = $find("animateReplyPanesBehavior");
+            //Get the Animation to be played onClick of the TargetControl 
+            var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+            //Construct the JSON String
+            var jsonAnimationString ="{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "+
+            "\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1" +
+            "\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}";
+            //Set the JSON of the AnimationExtender to be the JSON String
+            behaveYourself.set_OnClick( jsonAnimationString );
+            //Play the Animation
+            onClickAnimation.play();
+            }
+
+        &lt;/script&gt;
+
+        &lt;input type="button" value="Call Static Play Method" onclick="callStaticMethods();" /&gt;
+        &lt;input type="button" value="Create Instance And Play" onclick="createInstanceAndPlay();" /&gt;
+        &lt;input type="button" value="Set JSON String then Play" onclick="SetJSONStringThenPlay();" /&gt;
+        &lt;div runat="server" id="queryReply" style="background-color: #ffcc00; position: absolute;
+            top: 100px; left: 100px; height: 300px; width: 300px"&gt;
+            Click me to resize me ( Uses Markup )
+        &lt;/div&gt;
+        &lt;asp:ScriptManager ID="ScriptManager1" runat="server"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;ajaxToolkit:AnimationExtender runat="server" ID="animateReplyPanes" TargetControlID="queryReply"
+            BehaviorID="animateReplyPanesBehavior"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Resize height="100" width="200" duration ="0.2" fps="45" unit="px"&gt;&lt;/Resize&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+        &lt;/ajaxToolkit:AnimationExtender&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+Hope I helped someone out there looking For this information .
+Well, Happy Coding !!
+" />
+    <meta property="og:description" content="We will discuss the various ways&nbsp; in which one can animate a visual element using the MS AJAX Animation.
+The Example would be to resize a div named "queryReply" to have a height of 100px and width of 200px On&nbsp;Click of the&nbsp; Div&nbsp;.
+1) The Simplest Way&nbsp; , Markup 
+&lt;ajaxToolkit:AnimationExtender runat="server" ID="animateReplyPanes"
+        TargetControlID="queryReply" BehaviorID="animateReplyPanesBehavior"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                       &lt;Resize Height="100" FPS="25" Width="200" duration="0.3" unit="px"/&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolkit:AnimationExtender&gt;
+
+
+This would be the easiest way to&nbsp;attach &nbsp;an animation (&nbsp;ReSize ) to a control&nbsp; ( QueryReply )&nbsp;on an Event ( OnClick ) .
+When the Div &nbsp;is clicked , the Control "queryReply" is resized to have a height of 100 px and a width of 200px.
+2) The "Not So Simple" Ways via javascript
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) Call the Static PLAY Method &nbsp;of the Animation Framework to Animate the Control .
+
+
+&lt;!--AjaxControlToolkit.Animation.ResizeAnimation.play(target, duration, fps, width, height, unit);--&gt;
+
+
+
+//Play the Animation by calling its static methods
+AjaxControlToolkit.Animation.ResizeAnimation.play( $get("queryReply") , 0.3 , 25 , 100 , 300 , "px" );
+
+
+
+
+The Animation will play immediately after this line.
+b) Create an Instance of the Client-Side Animation Extenders to Animate the Control .
+&lt;!--Constructor: new AjaxControlToolkit.Animation.ResizeAnimation(target, duration, fps, width, height, unit); --&gt;
+
+
+//Create an instance of the ReSize Animation
+var resizeAnimation = new AjaxControlToolkit.Animation.ResizeAnimation( $get("queryReply") , 0.3 , 25 , 100 , 300 , "px");
+//Play the Animation just created
+resizeAnimation.play(); 
+
+c) Selectively playing the Animation Already defined in Markup for an AnimationExtender on the Page.
+&nbsp;
+Lets say that you already have animation defined on your page in markup and you want to trigger the animation using Script .
+You achieve this by :
+&nbsp;&nbsp; 1) Get a handle to the AnimationExtender's Behavior by using the "$find" method.
+//Get a handle to the Animation Behavior
+var behaveYourself       = $find("animateReplyPanesBehavior");
+
+
+&nbsp;&nbsp; 2) Based on where the animation is defined ( Onload , OnClick , OnHover&nbsp;, whatever&nbsp;), get a handle to the child Animation Definition.&nbsp;&nbsp;&nbsp; 
+//Get the Animation to be played onClick of the TargetControl 
+var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+//Get the Animation to be played onLoad of the TargetControl 
+var onLoadAnimation     = behaveYourself.get_OnLoadBehavior();
+//Get the Animation to be played onHover of the TargetControl 
+var onHoverAnimation     = behaveYourself.get_OnHoverBehavior();
+
+&nbsp;&nbsp; 3) Call the "Play" method on the&nbsp; required Animations Definition.
+&nbsp;
+//Play the Animation defined  onClick of the TargetControl 
+onClickAnimation.play();
+//Play the Animation defined  onLoad of the TargetControl 
+onLoadAnimation.play();
+//Play the Animation defined  onHover of the TargetControl 
+onHoverAnimation.play();
+
+&nbsp;
+
+
+d) Set the JSON String for an existing Animation Extender 
+Once you declare the Markup as above, you can access the animations that are assigned to the Extender by using the "get_&lt;Event&gt;" Methods on the Behavior .
+EX:
+
+//Get a handle to the Animation Behavior
+var behaveYourself       = $find("animateReplyPanesBehavior");
+//Get the Animation to be played onClick of the TargetControl 
+var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+&nbsp;
+
+Once you have the respective Animation Behavior , you can use the "set_&lt;EVENT&gt;" method to set the Animation JSON String .
+The Json String is constucted like this :
+"{
+     "AnimationName":"ReSize",
+     "Height":"100px",
+     "width":"200px",
+     "unit":"px",
+     "duration":"0.3",
+     "AnimationTarget":"queryReply",
+     "AnimationChildren":[]
+ }"
+The AnimationName is the Name of the Animation that you want run .
+The AnimationChildren is supposed to be an array of child animations .
+The ReSize animation cannot have Child Animations, so the array is empty.
+So, once you have the JSON String, we use the "Set_&lt;Event&gt;" function to set the JSON property of the animation.
+
+//Construct the JSON String
+var jsonAnimationString ="{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "+
+"\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1" +
+"\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}";
+//Set the JSON of the AnimationExtender to be the JSON String
+behaveYourself.set_OnClick( jsonAnimationString );
+//Play the Animation
+onClickAnimation.play();
+
+
+
+
+
+&nbsp;
+Complete Example :
+&nbsp;
+&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head runat="server"&gt;
+    &lt;title&gt;Ways to Call Animations&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form id="frmAnimations" runat="server"&gt;
+
+        &lt;script language="javascript"&gt;
+
+            function callStaticMethods(){
+            //Play the Animation by calling its static methods
+            AjaxControlToolkit.Animation.ResizeAnimation.play( $get("queryReply") , 0.2 , 45 , 200 , 100 , "px" );
+            }
+
+            function createInstanceAndPlay(){
+            //Create an instance of the ReSize Animation
+            var resizeAnimation = new AjaxControlToolkit.Animation.ResizeAnimation( $get("queryReply") , 0.2 , 45 , 200 , 100 , "px");
+            //Play the Animation just created
+            resizeAnimation.play();
+            }
+
+            function SetJSONStringThenPlay(){
+            //Get a handle to the Animation Behavior
+            var behaveYourself       = $find("animateReplyPanesBehavior");
+            //Get the Animation to be played onClick of the TargetControl 
+            var onClickAnimation     = behaveYourself.get_OnClickBehavior();
+            //Construct the JSON String
+            var jsonAnimationString ="{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "+
+            "\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1" +
+            "\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}";
+            //Set the JSON of the AnimationExtender to be the JSON String
+            behaveYourself.set_OnClick( jsonAnimationString );
+            //Play the Animation
+            onClickAnimation.play();
+            }
+
+        &lt;/script&gt;
+
+        &lt;input type="button" value="Call Static Play Method" onclick="callStaticMethods();" /&gt;
+        &lt;input type="button" value="Create Instance And Play" onclick="createInstanceAndPlay();" /&gt;
+        &lt;input type="button" value="Set JSON String then Play" onclick="SetJSONStringThenPlay();" /&gt;
+        &lt;div runat="server" id="queryReply" style="background-color: #ffcc00; position: absolute;
+            top: 100px; left: 100px; height: 300px; width: 300px"&gt;
+            Click me to resize me ( Uses Markup )
+        &lt;/div&gt;
+        &lt;asp:ScriptManager ID="ScriptManager1" runat="server"&gt;
+        &lt;/asp:ScriptManager&gt;
+        &lt;ajaxToolkit:AnimationExtender runat="server" ID="animateReplyPanes" TargetControlID="queryReply"
+            BehaviorID="animateReplyPanesBehavior"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Resize height="100" width="200" duration ="0.2" fps="45" unit="px"&gt;&lt;/Resize&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+        &lt;/ajaxToolkit:AnimationExtender&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+
+Hope I helped someone out there looking For this information .
+Well, Happy Coding !!
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="MS AJAX AnimationExtender : How Many Ways Do I Play thee ? ( Updated )" />
+    <meta property="twitter:title" content="MS AJAX AnimationExtender : How Many Ways Do I Play thee ? ( Updated )" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>MS AJAX AnimationExtender : How Many Ways Do I Play thee ? ( Updated )</h1>
+
+  <div class="entry">
+    <p>We will discuss the various ways&nbsp; in which one can animate a visual element using the MS AJAX Animation.</p>
+<p>The Example would be to resize a div named "queryReply" to have a height of 100px and width of 200px On&nbsp;Click of the&nbsp; Div&nbsp;.</p>
+<p>1) <strong>The Simplest Way&nbsp; , Markup </strong></p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AnimationExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="animateReplyPanes"</span>
+        <span class="attr">TargetControlID</span><span class="kwrd">="queryReply"</span> <span class="attr">BehaviorID</span><span class="kwrd">="animateReplyPanesBehavior"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                       <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">Height</span><span class="kwrd">="100"</span> <span class="attr">FPS</span><span class="kwrd">="25"</span> <span class="attr">Width</span><span class="kwrd">="200"</span> <span class="attr">duration</span><span class="kwrd">="0.3"</span> <span class="attr">unit</span><span class="kwrd">="px"</span><span class="kwrd">/&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>This would be the easiest way to&nbsp;attach &nbsp;an animation (&nbsp;ReSize ) to a control&nbsp; ( QueryReply )&nbsp;on an Event ( <span class="html">OnClick </span>) .</p>
+<p>When the Div &nbsp;is clicked , the Control "queryReply" is resized to have a height of 100 px and a width of 200px.</p>
+<p>2) The "Not So Simple" Ways via javascript</p>
+<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) Call the Static PLAY Method &nbsp;of the Animation Framework to Animate the Control .</strong></p>
+<blockquote>
+<div>
+<pre class="csharpcode"><span class="rem">&lt;!--AjaxControlToolkit.Animation.ResizeAnimation.play(target, duration, fps, width, height, unit);--&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<div>
+<pre class="csharpcode"><span class="rem">//Play the Animation by calling its static methods</span>
+AjaxControlToolkit.Animation.ResizeAnimation.play( $get(<span class="str">"queryReply"</span>) , 0.3 , 25 , 100 , 300 , <span class="str">"px"</span> );
+</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>The Animation will play immediately after this line.</p>
+<p><strong>b) Create an Instance of the Client-Side Animation Extenders to Animate the Control .</strong></p>
+<pre class="csharpcode"><span class="rem">&lt;!--Constructor: new AjaxControlToolkit.Animation.ResizeAnimation(target, duration, fps, width, height, unit); --&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<div>
+<pre class="csharpcode"><span class="rem">//Create an instance of the ReSize Animation</span>
+<span class="kwrd">var</span> resizeAnimation = <span class="kwrd">new</span> AjaxControlToolkit.Animation.ResizeAnimation( $get(<span class="str">"queryReply"</span>) , 0.3 , 25 , 100 , 300 , <span class="str">"px"</span>);
+<span class="rem">//Play the Animation just created</span>
+resizeAnimation.play(); </pre>
+</div>
+<div><strong>c) Selectively playing the Animation Already defined in Markup for an AnimationExtender on the Page.</strong></div>
+<div><strong></strong>&nbsp;</div>
+<div>Lets say that you already have animation defined on your page in markup and you want to trigger the animation using Script .</div>
+<div>You achieve this by :</div>
+<div>&nbsp;&nbsp; 1) Get a handle to the AnimationExtender's Behavior by using the "$find" method.</div>
+<pre class="csharpcode"><span class="rem">//Get a handle to the Animation Behavior</span>
+<span class="kwrd">var</span> behaveYourself       = $find(<span class="str">"animateReplyPanesBehavior"</span>);
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<div>&nbsp;&nbsp; 2) Based on where the animation is defined ( Onload , OnClick , OnHover&nbsp;, whatever&nbsp;), get a handle to the child Animation Definition.&nbsp;&nbsp;&nbsp; </div>
+<pre class="csharpcode"><span class="rem">//Get the Animation to be played onClick of the TargetControl </span>
+<span class="kwrd">var</span> onClickAnimation     = behaveYourself.get_OnClickBehavior();
+<span class="rem">//Get the Animation to be played onLoad of the TargetControl </span>
+<span class="kwrd">var</span> onLoadAnimation     = behaveYourself.get_OnLoadBehavior();
+<span class="rem">//Get the Animation to be played onHover of the TargetControl </span>
+<span class="kwrd">var</span> onHoverAnimation     = behaveYourself.get_OnHoverBehavior();</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<div>&nbsp;&nbsp; 3) Call the "Play" method on the&nbsp; required Animations Definition.</div>
+<div>&nbsp;</div>
+<pre class="csharpcode"><span class="rem">//Play the Animation defined  onClick of the TargetControl </span>
+onClickAnimation.play();
+<span class="rem">//Play the Animation defined  onLoad of the TargetControl </span>
+onLoadAnimation.play();
+<span class="rem">//Play the Animation defined  onHover of the TargetControl </span>
+onHoverAnimation.play();</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<div>&nbsp;</div>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong>d) Set the JSON String for an existing Animation Extender </strong></p>
+<p>Once you declare the Markup as above, you can access the animations that are assigned to the Extender by using the "get_&lt;Event&gt;" Methods on the Behavior .</p>
+<p>EX:</p>
+<div>
+<pre class="csharpcode"><span class="rem">//Get a handle to the Animation Behavior</span>
+<span class="kwrd">var</span> behaveYourself       = $find(<span class="str">"animateReplyPanesBehavior"</span>);
+<span class="rem">//Get the Animation to be played onClick of the TargetControl </span>
+<span class="kwrd">var</span> onClickAnimation     = behaveYourself.get_OnClickBehavior();</pre>
+<p>&nbsp;</p></div>
+</blockquote>
+<blockquote><pre class="csharpcode">Once you have the respective Animation Behavior , you can use the "set_&lt;EVENT&gt;" method to set the Animation JSON String .</pre>
+<pre class="csharpcode">The Json String is constucted like this :</pre>
+<pre class="csharpcode">"{
+     "AnimationName":"ReSize",
+     "Height":"100px",</pre>
+<pre class="csharpcode">     "width":"200px",
+     "unit":"px",
+     "duration":"0.3",
+     "AnimationTarget":"queryReply",
+     "AnimationChildren":[]
+ }"</pre>
+<pre class="csharpcode">The AnimationName is the Name of the Animation that you want run .</pre>
+<pre class="csharpcode">The AnimationChildren is supposed to be an array of child animations .</pre>
+<pre class="csharpcode">The ReSize animation cannot have Child Animations, so the array is empty.</pre>
+<pre class="csharpcode">So, once you have the JSON String, we use the "Set_&lt;Event&gt;" function to set the JSON property of the animation.</pre>
+<div>
+<pre class="csharpcode"><span class="rem">//Construct the JSON String</span>
+<span class="kwrd">var</span> jsonAnimationString =<span class="str">"{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "</span>+
+<span class="str">"\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1"</span> +
+<span class="str">"\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}"</span>;
+<span class="rem">//Set the JSON of the AnimationExtender to be the JSON String</span>
+behaveYourself.set_OnClick( jsonAnimationString );
+<span class="rem">//Play the Animation</span>
+onClickAnimation.play();</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<p>&nbsp;</p>
+<p><strong><u>Complete Example :</u></strong></p>
+<p>&nbsp;</p>
+<pre class="csharpcode"><span class="asp">&lt;%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %&gt;</span>
+<span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="kwrd">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">="http://www.w3.org/1999/xhtml"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Ways to Call Animations<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">form</span> <span class="attr">id</span><span class="kwrd">="frmAnimations"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+
+        <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span>
+
+            <span class="kwrd">function</span> callStaticMethods(){
+            <span class="rem">//Play the Animation by calling its static methods</span>
+            AjaxControlToolkit.Animation.ResizeAnimation.play( $get(<span class="str">"queryReply"</span>) , 0.2 , 45 , 200 , 100 , <span class="str">"px"</span> );
+            }
+
+            <span class="kwrd">function</span> createInstanceAndPlay(){
+            <span class="rem">//Create an instance of the ReSize Animation</span>
+            <span class="kwrd">var</span> resizeAnimation = <span class="kwrd">new</span> AjaxControlToolkit.Animation.ResizeAnimation( $get(<span class="str">"queryReply"</span>) , 0.2 , 45 , 200 , 100 , <span class="str">"px"</span>);
+            <span class="rem">//Play the Animation just created</span>
+            resizeAnimation.play();
+            }
+
+            <span class="kwrd">function</span> SetJSONStringThenPlay(){
+            <span class="rem">//Get a handle to the Animation Behavior</span>
+            <span class="kwrd">var</span> behaveYourself       = $find(<span class="str">"animateReplyPanesBehavior"</span>);
+            <span class="rem">//Get the Animation to be played onClick of the TargetControl </span>
+            <span class="kwrd">var</span> onClickAnimation     = behaveYourself.get_OnClickBehavior();
+            <span class="rem">//Construct the JSON String</span>
+            <span class="kwrd">var</span> jsonAnimationString =<span class="str">"{\"AnimationName\":\"ReSize\",\"Height\":\"100px\", "</span>+
+            <span class="str">"\"Width\":\"200\",\"unit\":\"px\",\"duration\":\"0.1"</span> +
+            <span class="str">"\",\"AnimationTarget\":\"queryReply\",\"AnimationChildren\":[]}"</span>;
+            <span class="rem">//Set the JSON of the AnimationExtender to be the JSON String</span>
+            behaveYourself.set_OnClick( jsonAnimationString );
+            <span class="rem">//Play the Animation</span>
+            onClickAnimation.play();
+            }
+
+        <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+        <span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">value</span><span class="kwrd">="Call Static Play Method"</span> <span class="attr">onclick</span><span class="kwrd">="callStaticMethods();"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">value</span><span class="kwrd">="Create Instance And Play"</span> <span class="attr">onclick</span><span class="kwrd">="createInstanceAndPlay();"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">value</span><span class="kwrd">="Set JSON String then Play"</span> <span class="attr">onclick</span><span class="kwrd">="SetJSONStringThenPlay();"</span> <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">id</span><span class="kwrd">="queryReply"</span> <span class="attr">style</span><span class="kwrd">="background-color: #ffcc00; position: absolute;
+            top: 100px; left: 100px; height: 300px; width: 300px"</span><span class="kwrd">&gt;</span>
+            Click me to resize me ( Uses Markup )
+        <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">ID</span><span class="kwrd">="ScriptManager1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AnimationExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="animateReplyPanes"</span> <span class="attr">TargetControlID</span><span class="kwrd">="queryReply"</span>
+            <span class="attr">BehaviorID</span><span class="kwrd">="animateReplyPanesBehavior"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span><span class="kwrd">="100"</span> <span class="attr">width</span><span class="kwrd">="200"</span> <span class="attr">duration</span> <span class="kwrd">="0.2"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AnimationExtender</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">form</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span>
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Hope I helped someone out there looking For this information .</p>
+<p>Well, Happy Coding !!</p>
+
+  </div>
+
+  <div class="date">
+    Written on April 13, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

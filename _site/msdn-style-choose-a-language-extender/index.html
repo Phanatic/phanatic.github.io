@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MSDN Style Choose a Language Extender – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Download Sample and Source Code : 
+
+Sample Application :  
+Source Code&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 
+
+Quite recently , someone asked me if there was a control that mimicked MSDN's "Choose a Language" Button.
+It looks like this:
+ 
+&nbsp;
+I would have explained that one could&nbsp; achieve this using a combination of the DropDownExtender and some hacky javascript to prevent the popup from closing when one clicks on the options in the CheckBoxList.
+But , this sounded to be a stupid way to solve the problem .And also , I was teaching a couple of guys how to write Ajax Control Extenders.Since this looked like a good example to illustrate and also a pretty fun problem to solve , I went ahead and wrote a control Extender that does exactly this .
+So , the behavior would be :
+a) We have a CheckBoxList inside a block Element such as a asp:Panel , which is initially hiddenb) We have a button upon clicking on which the chechboxList is shown.c) User can select multiple elements from the CheckBoxList.&nbsp;&nbsp; c.1) If One option is selected, the " Language Filter : " value would show the Option&nbsp;&nbsp; c.2) If more than one option is selected,&nbsp; it would show "Multiple Options"
+So , my extender looks like this .
+ 
+Looks very much like the MSDN widget , doesn't it ?So , how would one go about writing this extender ?
+The design would be dependent on the Behavior that you want to achieve.
+a) Are there any existing behaviors that you want to create that already exist ?&nbsp; You would want the Options to POPUP , so we need the PopupExtender.
+b) What kind of Properties would the Extender exhibit ?
+
+
+
+Property Name
+Description
+
+
+TargetPanelID 
+The Id of the asp:Panel that would contain the checkBoxList
+
+
+PopupPosition 
+The Position relative to the TargetControl where the Options would popup
+
+
+FilterText 
+&nbsp;
+
+
+
+c) What kind of Events would the Extender raise ?
+
+
+
+Event Name
+Description
+EventArgs
+
+
+itemSelected
+Raised when an item in the CheckBoxList is Selected
+The Checkbox , the text of the Checkbox , a value indicating if the checkbox is checked.
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+
+So , my design/spec is now ready .
+I follow these steps to setup the initial infrastructure for my Extender : Creating a new extenderBeing Thoroughly incompetent at finding the right name , I use the term "OptionPickerBehavior" to describe my extender and get 3 files ,
+
+OptionPickerBehavior.js  
+OptionPickerBehaviorDesigner.cs  
+OptionPickerBehaviorExtender.cs
+
+&nbsp;
+In the OptionPickerBehaviorExtender.cs Since we decided that I need the PopupExtender , I will need to add that as the RequiredScript for my extender.
+[RequiredScript(typeof(PopupExtender))]
+&nbsp;
+Defining the Properties We add the Necessary Properties 
+        [RequiredProperty]
+        [ExtenderControlProperty]
+        [ClientPropertyName("targetPanelID")]
+        [IDReferenceProperty(typeof(Panel))]
+        public string TargetPanelID
+        {
+            get { return GetPropertyValue("targetPanelID", ""); }
+            set { SetPropertyValue("targetPanelID", value); }
+        }
+
+
+We also define the other properties , PopupPosition  and FilterText  similarly .
+&nbsp;
+Defining the Event 
+        [ExtenderControlEvent]
+        [ClientPropertyName("itemSelected")]
+        public string OnClientItemSelected
+        {
+            get { return GetPropertyValue("itemSelected", ""); }
+            set { SetPropertyValue("itemSelected", value); }
+        } 
+In the OptionPickerBehavior.js
+The behavior of the control is defined in the accompanying OptionPickerBehavior.js file. Now , here is where the real meat of the control lies , since its too tedious to describe the whole thing in One Blog Post , I have put up the control Extender and a Sample application for download , its available for you guys to download and try out . I will blog about how we use JavaScript to Achieve the UI effect that you see.
+How do I use this control ?
+a) Reference the SampleExtenders Dll in your web project . b) Add a tagMapping in your web.config for the SampleExtenders Controls .&lt;pages&gt;
+   &lt;controls&gt;
+      &lt;add tagPrefix ="Raj" namespace="SampleExtenders" assembly="SampleExtenders"/&gt;
+    &lt;/controls&gt;
+&lt;/pages&gt;
+c) Add an ImageButton to act as the Trigger Control .
+&lt;asp:ImageButton runat="server" ID="btnToggleOptions" ImageUrl="~/images/Arrow-off.gif" /&gt;
+d) The TargetPanel which contains the CheckBoxList.
+&lt;!-- Target Panel Begins--&gt;
+&lt;asp:Panel runat="server" ID="OptionsList" Style="display: none; width: 150px" CssClass="grey"&gt;
+              &lt;asp:CheckBoxList runat="server" ID="chklOptions"&gt;
+                         &lt;asp:ListItem Text="Visual Basic" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="C#" Value="CSharp"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="C++" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="J#" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="JScript" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="XAML" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+              &lt;/asp:CheckBoxList&gt;
+&lt;/asp:Panel&gt;
+&lt;!-- Target Panel Ends--&gt;
+e) Markup for the OptionPickerExtender
+ &lt;Raj:OptionPickerBehavior runat="server" ID="optionList"
+            TargetControlID="btnToggleOptions"
+            TargetPanelID="OptionsList"
+            FilterText="Select Languages"
+            PopupPosition="BottomRight"
+            OnClientItemSelected="itemSelected"&gt;
+&lt;/Raj:OptionPickerBehavior&gt;
+&nbsp;
+f) The itemSelected function is wired up to handle the click on the CheckBoxes in the CheckBoxList.g) Thats it !! you are done !!Happy Coding .
+In case you have any questions , feel free to leave a comment on this post
+" />
+    <meta property="og:description" content="Download Sample and Source Code : 
+
+Sample Application :  
+Source Code&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : 
+
+Quite recently , someone asked me if there was a control that mimicked MSDN's "Choose a Language" Button.
+It looks like this:
+ 
+&nbsp;
+I would have explained that one could&nbsp; achieve this using a combination of the DropDownExtender and some hacky javascript to prevent the popup from closing when one clicks on the options in the CheckBoxList.
+But , this sounded to be a stupid way to solve the problem .And also , I was teaching a couple of guys how to write Ajax Control Extenders.Since this looked like a good example to illustrate and also a pretty fun problem to solve , I went ahead and wrote a control Extender that does exactly this .
+So , the behavior would be :
+a) We have a CheckBoxList inside a block Element such as a asp:Panel , which is initially hiddenb) We have a button upon clicking on which the chechboxList is shown.c) User can select multiple elements from the CheckBoxList.&nbsp;&nbsp; c.1) If One option is selected, the " Language Filter : " value would show the Option&nbsp;&nbsp; c.2) If more than one option is selected,&nbsp; it would show "Multiple Options"
+So , my extender looks like this .
+ 
+Looks very much like the MSDN widget , doesn't it ?So , how would one go about writing this extender ?
+The design would be dependent on the Behavior that you want to achieve.
+a) Are there any existing behaviors that you want to create that already exist ?&nbsp; You would want the Options to POPUP , so we need the PopupExtender.
+b) What kind of Properties would the Extender exhibit ?
+
+
+
+Property Name
+Description
+
+
+TargetPanelID 
+The Id of the asp:Panel that would contain the checkBoxList
+
+
+PopupPosition 
+The Position relative to the TargetControl where the Options would popup
+
+
+FilterText 
+&nbsp;
+
+
+
+c) What kind of Events would the Extender raise ?
+
+
+
+Event Name
+Description
+EventArgs
+
+
+itemSelected
+Raised when an item in the CheckBoxList is Selected
+The Checkbox , the text of the Checkbox , a value indicating if the checkbox is checked.
+
+
+&nbsp;
+&nbsp;
+&nbsp;
+
+
+
+So , my design/spec is now ready .
+I follow these steps to setup the initial infrastructure for my Extender : Creating a new extenderBeing Thoroughly incompetent at finding the right name , I use the term "OptionPickerBehavior" to describe my extender and get 3 files ,
+
+OptionPickerBehavior.js  
+OptionPickerBehaviorDesigner.cs  
+OptionPickerBehaviorExtender.cs
+
+&nbsp;
+In the OptionPickerBehaviorExtender.cs Since we decided that I need the PopupExtender , I will need to add that as the RequiredScript for my extender.
+[RequiredScript(typeof(PopupExtender))]
+&nbsp;
+Defining the Properties We add the Necessary Properties 
+        [RequiredProperty]
+        [ExtenderControlProperty]
+        [ClientPropertyName("targetPanelID")]
+        [IDReferenceProperty(typeof(Panel))]
+        public string TargetPanelID
+        {
+            get { return GetPropertyValue("targetPanelID", ""); }
+            set { SetPropertyValue("targetPanelID", value); }
+        }
+
+
+We also define the other properties , PopupPosition  and FilterText  similarly .
+&nbsp;
+Defining the Event 
+        [ExtenderControlEvent]
+        [ClientPropertyName("itemSelected")]
+        public string OnClientItemSelected
+        {
+            get { return GetPropertyValue("itemSelected", ""); }
+            set { SetPropertyValue("itemSelected", value); }
+        } 
+In the OptionPickerBehavior.js
+The behavior of the control is defined in the accompanying OptionPickerBehavior.js file. Now , here is where the real meat of the control lies , since its too tedious to describe the whole thing in One Blog Post , I have put up the control Extender and a Sample application for download , its available for you guys to download and try out . I will blog about how we use JavaScript to Achieve the UI effect that you see.
+How do I use this control ?
+a) Reference the SampleExtenders Dll in your web project . b) Add a tagMapping in your web.config for the SampleExtenders Controls .&lt;pages&gt;
+   &lt;controls&gt;
+      &lt;add tagPrefix ="Raj" namespace="SampleExtenders" assembly="SampleExtenders"/&gt;
+    &lt;/controls&gt;
+&lt;/pages&gt;
+c) Add an ImageButton to act as the Trigger Control .
+&lt;asp:ImageButton runat="server" ID="btnToggleOptions" ImageUrl="~/images/Arrow-off.gif" /&gt;
+d) The TargetPanel which contains the CheckBoxList.
+&lt;!-- Target Panel Begins--&gt;
+&lt;asp:Panel runat="server" ID="OptionsList" Style="display: none; width: 150px" CssClass="grey"&gt;
+              &lt;asp:CheckBoxList runat="server" ID="chklOptions"&gt;
+                         &lt;asp:ListItem Text="Visual Basic" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="C#" Value="CSharp"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="C++" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="J#" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="JScript" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+                         &lt;asp:ListItem Text="XAML" Value="Visual Basic"&gt;&lt;/asp:ListItem&gt;
+              &lt;/asp:CheckBoxList&gt;
+&lt;/asp:Panel&gt;
+&lt;!-- Target Panel Ends--&gt;
+e) Markup for the OptionPickerExtender
+ &lt;Raj:OptionPickerBehavior runat="server" ID="optionList"
+            TargetControlID="btnToggleOptions"
+            TargetPanelID="OptionsList"
+            FilterText="Select Languages"
+            PopupPosition="BottomRight"
+            OnClientItemSelected="itemSelected"&gt;
+&lt;/Raj:OptionPickerBehavior&gt;
+&nbsp;
+f) The itemSelected function is wired up to handle the click on the CheckBoxes in the CheckBoxList.g) Thats it !! you are done !!Happy Coding .
+In case you have any questions , feel free to leave a comment on this post
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="MSDN Style Choose a Language Extender" />
+    <meta property="twitter:title" content="MSDN Style Choose a Language Extender" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>MSDN Style Choose a Language Extender</h1>
+
+  <div class="entry">
+    <p><strong>Download Sample and Source Code : </strong></p>
+<ul>
+<li>Sample Application : <iframe style="border-right: #dde5e9 1px solid; padding-right: 0px; border-top: #dde5e9 1px solid; padding-left: 0px; padding-bottom: 0px; margin: 3px; border-left: #dde5e9 1px solid; width: 240px; padding-top: 0px; border-bottom: #dde5e9 1px solid; height: 26px; background-color: #ffffff" marginwidth="0" marginheight="0" src="http://cid-925c2d2bb2d03c6b.skydrive.live.com/embedrow.aspx/Public/RajExtenderSample.zip" frameborder="0" scrolling="no"></iframe> </li>
+<li>Source Code&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : <iframe style="border-right: #dde5e9 1px solid; padding-right: 0px; border-top: #dde5e9 1px solid; padding-left: 0px; padding-bottom: 0px; margin: 3px; border-left: #dde5e9 1px solid; width: 240px; padding-top: 0px; border-bottom: #dde5e9 1px solid; height: 26px; background-color: #ffffff" marginwidth="0" marginheight="0" src="http://cid-925c2d2bb2d03c6b.skydrive.live.com/embedrow.aspx/Public/SampleExtenders.zip" frameborder="0" scrolling="no"></iframe></li>
+</ul>
+<p>Quite recently , someone asked me if there was a control that mimicked MSDN's "Choose a Language" Button.</p>
+<p>It looks like this:</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MSDN_LanguagePick_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MSDN_LanguagePick_2.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="217" alt="MSDN_LanguagePick" src="/assets/MSDN_LanguagePick_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MSDN_LanguagePick_thumb.jpg" width="460" border="0" /></a> </p>
+<p>&nbsp;</p>
+<p>I would have explained that one could&nbsp; achieve this using a combination of the DropDownExtender and some hacky javascript to prevent the popup from closing when one clicks on the options in the CheckBoxList.</p>
+<p>But , this sounded to be a stupid way to solve the problem .And also , I was teaching a couple of guys how to write Ajax Control Extenders.<br />Since this looked like a good example to illustrate and also a pretty fun problem to solve , I went ahead and wrote a control Extender that does exactly this .</p>
+<p>So , the behavior would be :</p>
+<p>a) We have a CheckBoxList inside a block Element such as a asp:Panel , which is initially hidden<br />b) We have a button upon clicking on which the chechboxList is shown.<br />c) User can select multiple elements from the CheckBoxList.<br />&nbsp;&nbsp; c.1) If One option is selected, the " Language Filter : " value would show the Option<br />&nbsp;&nbsp; c.2) If more than one option is selected,&nbsp; it would show "Multiple Options"</p>
+<p>So , my extender looks like this .</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MyExtender-2_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MyExtender-2_2.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="147" alt="MyExtender-2" src="/assets/MyExtender-2_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/MSDNStyle_4877/MyExtender-2_thumb.jpg" width="466" border="0" /></a> </p>
+<p>Looks very much like the MSDN widget , doesn't it ?<br />So , how would one go about writing this extender ?</p>
+<p>The design would be dependent on the Behavior that you want to achieve.</p>
+<p><strong>a) Are there any existing behaviors that you want to create that already exist ?<br /></strong>&nbsp; You would want the Options to POPUP , so we need the PopupExtender.</p>
+<p><strong>b) What kind of Properties would the Extender exhibit ?</strong></p>
+<table cellspacing="0" cellpadding="2" width="805" border="0">
+<tbody>
+<tr>
+<td valign="top" width="201"><strong>Property Name</strong></td>
+<td valign="top" width="602"><strong>Description</strong></td>
+</tr>
+<tr>
+<td valign="top" width="203">TargetPanelID<strong> </strong></td>
+<td valign="top" width="602">The Id of the asp:Panel that would contain the checkBoxList</td>
+</tr>
+<tr>
+<td valign="top" width="204">PopupPosition<strong> </strong></td>
+<td valign="top" width="602">The Position relative to the TargetControl where the Options would popup</td>
+</tr>
+<tr>
+<td valign="top" width="205">FilterText<strong> </strong></td>
+<td valign="top" width="602">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p><strong>c) What kind of Events would the Extender raise ?</strong></p>
+<table cellspacing="0" cellpadding="2" width="805" border="0">
+<tbody>
+<tr>
+<td valign="top" width="142"><strong>Event Name</strong></td>
+<td valign="top" width="363"><strong>Description</strong></td>
+<td valign="top" width="298"><strong>EventArgs</strong></td>
+</tr>
+<tr>
+<td valign="top" width="144">itemSelected</td>
+<td valign="top" width="362">Raised when an item in the CheckBoxList is Selected</td>
+<td valign="top" width="298">The Checkbox , the text of the Checkbox , <br />a value indicating if the checkbox is checked.</td>
+</tr>
+<tr>
+<td valign="top" width="146">&nbsp;</td>
+<td valign="top" width="361">&nbsp;</td>
+<td valign="top" width="298">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>So , my design/spec is now ready .</p>
+<p>I follow these steps to setup the initial infrastructure for my Extender : <a href="http://www.asp.net/AJAX/AjaxControlToolkit/Samples/Walkthrough/CreatingNewExtender.aspx" target="_blank">Creating a new extender</a><br />Being Thoroughly incompetent at finding the right name , I use the term "OptionPickerBehavior" to describe my extender and get 3 files ,</p>
+<ol>
+<li>OptionPickerBehavior.js  </li>
+<li>OptionPickerBehaviorDesigner.cs  </li>
+<li>OptionPickerBehaviorExtender.cs</li>
+</ol>
+<p><strong></strong>&nbsp;</p>
+<p><strong>In the OptionPickerBehaviorExtender.cs <br /></strong>Since we decided that I need the PopupExtender , I will need to add that as the RequiredScript for my extender.</p>
+<pre class="csharpcode">[RequiredScript(<span class="kwrd">typeof</span>(PopupExtender))]</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong>Defining the Properties <br /></strong>We add the Necessary Properties </pre>
+<pre class="csharpcode">        [RequiredProperty]
+        [ExtenderControlProperty]
+        [ClientPropertyName(<span class="str">"targetPanelID"</span>)]
+        [IDReferenceProperty(<span class="kwrd">typeof</span>(Panel))]
+        <span class="kwrd">public</span> <span class="kwrd">string</span> TargetPanelID
+        {
+            get { <span class="kwrd">return</span> GetPropertyValue(<span class="str">"targetPanelID"</span>, <span class="str">""</span>); }
+            set { SetPropertyValue(<span class="str">"targetPanelID"</span>, <span class="kwrd">value</span>); }
+        }
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">We also define the other properties , PopupPosition<strong> </strong> and FilterText<strong> </strong> similarly .</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong>Defining the Event </strong></pre>
+<pre class="csharpcode">        [ExtenderControlEvent]
+        [ClientPropertyName(<span class="str">"itemSelected"</span>)]
+        <span class="kwrd">public</span> <span class="kwrd">string</span> OnClientItemSelected
+        {
+            get { <span class="kwrd">return</span> GetPropertyValue(<span class="str">"itemSelected"</span>, <span class="str">""</span>); }
+            set { SetPropertyValue(<span class="str">"itemSelected"</span>, <span class="kwrd">value</span>); }
+        } </pre>
+<pre class="csharpcode"><strong><font size="3">In the OptionPickerBehavior.js</font></strong></pre>
+<p>The behavior of the control is defined in the accompanying OptionPickerBehavior.js file. <br />Now , here is where the real meat of the control lies , since its too tedious to describe the whole thing in One Blog Post , <br />I have put up the control Extender and a Sample application for download , its available for you guys to download and try out . <br />I will blog about how we use JavaScript to Achieve the UI effect that you see.
+<pre class="csharpcode" /><font size="4"><strong>How do I use this control ?</strong></font>
+<p>a) Reference the SampleExtenders Dll in your web project . <br />b) Add a tagMapping in your web.config for the SampleExtenders Controls .<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">pages</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;</span><span class="html">controls</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">add</span> <span class="attr">tagPrefix</span> <span class="kwrd">="Raj"</span> <span class="attr">namespace</span><span class="kwrd">="SampleExtenders"</span> <span class="attr">assembly</span><span class="kwrd">="SampleExtenders"</span><span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">controls</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">pages</span><span class="kwrd">&gt;</span></pre>
+<p>c) Add an ImageButton to act as the Trigger Control .
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">asp:ImageButton</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnToggleOptions"</span> <span class="attr">ImageUrl</span><span class="kwrd">="~/images/Arrow-off.gif"</span> <span class="kwrd">/&gt;</span></pre>
+<p>d) The TargetPanel which contains the CheckBoxList.
+<pre class="csharpcode"><span class="rem">&lt;!-- Target Panel Begins--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Panel</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="OptionsList"</span> <span class="attr">Style</span><span class="kwrd">="display: none; width: 150px"</span> <span class="attr">CssClass</span><span class="kwrd">="grey"</span><span class="kwrd">&gt;</span>
+              <span class="kwrd">&lt;</span><span class="html">asp:CheckBoxList</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="chklOptions"</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="Visual Basic"</span> <span class="attr">Value</span><span class="kwrd">="Visual Basic"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="C#"</span> <span class="attr">Value</span><span class="kwrd">="CSharp"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="C++"</span> <span class="attr">Value</span><span class="kwrd">="Visual Basic"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="J#"</span> <span class="attr">Value</span><span class="kwrd">="Visual Basic"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="JScript"</span> <span class="attr">Value</span><span class="kwrd">="Visual Basic"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+                         <span class="kwrd">&lt;</span><span class="html">asp:ListItem</span> <span class="attr">Text</span><span class="kwrd">="XAML"</span> <span class="attr">Value</span><span class="kwrd">="Visual Basic"</span><span class="kwrd">&gt;&lt;/</span><span class="html">asp:ListItem</span><span class="kwrd">&gt;</span>
+              <span class="kwrd">&lt;/</span><span class="html">asp:CheckBoxList</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">asp:Panel</span><span class="kwrd">&gt;</span>
+<span class="rem">&lt;!-- Target Panel Ends--&gt;</span></pre>
+<p>e) Markup for the OptionPickerExtender
+<pre class="csharpcode"> <span class="kwrd">&lt;</span><span class="html">Raj:OptionPickerBehavior</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="optionList"</span>
+            <span class="attr">TargetControlID</span><span class="kwrd">="btnToggleOptions"</span>
+            <span class="attr">TargetPanelID</span><span class="kwrd">="OptionsList"</span>
+            <span class="attr">FilterText</span><span class="kwrd">="Select Languages"</span>
+            <span class="attr">PopupPosition</span><span class="kwrd">="BottomRight"</span>
+            <span class="attr">OnClientItemSelected</span><span class="kwrd">="itemSelected"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">Raj:OptionPickerBehavior</span><span class="kwrd">&gt;</span></pre>
+<p>&nbsp;</p>
+<pre /><font face="Trebuchet MS" size="2">f) The itemSelected function is wired up to handle the click on the CheckBoxes in the CheckBoxList.<br /></font><font face="Trebuchet MS" size="2">g) Thats it !! you are done !!</font><pre /><font face="Trebuchet MS" size="2">Happy Coding .</font><pre><strong /></pre>
+<p><font face="Trebuchet MS" size="2">In case you have any questions , feel free to leave a comment on this post</font></p></p></p>
+
+  </div>
+
+  <div class="date">
+    Written on October  8, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

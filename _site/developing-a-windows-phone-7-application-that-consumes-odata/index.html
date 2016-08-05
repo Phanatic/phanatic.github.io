@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Developing a Windows Phone 7 Application that consumes OData – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Click here to download the source for this application
+System Requirements :
+1. Windows Phone 7 Developer tools
+2. The OData client library for Windows Phone 7.
+We start by running Visual Studio 2010 Express For Windows Phone which is installed as part of Windows Phone 7 Developer tools.
+Step Zero is to generate the client types for the netflix Odata Service using the DataSvcUtil.exe tool. In the Mix RC release the &ldquo;Add Service Reference&rdquo; window is broken and will not generate proxy classes in a windows phone application. 
+Here is how you generate the client proxy types for the netflix Odata Service 
+Open a command prompt as administrator and navigate to %windir%\Microsoft.NET\Framework\v4.0.30128
+Run this command :
+DataSvcutil.exe /uri:http://odata.netflix.com/Catalog/ /DataServiceCollection /Version:2.0 /out:netflixClientTypes.cs
+Copy the generated netflixClientTypes.cs file into the application you create in the next step.
+Step one is to create a Windows Phone List Application and then customizing the ListViewItem template to show details about the catalog title. Here is the relevant XAML.
+&lt;mpc:ListViewItem
+       ImageSource="{Binding BoxArt.MediumUrl}"       Text="{Binding Title.Regular}" Layout="TextAndDetailsWithIcon"        Details="{Binding Synopsis}" Style="{StaticResource PhoneListBoxItemLayout}"/&gt;
+
+
+
+
+#1 . Application Start Screen
+#2. Popup to filter results
+#3. Details Screen for selected Movie
+
+
+
+ 
+
+
+
+
+When the Home Page ( Screen #1) above loads , we use the netFlixViewModel to query for the first 4 titles in the CatalogTitles set :
+
+public MainPage()
+{
+   InitializeComponent();
+
+   SupportedOrientations = SupportedPageOrientation.Portrait;
+   Loaded += new RoutedEventHandler(MainPage_Loaded);
+   PageTransitionList.Completed += new EventHandler(PageTransitionList_Completed);
+
+   netflixViewModel = this.Resources["netflixViewModel"] as NetflixViewModel;
+   netflixViewModel.CatalogsLoaded += new EventHandler&lt;CatalogTitleLoadingEventArgs&gt;(netflixViewModel_CatalogsLoaded);
+   netflixViewModel.GetCatalogTitles(4);
+}
+
+
+When the button &ldquo;Filter By Availability&rdquo; is clicked , we open a popup and pass in a filter criteria which is bound to the checkboxes shown above.
+private void FilterByAvailability(object sender, RoutedEventArgs e)
+   {
+            DeliveryFormatAvailabilityFilter filterData = new DeliveryFormatAvailabilityFilter();
+            FilterMoviesByGenre filterWindow = new FilterMoviesByGenre();
+            filterWindow.DataContext = filterData;
+            filterWindow.Show();
+            filterWindow.Closed += new EventHandler(filterWindow_Closed);
+   }
+
+When the user makes his/her selections and closes the dialog box above, we call another method on the viewmodel called GetCatalogTitlesByAvailability. The code looks like this : 
+void filterWindow_Closed(object sender, EventArgs e)
+   {
+            FilterMoviesByGenre filterWindow = sender as FilterMoviesByGenre;
+            if (filterWindow.DialogResult.HasValue &amp;&amp; filterWindow.DialogResult.Value)
+            {
+                DeliveryFormatAvailabilityFilter filterData = filterWindow.DataContext as DeliveryFormatAvailabilityFilter;
+                Dispatcher.BeginInvoke(
+                    () =&gt;
+                    {
+                        progressWindow = new Progress();
+                        progressWindow.textBlock2.Text = "Loading Movies";
+                        progressWindow.Show();
+                        netflixViewModel.GetCatalogTitlesByAvailability(filterData);
+                    }
+                    );
+            }
+   }
+
+When an item in the list is selected in the application&rsquo;s main screen , a hard-coded page transition animation kicks off and when it ends , the application navigates to the DetailsPage.xaml and sets up the Data Context to be the selected CatalogTitle instance.
+private void PageTransitionList_Completed(object sender, EventArgs e)
+{
+    // Set datacontext of details page to selected listbox item
+    NavigationService.Navigate(new Uri("/DetailsPage.xaml", UriKind.Relative));
+    FrameworkElement root = Application.Current.RootVisual as FrameworkElement;
+    root.DataContext = _selectedItem;
+}
+In the DetailsPage.Xaml page , we just setup the bindings to display the title and the movie&rsquo;s large image . You can customize this to do something fancier.
+&lt;TextBlock Text="{Binding Title.Regular}" Style="{StaticResource PhoneTextPageTitle2Style}" TextWrapping="Wrap"/&gt;
+        &lt;/Grid&gt;
+
+&lt;!--ContentGrid contains the details--&gt;
+        &lt;ScrollViewer Grid.Row="1"&gt;
+            &lt;Grid x:Name="ContentGrid" &gt;
+                &lt;Grid.Projection&gt;
+                    &lt;PlaneProjection/&gt;
+                &lt;/Grid.Projection&gt;
+                &lt;Grid.RowDefinitions&gt;
+                    &lt;RowDefinition Height="Auto"/&gt;
+                &lt;/Grid.RowDefinitions&gt;
+                &lt;Image Source="{Binding BoxArt.LargeUrl}" Grid.Row="0" /&gt;
+            &lt;/Grid&gt;
+        &lt;/ScrollViewer&gt;
+
+And , you are done ! Isn&rsquo;t this the best&nbsp; thing ever ? We are always looking for feedback about how to make this experience easier. Give us your feedback either via commenting on this post or sending me an email at PhaniRaj At Microsoft DOt Com.
+" />
+    <meta property="og:description" content="Click here to download the source for this application
+System Requirements :
+1. Windows Phone 7 Developer tools
+2. The OData client library for Windows Phone 7.
+We start by running Visual Studio 2010 Express For Windows Phone which is installed as part of Windows Phone 7 Developer tools.
+Step Zero is to generate the client types for the netflix Odata Service using the DataSvcUtil.exe tool. In the Mix RC release the &ldquo;Add Service Reference&rdquo; window is broken and will not generate proxy classes in a windows phone application. 
+Here is how you generate the client proxy types for the netflix Odata Service 
+Open a command prompt as administrator and navigate to %windir%\Microsoft.NET\Framework\v4.0.30128
+Run this command :
+DataSvcutil.exe /uri:http://odata.netflix.com/Catalog/ /DataServiceCollection /Version:2.0 /out:netflixClientTypes.cs
+Copy the generated netflixClientTypes.cs file into the application you create in the next step.
+Step one is to create a Windows Phone List Application and then customizing the ListViewItem template to show details about the catalog title. Here is the relevant XAML.
+&lt;mpc:ListViewItem
+       ImageSource="{Binding BoxArt.MediumUrl}"       Text="{Binding Title.Regular}" Layout="TextAndDetailsWithIcon"        Details="{Binding Synopsis}" Style="{StaticResource PhoneListBoxItemLayout}"/&gt;
+
+
+
+
+#1 . Application Start Screen
+#2. Popup to filter results
+#3. Details Screen for selected Movie
+
+
+
+ 
+
+
+
+
+When the Home Page ( Screen #1) above loads , we use the netFlixViewModel to query for the first 4 titles in the CatalogTitles set :
+
+public MainPage()
+{
+   InitializeComponent();
+
+   SupportedOrientations = SupportedPageOrientation.Portrait;
+   Loaded += new RoutedEventHandler(MainPage_Loaded);
+   PageTransitionList.Completed += new EventHandler(PageTransitionList_Completed);
+
+   netflixViewModel = this.Resources["netflixViewModel"] as NetflixViewModel;
+   netflixViewModel.CatalogsLoaded += new EventHandler&lt;CatalogTitleLoadingEventArgs&gt;(netflixViewModel_CatalogsLoaded);
+   netflixViewModel.GetCatalogTitles(4);
+}
+
+
+When the button &ldquo;Filter By Availability&rdquo; is clicked , we open a popup and pass in a filter criteria which is bound to the checkboxes shown above.
+private void FilterByAvailability(object sender, RoutedEventArgs e)
+   {
+            DeliveryFormatAvailabilityFilter filterData = new DeliveryFormatAvailabilityFilter();
+            FilterMoviesByGenre filterWindow = new FilterMoviesByGenre();
+            filterWindow.DataContext = filterData;
+            filterWindow.Show();
+            filterWindow.Closed += new EventHandler(filterWindow_Closed);
+   }
+
+When the user makes his/her selections and closes the dialog box above, we call another method on the viewmodel called GetCatalogTitlesByAvailability. The code looks like this : 
+void filterWindow_Closed(object sender, EventArgs e)
+   {
+            FilterMoviesByGenre filterWindow = sender as FilterMoviesByGenre;
+            if (filterWindow.DialogResult.HasValue &amp;&amp; filterWindow.DialogResult.Value)
+            {
+                DeliveryFormatAvailabilityFilter filterData = filterWindow.DataContext as DeliveryFormatAvailabilityFilter;
+                Dispatcher.BeginInvoke(
+                    () =&gt;
+                    {
+                        progressWindow = new Progress();
+                        progressWindow.textBlock2.Text = "Loading Movies";
+                        progressWindow.Show();
+                        netflixViewModel.GetCatalogTitlesByAvailability(filterData);
+                    }
+                    );
+            }
+   }
+
+When an item in the list is selected in the application&rsquo;s main screen , a hard-coded page transition animation kicks off and when it ends , the application navigates to the DetailsPage.xaml and sets up the Data Context to be the selected CatalogTitle instance.
+private void PageTransitionList_Completed(object sender, EventArgs e)
+{
+    // Set datacontext of details page to selected listbox item
+    NavigationService.Navigate(new Uri("/DetailsPage.xaml", UriKind.Relative));
+    FrameworkElement root = Application.Current.RootVisual as FrameworkElement;
+    root.DataContext = _selectedItem;
+}
+In the DetailsPage.Xaml page , we just setup the bindings to display the title and the movie&rsquo;s large image . You can customize this to do something fancier.
+&lt;TextBlock Text="{Binding Title.Regular}" Style="{StaticResource PhoneTextPageTitle2Style}" TextWrapping="Wrap"/&gt;
+        &lt;/Grid&gt;
+
+&lt;!--ContentGrid contains the details--&gt;
+        &lt;ScrollViewer Grid.Row="1"&gt;
+            &lt;Grid x:Name="ContentGrid" &gt;
+                &lt;Grid.Projection&gt;
+                    &lt;PlaneProjection/&gt;
+                &lt;/Grid.Projection&gt;
+                &lt;Grid.RowDefinitions&gt;
+                    &lt;RowDefinition Height="Auto"/&gt;
+                &lt;/Grid.RowDefinitions&gt;
+                &lt;Image Source="{Binding BoxArt.LargeUrl}" Grid.Row="0" /&gt;
+            &lt;/Grid&gt;
+        &lt;/ScrollViewer&gt;
+
+And , you are done ! Isn&rsquo;t this the best&nbsp; thing ever ? We are always looking for feedback about how to make this experience easier. Give us your feedback either via commenting on this post or sending me an email at PhaniRaj At Microsoft DOt Com.
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Developing a Windows Phone 7 Application that consumes OData" />
+    <meta property="twitter:title" content="Developing a Windows Phone 7 Application that consumes OData" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Developing a Windows Phone 7 Application that consumes OData</h1>
+
+  <div class="entry">
+    <p><a href="http://cid-925c2d2bb2d03c6b.office.live.com/self.aspx/Public/ODataOnWinPhoneSample%5E_July2010Beta.zip?sa=480820212">Click here to download the source for this application</a></p>
+<p>System Requirements :</p>
+<p>1. <a href="http://developer.windowsphone.com/windows-phone-7-series/">Windows Phone 7 Developer tools</a></p>
+<p>2. <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=b251b247-70ca-4887-bab6-dccdec192f8d&amp;displaylang=en">The OData client library for Windows Phone 7.</a></p>
+<p>We start by running Visual Studio 2010 Express For Windows Phone which is installed as part of Windows Phone 7 Developer tools.</p>
+<p>Step Zero is to generate the client types for the netflix Odata Service using the DataSvcUtil.exe tool. <br />In the Mix RC release the &ldquo;Add Service Reference&rdquo; window is broken and will not generate proxy classes in a windows phone application. </p>
+<p>Here is how you generate the client proxy types for the netflix Odata Service </p>
+<p>Open a command prompt as administrator and navigate to %windir%\Microsoft.NET\Framework\v4.0.30128</p>
+<p>Run this command :</p>
+<p>DataSvcutil.exe /uri:<a href="http://odata.netflix.com/Catalog/" title="http://odata.netflix.com/Catalog/">http://odata.netflix.com/Catalog/</a> /DataServiceCollection /Version:2.0 /out:netflixClientTypes.cs</p>
+<p>Copy the generated netflixClientTypes.cs file into the application you create in the next step.</p>
+<p>Step one is to create a Windows Phone List Application and then customizing the ListViewItem template to show details about the catalog title. Here is the relevant XAML.</p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">mpc</span><span style="COLOR: blue">:</span><span style="COLOR: #a31515">ListViewItem
+       </span><span style="COLOR: red">ImageSource</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">Binding </span><span style="COLOR: red">BoxArt</span><span style="COLOR: blue">.MediumUrl}"<br />       </span><span style="COLOR: red">Text</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">Binding </span><span style="COLOR: red">Title</span><span style="COLOR: blue">.Regular}" </span><span style="COLOR: red">Layout</span><span style="COLOR: blue">="TextAndDetailsWithIcon" <br />       </span><span style="COLOR: red">Details</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">Binding </span><span style="COLOR: red">Synopsis</span><span style="COLOR: blue">}" </span><span style="COLOR: red">Style</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">StaticResource </span><span style="COLOR: red">PhoneListBoxItemLayout</span><span style="COLOR: blue">}"/&gt;</span></pre>
+<p><a href="http://11011.net/software/vspaste"></a></p>
+<table>
+<tbody>
+<tr>
+<td>#1 . Application Start Screen</td>
+<td>#2. Popup to filter results</td>
+<td>#3. Details Screen for selected Movie</td>
+</tr>
+<tr>
+<td><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/ApplicationStart.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/ApplicationStart.png"><img height="484" width="247" src="/assets/ApplicationStart_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/ApplicationStart_thumb.png" alt="ApplicationStart" border="0" title="ApplicationStart" style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" /></a></td>
+<td><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/filterByAvailability.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/filterByAvailability.png"><img height="484" width="257" src="/assets/filterByAvailability_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/filterByAvailability_thumb.png" alt="filterByAvailability" border="0" title="filterByAvailability" style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" /></a> </td>
+<td><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/DetailsView.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/DetailsView.png"><img height="484" width="255" src="/assets/DetailsView_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/DevelopingaWIndowsPhone7APplicationthatc_13CFA/DetailsView_thumb.png" alt="DetailsView" border="0" title="DetailsView" style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" /></a></td>
+</tr>
+</tbody>
+</table>
+<p>When the Home Page ( Screen #1) above loads , we use the netFlixViewModel to query for the first 4 titles in the CatalogTitles set :</p>
+<blockquote>
+<pre class="code"><span style="COLOR: blue">public </span>MainPage()
+{
+   InitializeComponent();
+
+   SupportedOrientations = <span style="COLOR: #2b91af">SupportedPageOrientation</span>.Portrait;
+   Loaded += <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">RoutedEventHandler</span>(MainPage_Loaded);
+   PageTransitionList.Completed += <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">EventHandler</span>(PageTransitionList_Completed);
+
+   netflixViewModel = <span style="COLOR: blue">this</span>.Resources[<span style="COLOR: #a31515">"netflixViewModel"</span>] <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">NetflixViewModel</span>;
+   netflixViewModel.CatalogsLoaded += <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">EventHandler</span>&lt;<span style="COLOR: #2b91af">CatalogTitleLoadingEventArgs</span>&gt;(netflixViewModel_CatalogsLoaded);
+   netflixViewModel.GetCatalogTitles(4);
+}</pre>
+<p><a href="http://11011.net/software/vspaste"></a></p></blockquote>
+<p><a href="http://11011.net/software/vspaste"></a></p>
+<p>When the button &ldquo;Filter By Availability&rdquo; is clicked , we open a popup and pass in a filter criteria which is bound to the checkboxes shown above.</p>
+<pre class="code"><span style="COLOR: blue">private void </span>FilterByAvailability(<span style="COLOR: blue">object </span>sender, <span style="COLOR: #2b91af">RoutedEventArgs </span>e)
+   {
+            <span style="COLOR: #2b91af">DeliveryFormatAvailabilityFilter </span>filterData = <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">DeliveryFormatAvailabilityFilter</span>();
+            <span style="COLOR: #2b91af">FilterMoviesByGenre </span>filterWindow = <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">FilterMoviesByGenre</span>();
+            filterWindow.DataContext = filterData;
+            filterWindow.Show();
+            filterWindow.Closed += <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">EventHandler</span>(filterWindow_Closed);
+   }</pre>
+<p><a href="http://11011.net/software/vspaste"></a></p>
+<p>When the user makes his/her selections and closes the dialog box above, we call another method on the viewmodel called GetCatalogTitlesByAvailability. The code looks like this : </p>
+<pre class="code"><span style="COLOR: blue">void </span>filterWindow_Closed(<span style="COLOR: blue">object </span>sender, <span style="COLOR: #2b91af">EventArgs </span>e)
+   {
+            <span style="COLOR: #2b91af">FilterMoviesByGenre </span>filterWindow = sender <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">FilterMoviesByGenre</span>;
+            <span style="COLOR: blue">if </span>(filterWindow.DialogResult.HasValue &amp;&amp; filterWindow.DialogResult.Value)
+            {
+                <span style="COLOR: #2b91af">DeliveryFormatAvailabilityFilter </span>filterData = filterWindow.DataContext <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">DeliveryFormatAvailabilityFilter</span>;
+                Dispatcher.BeginInvoke(
+                    () =&gt;
+                    {
+                        progressWindow = <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">Progress</span>();
+                        progressWindow.textBlock2.Text = <span style="COLOR: #a31515">"Loading Movies"</span>;
+                        progressWindow.Show();
+                        netflixViewModel.GetCatalogTitlesByAvailability(filterData);
+                    }
+                    );
+            }
+   }</pre>
+<p><a href="http://11011.net/software/vspaste"></a></p>
+<p>When an item in the list is selected in the application&rsquo;s main screen , a hard-coded page transition animation kicks off and when it ends , the application navigates to the DetailsPage.xaml and sets up the Data Context to be the selected CatalogTitle instance.</p>
+<pre class="code"><span style="COLOR: blue">private void </span>PageTransitionList_Completed(<span style="COLOR: blue">object </span>sender, <span style="COLOR: #2b91af">EventArgs </span>e)
+{
+    <span style="COLOR: green">// Set datacontext of details page to selected listbox item
+    </span>NavigationService.Navigate(<span style="COLOR: blue">new </span><span style="COLOR: #2b91af">Uri</span>(<span style="COLOR: #a31515">"/DetailsPage.xaml"</span>, <span style="COLOR: #2b91af">UriKind</span>.Relative));
+    <span style="COLOR: #2b91af">FrameworkElement </span>root = <span style="COLOR: #2b91af">Application</span>.Current.RootVisual <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">FrameworkElement</span>;
+    root.DataContext = _selectedItem;
+}</pre>
+<p>In the DetailsPage.Xaml page , we just setup the bindings to display the title and the movie&rsquo;s large image . You can customize this to do something fancier.</p>
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">TextBlock </span><span style="COLOR: red">Text</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">Binding </span><span style="COLOR: red">Title</span><span style="COLOR: blue">.Regular}" </span><span style="COLOR: red">Style</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">StaticResource </span><span style="COLOR: red">PhoneTextPageTitle2Style</span><span style="COLOR: blue">}" </span><span style="COLOR: red">TextWrapping</span><span style="COLOR: blue">="Wrap"/&gt;
+        &lt;/</span><span style="COLOR: #a31515">Grid</span><span style="COLOR: blue">&gt;
+
+</span><span style="COLOR: green">&lt;!--ContentGrid contains the details--&gt;
+        </span><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">ScrollViewer </span><span style="COLOR: red">Grid.Row</span><span style="COLOR: blue">="1"&gt;
+            &lt;</span><span style="COLOR: #a31515">Grid </span><span style="COLOR: red">x</span><span style="COLOR: blue">:</span><span style="COLOR: red">Name</span><span style="COLOR: blue">="ContentGrid" &gt;
+                &lt;</span><span style="COLOR: #a31515">Grid.Projection</span><span style="COLOR: blue">&gt;
+                    &lt;</span><span style="COLOR: #a31515">PlaneProjection</span><span style="COLOR: blue">/&gt;
+                &lt;/</span><span style="COLOR: #a31515">Grid.Projection</span><span style="COLOR: blue">&gt;
+                &lt;</span><span style="COLOR: #a31515">Grid.RowDefinitions</span><span style="COLOR: blue">&gt;
+                    &lt;</span><span style="COLOR: #a31515">RowDefinition </span><span style="COLOR: red">Height</span><span style="COLOR: blue">="Auto"/&gt;
+                &lt;/</span><span style="COLOR: #a31515">Grid.RowDefinitions</span><span style="COLOR: blue">&gt;
+                &lt;</span><span style="COLOR: #a31515">Image </span><span style="COLOR: red">Source</span><span style="COLOR: blue">="{</span><span style="COLOR: #a31515">Binding </span><span style="COLOR: red">BoxArt</span><span style="COLOR: blue">.LargeUrl}" </span><span style="COLOR: red">Grid.Row</span><span style="COLOR: blue">="0" /&gt;
+            &lt;/</span><span style="COLOR: #a31515">Grid</span><span style="COLOR: blue">&gt;
+        &lt;/</span><span style="COLOR: #a31515">ScrollViewer</span><span style="COLOR: blue">&gt;
+</span></pre>
+<p>And , you are done ! Isn&rsquo;t this the best&nbsp; thing ever ? We are always looking for feedback about how to make this experience easier. Give us your feedback either via commenting on this post or sending me an email at PhaniRaj At Microsoft DOt Com.</p>
+
+  </div>
+
+  <div class="date">
+    Written on March 19, 2010
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

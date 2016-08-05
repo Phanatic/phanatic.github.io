@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Animation Control , Adding Cool Animations in your application, Scenario 2 – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Assigning Animations to Client-Side Controls
+If you need to assign Animation Behaviour&nbsp; to any Client-Side Controls using the AjaxControlToolKit's Animation Extender Control ,
+you gotta Explicitly create the AnimationExtender Control on the Client side using the $create function
+$create's Documentation is here&nbsp;&nbsp;&nbsp;Sys.UI.Component $create Method.
+$create(type, properties, events, references, element);
+Whenever, you add an Animation Extender control using the steps mentioned in my previous Post,
+&nbsp;Animation Control , Adding Cool Animations in your application&nbsp;,
+For the Markup 
+&lt;!-- asp:Image Control that houses the ThumbNail --&gt;
+&lt;asp:Image runat="server" ID="imgThumbNail1"
+      CssClass="imgThumbNail"
+     ImageUrl="thumbNails/Second_Dimension_by_celsojunior.jpg" /&gt;
+
+
+&lt;cc1:AnimationExtender ID="animationExtendThumbNail1" runat="server" TargetControlID="imgThumbNail1"&gt;
+  &lt;Animations&gt;
+       &lt;OnClick&gt;
+              &lt;Move Duration=".2"  horizontal="800" vertical="600" Unit="px"  /&gt;
+        &lt;/OnClick&gt;
+   &lt;/Animations&gt;
+&lt;/cc1:AnimationExtender&gt;
+
+The Runtime generates the Following&nbsp; $create Function 
+&lt;script type="text/javascript"&gt;
+&lt;!--
+
+Sys.Application.initialize();
+&lt;!-- Called when the Client Side Script Framework
+    and Controls are Initialised--&gt;
+Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {
+         &lt;!-- The ID to be associated with the control--&gt;
+         "id":"animationExtendThumbNail1",
+         imgThumbNail1
+         "OnClick":"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}",
+        &lt;!-- The Control to be targeted imgThumbNail1--&gt;
+         null, null, $get("imgThumbNail1"));
+});
+--&gt;
+&lt;/script&gt;
+Looking at this , we understand that the Server-Side Control associated with the Animation Control is Specified as the 
+   last parameter of the $create function is the Element the behaviour has to be associated with .
+So , lets start by creating a client Side Control .
+1) Create an &lt;img&gt; tag on the client Side , using the document.CreateElement Method
+&nbsp;
+/**********
+Function Name : CreateClientSideElementAndAttachAnimation
+Parameters    : 
+               a) parentElementId : The Parent Element Which will house the Dynamically Created Control .
+               
+Purpose       : This Function Creates A client Side &lt;img&gt; tag and Calls the Function to attach the Animation behavior
+**********/
+
+//parentElementId is the ID of the HTML element that will house the Dynamically Created Client Side Control 
+function  CreateClientSideElementAndAttachAnimation(parentElementId)
+{
+   //Lets be Efficient and use StringBuilder :-)
+   var imgElementTagString = new Sys.StringBuilder("");
+   // The ID of the dynamically Created control
+   var imgElementID = "imgDynamicControl"
+   imgElementTagString.append("&lt;img");
+        imgElementTagString.append(" id=\""+imgElementID+"\" ");
+        //Style the Control to have the "Position" Attribute set to "Absolute" and assign the left and Top Positions of the control 
+        imgElementTagString.append(" style=\"position:absolute;top:100px;left:20px;\" ");
+        imgElementTagString.append(" src=\"thumbNails/Second_Dimension_by_celsojunior.jpg\" ");
+   imgElementTagString.append("/&gt;");
+   //Create the Img Tag using the document.createElement
+   var imgElement = document.createElement( imgElementTagString.toString() );
+   //Add the Child to the "ChildNodes" collection of the Parent Control 
+   $get(parentElementId).appendChild( imgElement );
+
+   //Attach the Animation Control to the Dynamically Created Image Element
+   AttachAnimation( imgElementID );
+
+}
+2) Attach the Animation to the Dynamically Created Control 
+/**********
+Function Name : AttachAnimation
+Parameters    : 
+               a) controlID :  The Dynamically Created Control that has to be associated with the Animation Extender
+               
+Purpose       : This Function Creates an Animation Extender on the Client Side and Associates the Behaviour with the Dynamically 
+                Created Control Side
+**********/
+
+function AttachAnimation( controlID )
+{
+    //The Id of the Dynamically Created Animation Extender Control 
+    var animatorID = "dynamicallyCreatedAnimationExtender";
+
+    //Dynamically Create the  Animation Extender Control 
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {"id":animatorID,
+    //The Animation associted with the Extender in JSON 
+     "OnClick":"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}"}
+    // Associate the Client-Side Control with the Animation Extender by  using  "$get(&lt;controlID&gt;")
+     null, null, $get(controlID) );
+}
+&nbsp;
+The Script might look a little convoluted , but once you get the hang of it, its pretty easy to tweak it as necessary .
+&nbsp;
+
+
+" />
+    <meta property="og:description" content="Assigning Animations to Client-Side Controls
+If you need to assign Animation Behaviour&nbsp; to any Client-Side Controls using the AjaxControlToolKit's Animation Extender Control ,
+you gotta Explicitly create the AnimationExtender Control on the Client side using the $create function
+$create's Documentation is here&nbsp;&nbsp;&nbsp;Sys.UI.Component $create Method.
+$create(type, properties, events, references, element);
+Whenever, you add an Animation Extender control using the steps mentioned in my previous Post,
+&nbsp;Animation Control , Adding Cool Animations in your application&nbsp;,
+For the Markup 
+&lt;!-- asp:Image Control that houses the ThumbNail --&gt;
+&lt;asp:Image runat="server" ID="imgThumbNail1"
+      CssClass="imgThumbNail"
+     ImageUrl="thumbNails/Second_Dimension_by_celsojunior.jpg" /&gt;
+
+
+&lt;cc1:AnimationExtender ID="animationExtendThumbNail1" runat="server" TargetControlID="imgThumbNail1"&gt;
+  &lt;Animations&gt;
+       &lt;OnClick&gt;
+              &lt;Move Duration=".2"  horizontal="800" vertical="600" Unit="px"  /&gt;
+        &lt;/OnClick&gt;
+   &lt;/Animations&gt;
+&lt;/cc1:AnimationExtender&gt;
+
+The Runtime generates the Following&nbsp; $create Function 
+&lt;script type="text/javascript"&gt;
+&lt;!--
+
+Sys.Application.initialize();
+&lt;!-- Called when the Client Side Script Framework
+    and Controls are Initialised--&gt;
+Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {
+         &lt;!-- The ID to be associated with the control--&gt;
+         "id":"animationExtendThumbNail1",
+         imgThumbNail1
+         "OnClick":"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}",
+        &lt;!-- The Control to be targeted imgThumbNail1--&gt;
+         null, null, $get("imgThumbNail1"));
+});
+--&gt;
+&lt;/script&gt;
+Looking at this , we understand that the Server-Side Control associated with the Animation Control is Specified as the 
+   last parameter of the $create function is the Element the behaviour has to be associated with .
+So , lets start by creating a client Side Control .
+1) Create an &lt;img&gt; tag on the client Side , using the document.CreateElement Method
+&nbsp;
+/**********
+Function Name : CreateClientSideElementAndAttachAnimation
+Parameters    : 
+               a) parentElementId : The Parent Element Which will house the Dynamically Created Control .
+               
+Purpose       : This Function Creates A client Side &lt;img&gt; tag and Calls the Function to attach the Animation behavior
+**********/
+
+//parentElementId is the ID of the HTML element that will house the Dynamically Created Client Side Control 
+function  CreateClientSideElementAndAttachAnimation(parentElementId)
+{
+   //Lets be Efficient and use StringBuilder :-)
+   var imgElementTagString = new Sys.StringBuilder("");
+   // The ID of the dynamically Created control
+   var imgElementID = "imgDynamicControl"
+   imgElementTagString.append("&lt;img");
+        imgElementTagString.append(" id=\""+imgElementID+"\" ");
+        //Style the Control to have the "Position" Attribute set to "Absolute" and assign the left and Top Positions of the control 
+        imgElementTagString.append(" style=\"position:absolute;top:100px;left:20px;\" ");
+        imgElementTagString.append(" src=\"thumbNails/Second_Dimension_by_celsojunior.jpg\" ");
+   imgElementTagString.append("/&gt;");
+   //Create the Img Tag using the document.createElement
+   var imgElement = document.createElement( imgElementTagString.toString() );
+   //Add the Child to the "ChildNodes" collection of the Parent Control 
+   $get(parentElementId).appendChild( imgElement );
+
+   //Attach the Animation Control to the Dynamically Created Image Element
+   AttachAnimation( imgElementID );
+
+}
+2) Attach the Animation to the Dynamically Created Control 
+/**********
+Function Name : AttachAnimation
+Parameters    : 
+               a) controlID :  The Dynamically Created Control that has to be associated with the Animation Extender
+               
+Purpose       : This Function Creates an Animation Extender on the Client Side and Associates the Behaviour with the Dynamically 
+                Created Control Side
+**********/
+
+function AttachAnimation( controlID )
+{
+    //The Id of the Dynamically Created Animation Extender Control 
+    var animatorID = "dynamicallyCreatedAnimationExtender";
+
+    //Dynamically Create the  Animation Extender Control 
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {"id":animatorID,
+    //The Animation associted with the Extender in JSON 
+     "OnClick":"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}"}
+    // Associate the Client-Side Control with the Animation Extender by  using  "$get(&lt;controlID&gt;")
+     null, null, $get(controlID) );
+}
+&nbsp;
+The Script might look a little convoluted , but once you get the hang of it, its pretty easy to tweak it as necessary .
+&nbsp;
+
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Animation Control , Adding Cool Animations in your application, Scenario 2" />
+    <meta property="twitter:title" content="Animation Control , Adding Cool Animations in your application, Scenario 2" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Animation Control , Adding Cool Animations in your application, Scenario 2</h1>
+
+  <div class="entry">
+    <p><strong>Assigning Animations to Client-Side Controls</strong></p>
+<p>If you need to assign Animation Behaviour&nbsp; to any Client-Side Controls using the AjaxControlToolKit's Animation Extender Control ,</p>
+<p>you gotta Explicitly create the AnimationExtender Control on the Client side using the $create function</p>
+<p>$create's Documentation is here&nbsp;&nbsp;&nbsp;<a href="http://ajax.asp.net/docs/ClientReference/Sys/ComponentClass/5afdb70e-e14c-4fd7-a674-7ff78bd1fb59.aspx#ID0E55AG">Sys.UI.Component $create Method</a>.</p>
+<pre class="csharpcode">$create(type, properties, events, references, element);</pre>
+<pre class="csharpcode">Whenever, you add an Animation Extender control using the steps mentioned in my previous Post,</pre>
+<p>&nbsp;<a href="http://blogs.msdn.com/phaniraj/archive/2007/01/20/animation-control-another-way-of-changing-users-perception.aspx">Animation Control , Adding Cool Animations in your application</a>&nbsp;,</p>
+<p>For the Markup </p>
+<pre class="csharpcode"><span class="rem">&lt;!-- asp:Image Control that houses the ThumbNail --&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Image</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="imgThumbNail1"</span>
+      <span class="attr">CssClass</span><span class="kwrd">="imgThumbNail"</span>
+     <span class="attr">ImageUrl</span><span class="kwrd">="thumbNails/Second_Dimension_by_celsojunior.jpg"</span> <span class="kwrd">/&gt;</span>
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">cc1:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="animationExtendThumbNail1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="imgThumbNail1"</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+       <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+              <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">Duration</span><span class="kwrd">=".2"</span>  <span class="attr">horizontal</span><span class="kwrd">="800"</span> <span class="attr">vertical</span><span class="kwrd">="600"</span> <span class="attr">Unit</span><span class="kwrd">="px"</span>  <span class="kwrd">/&gt;</span>
+        <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+   <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">cc1:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>The Runtime generates the Following&nbsp; $create Function </p>
+<pre class="csharpcode">&lt;script type=<span class="str">"text/javascript"</span>&gt;
+&lt;!--
+
+Sys.Application.initialize();
+&lt;!-- Called when the Client Side Script Framework
+    and Controls are Initialised--&gt;
+Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {
+         &lt;!-- The ID to be associated with the control--&gt;
+<span class="str">         "id"</span>:<span class="str">"animationExtendThumbNail1"</span>,
+         imgThumbNail1
+         <span class="str">"OnClick"</span>:<span class="str">"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}"</span>,
+        &lt;!-- The Control to be targeted <span class="str">imgThumbNail1-</span>-&gt;
+         <span class="kwrd">null</span>, <span class="kwrd">null</span>, $get(<span class="str">"imgThumbNail1"</span>));
+});
+--&gt;
+&lt;/script&gt;</pre>
+<pre class="csharpcode">Looking at this , we understand that the Server-Side Control associated with the Animation Control is Specified as the </pre>
+<pre class="csharpcode">   last parameter of the $create function is the Element the behaviour has to be associated with .</pre>
+<pre class="csharpcode">So , lets start by creating a client Side Control .</pre>
+<pre class="csharpcode">1) Create an &lt;img&gt; tag on the client Side , using the document.CreateElement Method</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><span class="rem">/**********</span>
+<span class="rem">Function Name : CreateClientSideElementAndAttachAnimation</span>
+<span class="rem">Parameters    : </span>
+<span class="rem">               a) parentElementId : The Parent Element Which will house the Dynamically Created Control .</span>
+<span class="rem">               </span>
+<span class="rem">Purpose       : This Function Creates A client Side &lt;img&gt; tag and Calls the Function to attach the Animation behavior</span>
+<span class="rem">**********/</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="rem">//parentElementId is the ID of the HTML element that will house the Dynamically Created Client Side Control </span>
+<span class="kwrd">function</span>  CreateClientSideElementAndAttachAnimation(parentElementId)
+{
+   <span class="rem">//Lets be Efficient and use StringBuilder :-)</span>
+   <span class="kwrd">var</span> imgElementTagString = <span class="kwrd">new</span> Sys.StringBuilder(<span class="str">""</span>);</pre>
+<pre class="csharpcode">   <span class="rem">// The ID of the dynamically Created control</span>
+   <span class="kwrd">var</span> imgElementID = <span class="str">"imgDynamicControl"</span>
+   imgElementTagString.append(<span class="str">"&lt;img"</span>);
+        imgElementTagString.append(<span class="str">" id=\""</span>+imgElementID+<span class="str">"\" "</span>);</pre>
+<pre class="csharpcode">        <span class="rem">//Style the Control to have the "Position" Attribute set to "Absolute" and assign the left and Top Positions of the control </span>
+        imgElementTagString.append(<span class="str">" style=\"position:absolute;top:100px;left:20px;\" "</span>);
+        imgElementTagString.append(<span class="str">" src=\"thumbNails/Second_Dimension_by_celsojunior.jpg\" "</span>);</pre>
+<pre class="csharpcode">   imgElementTagString.append(<span class="str">"/&gt;"</span>);
+   <span class="rem">//Create the Img Tag using the document.createElement</span>
+   <span class="kwrd">var</span> imgElement = document.createElement( imgElementTagString.toString() );</pre>
+<pre class="csharpcode">   <span class="rem">//Add the Child to the "ChildNodes" collection of the Parent Control </span>
+   $get(parentElementId).appendChild( imgElement );
+
+   <span class="rem">//Attach the Animation Control to the Dynamically Created Image Element</span>
+   AttachAnimation( imgElementID );
+
+}</pre>
+<pre class="csharpcode">2) Attach the Animation to the Dynamically Created Control </pre>
+<pre class="csharpcode"><span class="rem">/**********</span>
+<span class="rem">Function Name : AttachAnimation</span>
+<span class="rem">Parameters    : </span>
+<span class="rem">               a) controlID :  The Dynamically Created Control that has to be associated with the Animation Extender</span>
+<span class="rem">               </span>
+<span class="rem">Purpose       : This Function Creates an Animation Extender on the Client Side and Associates the Behaviour with the Dynamically </span>
+<span class="rem">                Created Control Side</span>
+<span class="rem">**********/</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="kwrd">function</span> AttachAnimation( controlID )
+{
+    <span class="rem">//The Id of the Dynamically Created Animation Extender Control </span>
+    <span class="kwrd">var</span> animatorID = <span class="str">"dynamicallyCreatedAnimationExtender"</span>;
+
+    <span class="rem">//Dynamically Create the  Animation Extender Control </span>
+    $create(AjaxControlToolkit.Animation.AnimationBehavior,
+    {<span class="str">"id"</span>:animatorID,</pre>
+<pre class="csharpcode">    <span class="rem">//The Animation associted with the Extender in JSON </span></pre>
+<pre class="csharpcode">     <span class="str">"OnClick"</span>:<span class="str">"{\"AnimationName\":\"Move\",\"Duration\":\".2\",\"horizontal\":\"800\",\"vertical\":\"600\",\"Unit\":\"px\",\"AnimationChildren\":[]}"</span>}</pre>
+<pre class="csharpcode">    <span class="rem">// Associate the Client-Side Control with the Animation Extender by  using  "$get(&lt;controlID&gt;")</span></pre>
+<pre class="csharpcode">     <span class="kwrd">null</span>, <span class="kwrd">null</span>, $get(controlID) );
+}</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The Script might look a little convoluted , but once you get the hang of it, its pretty easy to tweak it as necessary .</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+
+  </div>
+
+  <div class="date">
+    Written on January 20, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

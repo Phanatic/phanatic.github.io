@@ -1,0 +1,325 @@
+---
+layout: post
+title: Customizing the Alert  Messages in IE
+date: 2007-03-03 03:53:54.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Components
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/03/03/cusomizing-the-alert-confirm-messages-in-ie.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1794544'
+  orig_parent_id: '1794544'
+  orig_thread_id: '499109'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/03/03/customizing-the-alert-messages-in-ie.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Customizing the Alert  Messages in IE" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/03/03/customizing-the-alert-messages-in-ie/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Have you ever felt that this looks ugly ? Did you ever want to customize the Image , the text, the Icons ? You would probably want to customize it to the Look and feel of your web application. We are gonna talk about how to customize the Alert Box in IE . When we..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/Ordinary.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Customizing the Alert  Messages in IE" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/03/03/customizing-the-alert-messages-in-ie/" />
+    <meta name="twitter:description" content="Have you ever felt that this looks ugly ? Did you ever want to customize the Image , the text, the Icons ? You would probably want to customize it to the Look and feel of your web application. We are gonna talk about how to customize the Alert Box in IE . When we..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/Ordinary.jpg" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Have you ever felt that this looks ugly ?</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/Ordinary%5B1%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/Ordinary%5B1%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="192" src="{{ site.baseurl }}/assets/Ordinary.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/Ordinary.jpg" width="240" border="0" /></a> </p>
+<p>Did you ever want to customize the Image , the text, the Icons ?</p>
+<p>You would probably want to customize it to the Look and feel of your web application.</p>
+<p>We are gonna talk about how to customize the Alert Box in IE .</p>
+<p>When we are done , it will look like this .</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customAlert%5B1%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customAlert%5B1%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="192" src="{{ site.baseurl }}/assets/customAlert.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customAlert.jpg" width="240" border="0" /></a> </p>
+<p>We can change the Default ALERT function with Javascript .</p>
+<pre class="csharpcode">window.alert=<span class="kwrd">function</span>( alertMessage ){
+<span class="rem">//Function Body</span>
+}
+</pre>
+<pre class="csharpcode">Thats it!!! Thats the Magic line!</pre>
+<pre class="csharpcode">With this function , you can customize the way the alert messages are shown.</pre>
+<pre class="csharpcode">I will demonstrate one way to render the custom Alert  message.</pre>
+<pre class="csharpcode">We will put a DIV in the Page that will show the alert message .</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="alertPanel"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><font face="Consolas" size="2">We will form the body by forming a string containing the representational HTML .</font></pre>
+<pre class="csharpcode">    &lt;DIV&gt; //To Contain the Alert Message</pre>
+<blockquote><pre class="csharpcode">       &lt;IMG&gt; //The icon of the message prompt</pre>
+</blockquote>
+<pre class="csharpcode">             &lt;SPAN&gt; //This element contains the text to be shown</pre>
+<pre class="csharpcode">             &lt;INPUT TYPE="BUTTON"/&gt; //The Button to close the alert message </pre>
+<pre class="csharpcode">    &lt;/DIV&gt;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong><u>Actual Code showing the same </u></strong></pre>
+<pre class="csharpcode"><span class="kwrd">var</span> alertBox = <span class="str">"&lt;DIV style=\"width:350px;height:70px\" class=\"alertPosition\"&gt;"</span>;
+            alertBox +=<span class="str">"&lt;div class=\"alertBoxIn\" &gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;img src=\"images/InfoBox-48x48.png\" style=\"position: relative; top: 1%; left: 2%\" /&gt;&lt;/td&gt;"</span>;
+                     alertBox +=<span class="str">"&lt;SPAN style=\"position: relative; top:-30%; left: 12%\"&gt;"</span>+alertMessage+<span class="str">"&lt;/SPAN&gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;input style=\"position: relative; top:20%; left:10%\" type=\"button\" value=\"    Ok      \" onclick=\"closeAlert();\" /&gt;"</span>;
+            alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+    alertBox+=<span class="str">"&lt;/div&gt;"</span>;</pre>
+<pre class="csharpcode">Once the Body of the Alert message is formed , we need to add it to the document.</pre>
+<pre class="csharpcode">we will do this by injecting the body of the Alert Message into the alertPanel Div that we already have on the page .</pre>
+<pre class="csharpcode">document.getElementById(<span class="str">"alertPanel"</span>).innerHTML = alertBox;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">Upon click of the Button , you would want to close the alert message .</pre>
+<pre class="csharpcode">We close the Alert message by removing it from the document .</pre>
+<pre class="csharpcode">document.getElementById(<span class="str">"alertPanel"</span>).innerHTML =   <span class="str">""</span> ;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The Completed Function looks like this ......</pre>
+<pre class="csharpcode">window.alert=<span class="kwrd">function</span>( alertMessage )
+{
+    <span class="kwrd">var</span> alertBox = <span class="str">""</span>;
+            alertBox +=<span class="str">"&lt;div style=\"width:350px;height:70px\" class=\"alertBoxIn alertPosition\" &gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;img src=\"images/InfoBox-48x48.png\" style=\"position: relative; top: 1%; left: 2%\" /&gt;&lt;/td&gt;"</span>;
+                     alertBox +=<span class="str">"&lt;SPAN style=\"position: relative; top:-30%; left: 12%\"&gt;"</span>+alertMessage+<span class="str">"&lt;/SPAN&gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;input style=\"position: relative; top:20%; left:10%\" type=\"button\" value=\"    Ok      \" onclick=\"closeAlert();\" /&gt;"</span>;
+            alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+    document.getElementById(<span class="str">"alertPanel"</span>).innerHTML = alertBox;
+    document.getElementById(<span class="str">"alertPanel"</span>).focus();
+ }</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong><u>Bonus:</u></strong></pre>
+<pre class="csharpcode"><strong><u>Creating your own alert prompt message</u></strong></pre>
+<pre class="csharpcode">I changed the icon to make it look like an error message .</pre>
+<pre class="csharpcode">See here.....</pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customError%5B1%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customError%5B1%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="192" src="{{ site.baseurl }}/assets/customError.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/CusomizingtheAlertConfirmMessagesinIE_B410/customError.jpg" width="240" border="0" /></a> </pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The javascript for this custom error function is :</pre>
+<pre class="csharpcode"><span class="kwrd">function</span> ErorMessage( errorMessage )
+{
+
+  <span class="kwrd">var</span> alertBox = <span class="str">"&lt;DIV style=\"width:350px;height:70px\" class=\"alertPosition\"&gt;"</span>;
+            alertBox +=<span class="str">"&lt;div class=\"alertBoxIn\" &gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;img src=\"images/ErrorCircle-48x48.png\" style=\"position: relative; top: 1%; left: 2%\" /&gt;&lt;/td&gt;"</span>;
+                     alertBox +=<span class="str">"&lt;SPAN style=\"position: relative; top:-30%; left: 12%\"&gt;"</span>+errorMessage+<span class="str">"&lt;/SPAN&gt;"</span>;
+                     alertBox  +=<span class="str">"&lt;input style=\"position: relative; top:20%; left:10%\" type=\"button\" value=\"    Ok      \" onclick=\"closeAlert();\" /&gt;"</span>;
+            alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+    alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+    document.getElementById(<span class="str">"alertPanel"</span>).innerHTML = alertBox;
+}</pre>
+<pre class="csharpcode">Once this function is implemented, you can use the alert in your functions normally , be sure to include the script and the div "alertPanel".</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The Complete code looks like this ......</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="kwrd">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">="http://www.w3.org/1999/xhtml"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>AJAX Client Side Documentation<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">href</span><span class="kwrd">="css/defaultStyles.css"</span> <span class="attr">rel</span><span class="kwrd">="stylesheet"</span> <span class="attr">type</span><span class="kwrd">="text/css"</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span><span class="kwrd">&gt;</span>
+        window.alert=<span class="kwrd">function</span>( alertMessage )
+            {
+                <span class="kwrd">var</span> alertBox = <span class="str">""</span>;
+                        alertBox +=<span class="str">"&lt;div style=\"width:350px;height:70px\" class=\"alertBoxIn alertPosition\" &gt;"</span>;
+                                 alertBox  +=<span class="str">"&lt;img src=\"n\" style=\"position: relative; top: 1%; left: 2%\" /&gt;&lt;/td&gt;"</span>;
+                                 alertBox +=<span class="str">"&lt;SPAN style=\"position: relative; top:-30%; left: 12%\"&gt;"</span>+alertMessage+<span class="str">"&lt;/SPAN&gt;"</span>;
+                                 alertBox  +=<span class="str">"&lt;input style=\"position: relative; top:20%; left:10%\" type=\"button\" value=\"    Ok      \" onclick=\"closeAlert();\" /&gt;"</span>;
+                        alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+                document.getElementById(<span class="str">"alertPanel"</span>).innerHTML = alertBox;
+                document.getElementById(<span class="str">"alertPanel"</span>).focus();
+             }
+
+            <span class="kwrd">function</span> ErorMessage( errorMessage )
+            {
+
+              <span class="kwrd">var</span> alertBox = <span class="str">"&lt;DIV style=\"width:350px;height:70px\" class=\"alertPosition\"&gt;"</span>;
+                        alertBox +=<span class="str">"&lt;div class=\"alertBoxIn\" &gt;"</span>;
+                                 alertBox  +=<span class="str">"&lt;img src=\"images/ErrorCircle-48x48.png\" style=\"position: relative; top: 1%; left: 2%\" /&gt;&lt;/td&gt;"</span>;
+                                 alertBox +=<span class="str">"&lt;SPAN style=\"position: relative; top:-30%; left: 12%\"&gt;"</span>+errorMessage+<span class="str">"&lt;/SPAN&gt;"</span>;
+                                 alertBox  +=<span class="str">"&lt;input style=\"position: relative; top:20%; left:10%\" type=\"button\" value=\"    Ok      \" onclick=\"closeAlert();\" /&gt;"</span>;
+                        alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+                alertBox+=<span class="str">"&lt;/div&gt;"</span>;
+                document.getElementById(<span class="str">"alertPanel"</span>).innerHTML = alertBox;
+            }
+
+            <span class="kwrd">function</span> closeAlert()
+            {
+                <span class="kwrd">var</span> alertBox =  document.getElementById(<span class="str">"alertPanel"</span>);
+                alertBox.innerHTML =<span class="str">""</span>;
+            }
+
+    <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">value</span><span class="kwrd">="Alert Popup"</span> <span class="attr">onclick</span><span class="kwrd">="javascript:alert('This is a custom alert message')"</span> <span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">input</span> <span class="attr">type</span><span class="kwrd">="button"</span> <span class="attr">value</span><span class="kwrd">="Error Popup"</span> <span class="attr">onclick</span><span class="kwrd">="javascript:ErorMessage('This is a custom Error message')"</span> <span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="alertPanel"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span>
+</pre>
+<pre class="csharpcode"><strong><u>PROPS:</u></strong></pre>
+<pre class="csharpcode">The Images I use in the demo come from here ...<a title="http://www.iconarchive.com/category/application/vista-elements-icons-by-icons-land.html" href="http://www.iconarchive.com/category/application/vista-elements-icons-by-icons-land.html">http://www.iconarchive.com/category/application/vista-elements-icons-by-icons-land.html</a></pre>
+<pre class="csharpcode">The Icons rock !!! If interested , give the author a visit at : <a title="http://www.icons-land.com/" href="http://www.icons-land.com/. ">http://www.icons-land.com/. </a> I strongly suggest you check them out .</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

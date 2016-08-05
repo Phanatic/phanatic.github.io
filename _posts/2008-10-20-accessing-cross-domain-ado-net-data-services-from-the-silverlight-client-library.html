@@ -1,0 +1,160 @@
+---
+layout: post
+title: Accessing Cross-Domain ADO.NET Data Services from the Silverlight Client Library
+date: 2008-10-20 22:36:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- CrossDomain
+- DataServiceContext
+- Demo
+- Documentation
+- Prototype
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/10/21/accessing-cross-domain-ado-net-data-services-from-the-silverlight-client-library.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9008548'
+  orig_parent_id: '9008548'
+  orig_thread_id: '612987'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '1'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/10/20/accessing-cross-domain-ado-net-data-services-from-the-silverlight-client-library.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Accessing Cross-Domain ADO.NET Data Services from the Silverlight Client Library" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/10/20/accessing-cross-domain-ado-net-data-services-from-the-silverlight-client-library/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="When we built the client library for Silverlight in Silverlight 2.0 , the underlying Network Stack provided by Silverlight core libraries was very limited in terms of the Status Codes and Request Verbs that it supported.Our options were : a) Use the System.Net libraries provided by the agClr and give a limited subset of the..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_thumb.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Accessing Cross-Domain ADO.NET Data Services from the Silverlight Client Library" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/10/20/accessing-cross-domain-ado-net-data-services-from-the-silverlight-client-library/" />
+    <meta name="twitter:description" content="When we built the client library for Silverlight in Silverlight 2.0 , the underlying Network Stack provided by Silverlight core libraries was very limited in terms of the Status Codes and Request Verbs that it supported.Our options were : a) Use the System.Net libraries provided by the agClr and give a limited subset of the..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_thumb.png" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>When we built the client library for Silverlight in Silverlight 2.0 , the underlying Network Stack provided by Silverlight core libraries    <br />was very limited in terms of the Status Codes and Request Verbs that it supported.Our options were :     <br />a) Use the System.Net libraries provided by the agClr and give a limited subset of the functionality available on the desktop.     <br />b) Cook up our own Network stack and provide all the functionality provided on the desktop , in Silverlight.</p>
+<p>We went with Option (b) and built a network stack that uses the browser’s underlying XmlHttpRequest object.    <br />This means that the <a href="http://msdn.microsoft.com/en-us/library/cc197955(VS.95).aspx">cross domain access available in Silverlight networking stack</a> is not available in our networking stack.     </p>
+<p>Forums user Ben Hayat asked a <a href="http://forums.microsoft.com/Forums/ShowPost.aspx?PostID=3995200&amp;SiteID=1">question</a> about the guidelines for Cross-Domain access using our Silverlight Client Library .     </p>
+<p>Now , this is not supported out of the box . But ,you can use the same solution as you would for an Ajax application ,    <br />which is building&#160; a server-side proxy that talks to the remote service and is completely transparent to the client library.     </p>
+<p>Below is a sample Server-Side proxy that would help one talk to Data Services hosted on a different domain than the Silverlight application.     </p>
+<p>There are a couple of issues that a Server-Side proxy needs to solve for an ADO.NET Data Service ,     <br />&#160; a) Appear totally transparent     <br />&#160; b) Resolve Identities of resources to appear as they would from the Proxy service and not the original Data Service.     </p>
+<p>Issue a) is easy , Issue b) is a little more involved.     </p>
+<p>When the client library receives a Payload back as part of a query ,we construct the entity’s identity based on the following rules,     <br />ex: If you browse to <a href="http://ServiceEndpoint/Northwind.svc/"><strong>http://ServiceEndpoint</strong></a><strong>/Northwind.svc/Customers('ALFKI') ,</strong>the response looks like this :</p>
+<pre class="csharpcode">&#160;<span class="kwrd">&lt;</span><span class="html">entry</span> <strong><font color="#800040"><span class="attr">xml:base</span><span class="kwrd">=&quot;http://ServiceEndpointNorthwind.svc/&quot;</span>
+</font></strong>       <span class="attr">xmlns:d</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices&quot;</span>
+       <span class="attr">xmlns:m</span><span class="kwrd">=&quot;http://schemas.microsoft.com/ado/2007/08/dataservices/metadata&quot;</span>
+       <span class="attr">xmlns</span><span class="kwrd">=&quot;http://www.w3.org/2005/Atom&quot;</span><span class="kwrd">&gt;</span>
+<strong><font color="#800000"><span class="kwrd">&lt;</span><span class="html">link</span> <span class="attr">rel</span><span class="kwrd">=&quot;edit&quot;</span> <span class="attr">title</span><span class="kwrd">=&quot;Customers&quot;</span> <span class="attr">href</span><span class="kwrd">=&quot;Customers('ALFKI')&quot;</span> <span class="kwrd">/&gt;</span>
+</font><span class="kwrd">&lt;</span><span class="html">id</span><span class="kwrd">&gt;</span>http://ServiceEndpointNorthwind.svc/Customers('ALFKI')<span class="kwrd">&lt;/</span><span class="html">id</span><span class="kwrd">&gt;</span> </strong>
+    <span class="kwrd">&lt;</span><span class="html">content</span> <span class="attr">type</span><span class="kwrd">=&quot;application/xml&quot;</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+     <strong>Properties go here <br /></strong>    <span class="kwrd">&lt;/</span><span class="html">m:properties</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">content</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">entry</span><span class="kwrd">&gt;</span></pre>
+<p>&#160;</p>
+<p>When we get the above payload back as a response , we&#160; create&#160; a Customer object and its identity is the value of the &lt;id&gt; field in the payload.<br />
+  <br />When you make any edits to this Customer object, <u>the edits are sent to the URI specified in the &lt;link rel=”edit”&gt; value of the payload.<br />
+    <br /></u>Which means that the proxy server has to modify the payload it recieves from the real Data Service to make sure that all links , Id and Edit</p>
+<p>point to the proxy Data Service and not the real Data Service. The easiest way to do this is to do a String.Replace replacing all occurrences of the</p>
+<p>the original Service end point with the Proxy Service end point in the payload.</p>
+<p>Without further stalling&#160; , here is the&#160; <a href="http://blogs.msdn.com/phaniraj/attachment/9008548.ashx">Proxy Handler</a>. </p>
+<h5>A couple of words of caution so that I can keep my job, </h5>
+<ol>
+<li>This is only a sample implementation of what a proxy <strong>could</strong><em></em> look like. </li>
+<li>Do <strong>NOT</strong> use this in your production applications. </li>
+<li>This is <strong>NOT</strong> an official solution provided by the ADO.NET Data Services team ,
+<p>this is just me illustrating how to write a proxy. </li>
+<li>If you download this sample , it means that you understand these rules . </li>
+<li>For any problems with this sample , leave a comment on my blog ,<br />
+    <br />the ADO.NET Data Services Forums is <strong>NOT </strong>the right place for any issues with this proxy. </li>
+</ol>
+<h5>Running the sample&#160; </h5>
+<ol>
+<li>Download the sources from the link above. </li>
+<li>Open the solution in Visual Studio 2008 and hit F5. </li>
+<li>You should see the Silverlight application come up and<br />
+    <br />get the data from the Data Service hosted in a different application. </li>
+</ol>
+<p>The Cross Domain Proxy is a generic AShx handler which receives the requests from the Client library and forwards them onto the<br />
+  <br />original Data Service , gets the response , changes the ID and Edit Links and returns the response to the Silverlight Client . </p>
+<ol>
+<li>Client Sends request to Proxy Handler </li>
+<li>Proxy Handler sends the request data to the Original Data Service </li>
+<li>Data Service responds with response </li>
+<li>Proxy handler reads response and changes the ID and EDIT links in the payload </li>
+<li>In case of POST , the Proxy Handler changes the response “Location” Header<br />
+    <br />so that the identity points to the Proxy Handler and not the Data Service. </li>
+<li>Proxy handler returns the response data to the client . </li>
+</ol>
+<h5>How do I use this in my application ?</h5>
+<p></p>
+<p>The source available for download contains “CrossDomainHandlerBase” which is the class that contains the functionality required<br />
+  <br />for recieving requests from clients and forwarding the requests onto the Data Service. </p>
+<h5>Setting up the Server-Side Proxy </h5>
+<p></p>
+<ol>
+<li>Add a Generic ASHX Handler to the application that contains the Web page hosting the Silverlight application ,
+<ol>
+<li>Right-Click on Project </li>
+<li>Add –&gt; New Item –&gt; Generic Handler<br />
+        <br />&#160;<a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_2.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_2.png"><img title="image" style="border-top-width: 0px; display: inline; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="449" alt="image" src="{{ site.baseurl }}/assets/image_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_thumb.png" width="644" border="0" /></a> </li>
+</ol>
+</li>
+</ol>
+<p>&#160;&#160;&#160; 2. This will create a Generic Handler which implements IHttpHandler.</p>
+<p>&#160;&#160;&#160; 3. Remove the code stubs for IHttpHandler methods and properties .<br />
+  <br />&#160;&#160;&#160; 4. Replace IHttpHandler with “CrossDomainHandlerBase”.&#160; <br />&#160;</p>
+<pre class="csharpcode">    [WebService(Namespace = <span class="str">&quot;http://tempuri.org/&quot;</span>)]
+    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
+    <span class="kwrd">public</span> <span class="kwrd">class</span> CrossDomainHandler : CrossDomainHandlerBase
+    {
+        <span class="kwrd">public</span> CrossDomainHandler()
+            : <span class="kwrd">base</span>()
+        {
+            <span class="kwrd">this</span>.DataServiceURI = <span class="str">&quot;URI FOR THE DATA SERVICE&quot;</span>;
+            <span class="kwrd">this</span>.ProxyServiceURI = <span class="str">&quot;URI FOR THE PROXY SERVICE&quot;</span>;
+        }
+     }</pre>
+<p>&#160;&#160;&#160; 4.From this point on , for all purposes , the Proxy Handler service IS the Data Service</p>
+<h5>Setting up the Silverlight application for Cross-Domain access</h5>
+<ol>
+<li>Right-Click on “References” in the Project </li>
+<li>Select &quot;Add Service Reference&quot; </li>
+<li>In the “Address” field , enter the URI for the proxy service , </li>
+<li><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_6.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_6.png"><img title="image" style="border-top-width: 0px; display: inline; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="484" alt="image" src="{{ site.baseurl }}/assets/image_thumb_2.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AccessingCrossDomainDataServicesfromtheS_C375/image_thumb_2.png" width="519" border="0" /></a>
+<p></li>
+<li>In case of the sample solution provided, the Provider is called “DataProvider”, hence<br />
+    <br />the code-gen produces the code with a type “DataProvider” derived from DataServiceContext. </li>
+<li>When you instantiate the Context in the Silverlight application , always specify the Base URI<br />
+    <br />as the Proxy Handler’s URI,</p>
+<p></p>
+<pre class="csharpcode">DataProvider dataProvider = <span class="kwrd">new</span> DataProvider(
+                <span class="kwrd">new</span> Uri(<span class="str">&quot;RELATIVE URI FOR THE PROXY SERVICE&quot;</span>,
+                            UriKind.RelativeOrAbsolute)
+                  );</pre>
+</li>
+<li>This is the most important step of all <strong>, Party on !!</strong> </li>
+</ol>
+<p>To do in the near future :</p>
+<ol>
+<li>Convert the Handler to be an IHttpAsyncHandler so that we dont block on waiting for the response from the Data Service </li>
+<li>Provide better mechanisms for Identity Resolution other than String.Replace . </li>
+<li>Write a better demo app than something which binds all the parts of my name to a Grid. </li>
+<li>Your suggestion goes here . </li>
+</ol>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/09/00/85/48/slCrossDomain.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-09-00-85-48/slCrossDomain.zip">slCrossDomain.zip</a></p>

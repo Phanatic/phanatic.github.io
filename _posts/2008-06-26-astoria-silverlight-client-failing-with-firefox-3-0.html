@@ -1,0 +1,118 @@
+---
+layout: post
+title: Astoria Silverlight Client Failing with FireFox 3.0
+date: 2008-06-26 18:27:47.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/06/26/astoria-silverlight-client-failing-with-firefox-3-0.aspx
+  orig_site_id: '7524'
+  orig_post_id: '8658617'
+  orig_parent_id: '8658617'
+  orig_thread_id: '591713'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/06/26/astoria-silverlight-client-failing-with-firefox-3-0.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Astoria Silverlight Client Failing with FireFox 3.0" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/06/26/astoria-silverlight-client-failing-with-firefox-3-0/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Hi all, By now , anyone running a SIlverlight application Astoria Silverlight Client library in Firefox 3.0 would have seen a weird error about charsets. This blog post will describe the error and how to work-around it . Consider the following query : DataServiceQuery&lt;Customers&gt; customerQuery = from cus in context.Customers where cus.ID ==&#039;ALFKI&#039; select cus;..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Astoria Silverlight Client Failing with FireFox 3.0" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/06/26/astoria-silverlight-client-failing-with-firefox-3-0/" />
+    <meta name="twitter:description" content="Hi all, By now , anyone running a SIlverlight application Astoria Silverlight Client library in Firefox 3.0 would have seen a weird error about charsets. This blog post will describe the error and how to work-around it . Consider the following query : DataServiceQuery&lt;Customers&gt; customerQuery = from cus in context.Customers where cus.ID ==&#039;ALFKI&#039; select cus;..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Hi all,</p>
+<p>By now , anyone running a SIlverlight application Astoria Silverlight Client library in Firefox 3.0 would have seen a weird error about charsets.    </p>
+<p>This blog post will describe the error and how to work-around it .</p>
+<p>Consider the following query : </p>
+<pre class="csharpcode">DataServiceQuery&lt;Customers&gt; customerQuery = from cus <span class="kwrd">in</span> context.Customers
+                                            <span class="kwrd">where</span> cus.ID ==<span class="str">'ALFKI'</span>
+                                            select cus;
+
+AsyncCallback ac = iasyncResult =&gt;{
+  DataServiceQuery&lt;Customers&gt; cusQuery = iasyncResult.AsyncState <span class="kwrd">as</span>  DataServiceQuery&lt;Customers&gt;;
+  QueryOperationResponse&lt;Customer&gt;  response = cusQuery.EndExecute(iasyncResult); &lt;-- Exception Thrown here
+}
+
+customerQuery.BeginExecute(ac,customerQuery); </pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>
+  <br />When this code runs in Firefox 3.0 , the highlighted line throws the exception,</p>
+<blockquote>
+<p><strong>Error Message : Character set 'iso-8859-1' is not supported.<br />
+      <br /></strong></p>
+<p><strong>Stack Trace : </strong></p>
+<p>&#160;&#160; at System.Data.Services.Client.HttpProcessUtility.EncodingFromName(String name)<br />
+    <br />&#160;&#160; at System.Data.Services.Client.HttpProcessUtility.MediaType.SelectEncoding()</p>
+<p>&#160;&#160; at System.Data.Services.Client.HttpProcessUtility.ReadContentType(String contentType, String&amp; mime, Encoding&amp; encoding)</p>
+<p>&#160;&#160; at System.Data.Services.Client.DataServiceContext.GetMaterializer(Type elementType, String contentType, Func`1 response, Func`4 create)</p>
+<p>&#160;&#160; at System.Data.Services.Client.DataServiceRequest.Materialize[TElement](DataServiceContext context, String contentType, Func`1 response)</p>
+<p>&#160;&#160; at System.Data.Services.Client.DataServiceRequest`1.Materialize(DataServiceContext context, String contentType, Func`1 response)</p>
+<p>&#160;&#160; at System.Data.Services.Client.DataServiceContext.EndExecute[TElement](IAsyncResult asyncResult)</p>
+<p></p>
+</blockquote>
+<h5>What is this error ?</h5>
+<p>When&#160; we recieve the ATOM response from the server , we need to read the stream of content in the charset present in the Accept-charset header. The server does not set the Accept-Charset header and replays what the client sent. The normal Accept-Charset header sent to the server from the SL client looks like this ..</p>
+<blockquote>
+<p><strong>Accept-Charset: UTF-8</strong></p>
+</blockquote>
+<p>Now , in FireFox 3.0 , the Accept-Charset header , even though we explicitly set it to be the above , whats sent to the server is ..</p>
+<blockquote>
+<p><strong>Accept-Charset: <em>ISO-8859-1</em>,utf-8;q=0.7,*;q=0.7</p>
+<p></strong>And the Server responds back with the same charset and we try to read the content with this char-set.</p>
+</blockquote>
+<p>Unfortunately , the charset <em><strong>ISO-8859-1</strong></em>, is not supported by the underlying Platform i.e SIlverlight.</p>
+<p>and hence we error out</p>
+<h5>How do I fix this for now ?</h5>
+<p>Follow these instructions on changing your browser settings to work around the issue</p>
+<ol>
+<li>Type <b>about:config</b> in the Firefox browser's address bar. </li>
+<li>Navigate through a dialog box and check “I’ll be careful”. </li>
+<li>In the Page’s Search box , type : “<b>intl.charset.default</b>” . </li>
+<li>Double click on the entry&#160; that turns up , and set the value to “<b>utf-8</b>” . </li>
+</ol>
+<p>Hope this helps.If you still face problems , open a thread on the <a href="http://forums.microsoft.com/Forums/ShowForum.aspx?ForumID=1430&amp;SiteID=1">Astoria Forums</a> and we will try to help out.</p>

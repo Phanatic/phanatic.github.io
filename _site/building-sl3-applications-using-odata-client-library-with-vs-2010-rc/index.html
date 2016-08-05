@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Building SL3 applications using OData client Library with Vs 2010 RC – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="So , here you are trying to build an awesome OData client application in SL3 using the V.S 2010 RC’s just as amazing Multi-targeting support for Silverlight applications.    You’ve downloaded the SL3 CTP3 assembly from here and unzipped the System.Data.Services.Client.dll file to a local folder c:\temp\SL3_CTP3_OData_Client ( your folder may vary ).
+Using a V2 feature in the client library , after adding a reference to the client library from the local folder , results in a compilation error.
+ 
+Error : The type or namespace name 'DataServiceCollection' could not be found (are you missing a using directive or an assembly reference?)
+But , I added the reference manually and pointed it to the right Client library which should have these types declared&#160; in it . 
+Well, it turns out that Visual Studio 2010 RC uses the client library from the SL3 SDK library anyway , even if you specified the path manually.
+To fix this , add the folder which contains the SL3 CTP3 client library to the “Reference Paths” of the application , as shown here :
+1. Right click the project in Visual Studio and select “Properties”
+2. Click the “Reference Paths” tab in the property tabs.
+3. Add the folder containing the SL3 CTP3 client library as shown below. 
+ 
+Once you add the reference path to the folder containing the SL3 CTP3 library , you should stop seeing the compilation failures ,    and you should be able to access the SL3 CTP3 features such as the DataServiceCollection type and the LoadAsync methods
+Special thanks to Shyam who first ran into this and helped figure out how to fix this .
+" />
+    <meta property="og:description" content="So , here you are trying to build an awesome OData client application in SL3 using the V.S 2010 RC’s just as amazing Multi-targeting support for Silverlight applications.    You’ve downloaded the SL3 CTP3 assembly from here and unzipped the System.Data.Services.Client.dll file to a local folder c:\temp\SL3_CTP3_OData_Client ( your folder may vary ).
+Using a V2 feature in the client library , after adding a reference to the client library from the local folder , results in a compilation error.
+ 
+Error : The type or namespace name 'DataServiceCollection' could not be found (are you missing a using directive or an assembly reference?)
+But , I added the reference manually and pointed it to the right Client library which should have these types declared&#160; in it . 
+Well, it turns out that Visual Studio 2010 RC uses the client library from the SL3 SDK library anyway , even if you specified the path manually.
+To fix this , add the folder which contains the SL3 CTP3 client library to the “Reference Paths” of the application , as shown here :
+1. Right click the project in Visual Studio and select “Properties”
+2. Click the “Reference Paths” tab in the property tabs.
+3. Add the folder containing the SL3 CTP3 client library as shown below. 
+ 
+Once you add the reference path to the folder containing the SL3 CTP3 library , you should stop seeing the compilation failures ,    and you should be able to access the SL3 CTP3 features such as the DataServiceCollection type and the LoadAsync methods
+Special thanks to Shyam who first ran into this and helped figure out how to fix this .
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Building SL3 applications using OData client Library with Vs 2010 RC" />
+    <meta property="twitter:title" content="Building SL3 applications using OData client Library with Vs 2010 RC" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Building SL3 applications using OData client Library with Vs 2010 RC</h1>
+
+  <div class="entry">
+    <p>So , here you are trying to build an awesome OData client application in SL3 using the V.S 2010 RC’s just as amazing Multi-targeting support for Silverlight applications.    <br />You’ve downloaded the SL3 CTP3 assembly from <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=a3de8c35-8974-4c51-858c-c5a4544c2fed&amp;displaylang=en">here</a> and unzipped the System.Data.Services.Client.dll file to a local folder c:\temp\SL3_CTP3_OData_Client ( your folder may vary ).</p>
+<p>Using a V2 feature in the client library , after adding a reference to the client library from the local folder , results in a compilation error.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="CompilationFailure" border="0" alt="CompilationFailure" src="/assets/CompilationFailure_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure_thumb.png" width="640" height="143" /></a><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure_21.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure_21.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="CompilationFailure_21" border="0" alt="CompilationFailure_21" src="/assets/CompilationFailure_21_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/CompilationFailure_21_thumb.png" width="1024" height="65" /></a> </p>
+<p>Error : The type or namespace name 'DataServiceCollection' could not be found (are you missing a using directive or an assembly reference?)</p>
+<p><strong><em>But , I added the reference manually and pointed it to the right Client library which should have these types declared&#160; in it . </em></strong></p>
+<p>Well, it turns out that Visual Studio 2010 RC uses the client library from the SL3 SDK library anyway , even if you specified the path manually.</p>
+<p><strong>To fix this </strong>, add the folder which contains the SL3 CTP3 client library to the “Reference Paths” of the application , as shown here :</p>
+<p>1. Right click the project in Visual Studio and select “Properties”</p>
+<p>2. Click the “Reference Paths” tab in the property tabs.</p>
+<p>3. Add the folder containing the SL3 CTP3 client library as shown below. </p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/Add_TO_Reference_Paths_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/Add_TO_Reference_Paths_1.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="Add_TO_Reference_Paths" border="0" alt="Add_TO_Reference_Paths" src="/assets/Add_TO_Reference_Paths_thumb_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildingSL3applicationsusingODataclientL_10828/Add_TO_Reference_Paths_thumb_1.png" width="640" height="279" /></a> </p>
+<p>Once you add the reference path to the folder containing the SL3 CTP3 library , you should stop seeing the compilation failures ,    <br />and you should be able to access the SL3 CTP3 features such as the DataServiceCollection type and the LoadAsync methods</p>
+<p>Special thanks to <a href="http://blog.pather.net/">Shyam</a> who first ran into this and helped figure out how to fix this .</p>
+
+  </div>
+
+  <div class="date">
+    Written on March 21, 2010
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

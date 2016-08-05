@@ -1,0 +1,336 @@
+---
+layout: post
+title: Animating Multiple Controls on an Event using Microsoft Ajax AnimationExtender
+  Controls
+date: 2007-02-03 13:51:00.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- Animation
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/02/03/animating-multiple-controls-on-an-event-using-microsoft-ajax-animationextender-controls.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1591839'
+  orig_parent_id: '1591839'
+  orig_thread_id: '493719'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/02/03/animating-multiple-controls-on-an-event-using-microsoft-ajax-animationextender-controls.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Animating Multiple Controls on an Event using Microsoft Ajax AnimationExtender Controls" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/03/animating-multiple-controls-on-an-event-using-microsoft-ajax-animationextender-controls/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="We can assocaite multiple controls on a single event on a control firing&nbsp; by using the &#8220;AnimationTarget&#8221; attribute of the Animation class. lets take the example of a strip of thumbnails which should move upon click on the first thumbnail. See Demo here &nbsp; We have four thumbnails , arranged ina&nbsp; row , see screenshot..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AnimatingMultipleControlsonanEvent_14C22/thumbnails_static_thumb9.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Animating Multiple Controls on an Event using Microsoft Ajax AnimationExtender Controls" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/03/animating-multiple-controls-on-an-event-using-microsoft-ajax-animationextender-controls/" />
+    <meta name="twitter:description" content="We can assocaite multiple controls on a single event on a control firing&nbsp; by using the &#8220;AnimationTarget&#8221; attribute of the Animation class. lets take the example of a strip of thumbnails which should move upon click on the first thumbnail. See Demo here &nbsp; We have four thumbnails , arranged ina&nbsp; row , see screenshot..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AnimatingMultipleControlsonanEvent_14C22/thumbnails_static_thumb9.jpg" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>We can assocaite multiple controls on a single event on a control firing&nbsp; by using the "AnimationTarget" attribute of the Animation class.</p>
+<p>lets take the example of a strip of thumbnails which should move upon click on the first thumbnail.</p>
+<p>See Demo here</p>
+<p>&nbsp;</p>
+<div class="wlWriterSmartContent" id="d49da610-fc34-4988-88d9-3c0a788fd878:b79b84c3-e9ce-4546-8d22-fb90073b0e3b" contenteditable="false" style="padding-right: 0px; display: inline; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px"><embed src="http://images.soapbox.msn.com/flash/soapbox1_1.swf" quality="high" width="412" height="362" wmode="transparent" name="msn_soapbox" type="application/x-shockwave-flash" pluginspage="http://macromedia.com/go/getflashplayer" flashvars="c=v&v=fa65abd1-44df-4109-a6b7-ee6ff6ab2865"></embed></div>
+<p>We have four thumbnails , arranged ina&nbsp; row , see screenshot below.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/AnimatingMultipleControlsonanEvent_14C22/thumbnails_static11.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AnimatingMultipleControlsonanEvent_14C22/thumbnails_static11.jpg" atomicselection="true"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="192" src="{{ site.baseurl }}/assets/thumbnails_static_thumb9.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/AnimatingMultipleControlsonanEvent_14C22/thumbnails_static_thumb9.jpg" width="240" border="0" /></a> </p>
+<p>We shall use Four Image Controls and position them using Css Positioning Styles.</p>
+<pre class="csharpcode"><span class="rem">&lt;!-- The thumbnails that move --&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:Image</span> <span class="attr">runat</span><span class="kwrd">="server"</span>
+                <span class="attr">Style</span><span class="kwrd">="position: absolute; top: 100px; left: 100px"</span>
+                <span class="attr">ImageUrl</span><span class="kwrd">="~/thumbNails/___Fragile_heart____by_Liek.jpg"</span>
+                <span class="attr">ID</span><span class="kwrd">="imgThumbNail1"</span> <span class="attr">CssClass</span><span class="kwrd">="imgThumbNail"</span> <span class="kwrd">/&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:Image</span> <span class="attr">runat</span><span class="kwrd">="server"</span>
+                <span class="attr">Style</span><span class="kwrd">="position: absolute; top: 100px; left: 210px"</span>
+                <span class="attr">ImageUrl</span><span class="kwrd">="~/thumbNails/001_by_Frnak.jpg"</span>
+                <span class="attr">ID</span><span class="kwrd">="imgThumbNail2"</span> <span class="attr">CssClass</span><span class="kwrd">="imgThumbNail"</span> <span class="kwrd">/&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:Image</span> <span class="attr">runat</span><span class="kwrd">="server"</span>
+                <span class="attr">Style</span><span class="kwrd">="position: absolute; top: 100px; left: 320px"</span>
+                <span class="attr">ImageUrl</span><span class="kwrd">="~/thumbNails/AshXP_Design_1.jpg"</span>
+                <span class="attr">ID</span><span class="kwrd">="imgThumbNail3"</span> <span class="attr">CssClass</span><span class="kwrd">="imgThumbNail"</span> <span class="kwrd">/&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">asp:Image</span> <span class="attr">runat</span><span class="kwrd">="server"</span>
+                <span class="attr">Style</span><span class="kwrd">="position: absolute; top: 100px; left: 430px"</span>
+                <span class="attr">ImageUrl</span><span class="kwrd">="~/thumbNails/Devotion_by_h16.jpg"</span>
+                <span class="attr">ID</span><span class="kwrd">="imgThumbNail4"</span> <span class="attr">CssClass</span><span class="kwrd">="imgThumbNail"</span> <span class="kwrd">/&gt;</span></pre>
+<pre class="csharpcode">To associate an animation with a control , we need to use the AnimationExtender which is part of the AjaxControlToolKit.</pre>
+<pre class="csharpcode"><span class="rem">&lt;!-- The Animation Extender Control --&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">cc1:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="imgThumbNail1"</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode">We add Animations to this control .</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode">We Will move the thumbnails on Clicking on the asp:Image Control .</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">The Animations will move in a sequence.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Sequence</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">The animations would be </pre>
+<pre class="csharpcode">1) The Image Resizes to a slightly bigger size </pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"130"</span> <span class="attr">width</span><span class="kwrd">="120"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail4"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">2) It Goes back to its original size.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"110"</span> <span class="attr">width</span><span class="kwrd">="100"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail4"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">3) It shifts by its horizontal and vertical positions relatively.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">vertical</span><span class="kwrd">="0"</span> <span class="attr">horizontal</span><span class="kwrd">="50"</span>  <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">relative</span> <span class="kwrd">="true"</span> <span class="attr">duration</span><span class="kwrd">="0.2" <span class="attr">AnimationTarget</span><span class="kwrd">="imgThumbNail4"</span></span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">As you can very clearly see , we can animate controls that were not associated with an animation extender control by using the </pre>
+<pre class="csharpcode">"AnimationTarget" Property of the animations</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">This would repeat for all the 4 controls , the complete tag would look this .</pre>
+<pre class="csharpcode"> <span class="kwrd">&lt;</span><span class="html">cc1:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="imgThumbNail1"</span><span class="kwrd">&gt;</span>
+          <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+              <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                 <span class="kwrd">&lt;</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"130"</span> <span class="attr">width</span><span class="kwrd">="120"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail4"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"110"</span> <span class="attr">width</span><span class="kwrd">="100"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail4"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">AnimationTarget</span><span class="kwrd">="imgThumbNail4"</span> <span class="attr">vertical</span><span class="kwrd">="0"</span> <span class="attr">horizontal</span><span class="kwrd">="50"</span>  <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">relative</span> <span class="kwrd">="true"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"130"</span> <span class="attr">width</span><span class="kwrd">="120"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail3"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"110"</span> <span class="attr">width</span><span class="kwrd">="100"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail3"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">AnimationTarget</span><span class="kwrd">="imgThumbNail3"</span> <span class="attr">vertical</span><span class="kwrd">="0"</span> <span class="attr">horizontal</span><span class="kwrd">="50"</span>  <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">relative</span> <span class="kwrd">="true"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"130"</span> <span class="attr">width</span><span class="kwrd">="120"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"110"</span> <span class="attr">width</span><span class="kwrd">="100"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">AnimationTarget</span><span class="kwrd">="imgThumbNail2"</span> <span class="attr">vertical</span><span class="kwrd">="0"</span> <span class="attr">horizontal</span><span class="kwrd">="50"</span>  <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">relative</span> <span class="kwrd">="true"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"130"</span> <span class="attr">width</span><span class="kwrd">="120"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail1"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Resize</span> <span class="attr">height</span>= <span class="kwrd">"110"</span> <span class="attr">width</span><span class="kwrd">="100"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">duration</span> <span class="kwrd">="0.05"</span> <span class="attr">AnimationTarget</span> <span class="kwrd">="imgThumbNail1"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Resize</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">AnimationTarget</span><span class="kwrd">="imgThumbNail1"</span> <span class="attr">vertical</span><span class="kwrd">="0"</span> <span class="attr">horizontal</span><span class="kwrd">="50"</span>  <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="attr">relative</span> <span class="kwrd">="true"</span> <span class="attr">duration</span><span class="kwrd">="0.2"</span><span class="kwrd">&gt;&lt;/</span><span class="html">Move</span><span class="kwrd">&gt;</span>
+                 <span class="kwrd">&lt;/</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+              <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+           <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">cc1:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">Clicking on the First Thumbnail , we can animate the other controls which do not have animation extenders associated with them.</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

@@ -1,0 +1,528 @@
+---
+layout: post
+title: Using the ADO.NET Data Services Silverlight client library in x-domain and
+  out of browser scenarios – II (Forms Authentication)
+date: 2009-09-09 19:20:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Demo
+- Documentation
+- Forms Authentication
+- Silverlight
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2009/09/10/using-the-ado-net-data-services-silverlight-client-library-in-x-domain-and-out-of-browser-scenarios-ii-forms-authentication.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9893382'
+  orig_parent_id: '9893382'
+  orig_thread_id: '675477'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '1'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2009/09/09/using-the-ado-net-data-services-silverlight-client-library-in-x-domain-and-out-of-browser-scenarios-ii-forms-authentication.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Using the ADO.NET Data Services Silverlight client library in x-domain and out of browser scenarios &ndash; II (Forms Authentication)" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/09/09/using-the-ado-net-data-services-silverlight-client-library-in-x-domain-and-out-of-browser-scenarios-ii-forms-authentication/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Click here to download sample application&nbsp; Using the ADO.NET Data Services Silverlight client library in x-domain and out of browser scenarios – II (Forms Authentication) In this blog post, we will talk about using the Silverlight Client Library against a Data Service that is secured with Asp.Net Forms Authentication In short, the whole process of..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_3.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Using the ADO.NET Data Services Silverlight client library in x-domain and out of browser scenarios &ndash; II (Forms Authentication)" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2009/09/09/using-the-ado-net-data-services-silverlight-client-library-in-x-domain-and-out-of-browser-scenarios-ii-forms-authentication/" />
+    <meta name="twitter:description" content="Click here to download sample application&nbsp; Using the ADO.NET Data Services Silverlight client library in x-domain and out of browser scenarios – II (Forms Authentication) In this blog post, we will talk about using the Silverlight Client Library against a Data Service that is secured with Asp.Net Forms Authentication In short, the whole process of..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_3.png" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p><strong><em><a href="http://blogs.msdn.com/phaniraj/attachment/9893382.ashx" mce_href="http://blogs.msdn.com/phaniraj/attachment/9893382.ashx">Click here to download sample application</a></em></strong>&nbsp;</p>
+<p>Using the ADO.NET Data Services Silverlight client library in x-domain and out of browser scenarios – II (Forms Authentication) <br />In this blog post, we will talk about using the Silverlight Client Library against a Data Service that is secured with Asp.Net Forms Authentication <br />In short, the whole process of authenticating against a Forms Authentication protected Data Service looks like this. <br /><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_8.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_8.png" mce_href="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_8.png"><img style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" title="image" border="0" alt="image" src="{{ site.baseurl }}/assets/image_thumb_3.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_3.png" width="729" height="303" mce_src="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_3.png" /></a> </p>
+<h3>Server Setup </h3>
+<ol>
+<li>Setup Forms Authentication on the Data Service Server </li>
+<li>Enable the WCF Authentication Service by following the reference here : <a href="http://msdn.microsoft.com/en-us/library/bb398990.aspx" mce_href="http://msdn.microsoft.com/en-us/library/bb398990.aspx">How to: Enable the WCF Authentication Service</a> </li>
+<li>Exclude the following resources from requiring authentication , </li>
+</ol>
+<blockquote>
+<p>3.1 The WCF Authentication Service <br />3.2 The ClientAccessPolicy.xml File <br />Ex:</p>
+</blockquote>
+<pre class="csharpcode"><span class="rem">&lt;!-- The ClientAccessPolicy.xml file is required for the client to confirm if the server allows X-Domain callers.</span>
+<span class="rem">       This should be downloadable without authenticating--&gt;</span>
+ <span class="kwrd">&lt;</span><span class="html">location</span> <span class="attr">path</span><span class="kwrd">="clientaccesspolicy.xml"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">system.web</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">authorization</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">allow</span> <span class="attr">users</span><span class="kwrd">="*"</span> <span class="kwrd">/&gt;</span>
+      <span class="kwrd">&lt;/</span><span class="html">authorization</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">system.web</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">location</span><span class="kwrd">&gt;</span>
+ <span class="rem">&lt;!--This should be downloadable without authenticating.--&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">location</span> <span class="attr">path</span><span class="kwrd">="AuthenticationService.svc"</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">system.web</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">authorization</span><span class="kwrd">&gt;</span>
+        <span class="kwrd">&lt;</span><span class="html">allow</span> <span class="attr">users</span><span class="kwrd">="*"</span> <span class="kwrd">/&gt;</span>
+      <span class="kwrd">&lt;/</span><span class="html">authorization</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">system.web</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;/</span><span class="html">location</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p>4. If the DataServiceHost does not have a global.asax file, add one to the project. <br />5. In the Global.asax file, we need to listen on the <a href="http://msdn.microsoft.com/en-us/library/system.web.applicationservices.authenticationservice.creatingcookie.aspx" mce_href="http://msdn.microsoft.com/en-us/library/system.web.applicationservices.authenticationservice.creatingcookie.aspx">AuthenticationService.CreatingCookie</a> event to customize the FormsAuth Cookie that the service creates.</p>
+<p><b>Why do we need to customize the FormsAuth cookie? <br /></b>The WCF Authentication service by default creates <a href="http://msdn.microsoft.com/en-us/library/system.web.httpcookie.httponly.aspx" mce_href="http://msdn.microsoft.com/en-us/library/system.web.httpcookie.httponly.aspx">HTTPOnly</a> Cookies. <br />This means that the cookie isn’t accessible by client-script. <br />It generally isn’t a problem when the client application is running in the same domain as the Website, <br />as the browser handles cookie management for us transparently. <br />When the client is not in the same domain as the Website, and we use the ClientHttpWebRequest networking stack, <br />we are unable to access any cookies marked as HttpOnly. <br />To work around this limitation, we recreate the FormsAuth cookie with HttpOnly set to false in the CreatingCookie event handler. <br />For more details: <a href="http://msdn.microsoft.com/en-us/library/bb398778.aspx" mce_href="http://msdn.microsoft.com/en-us/library/bb398778.aspx">How to: Customize the Authentication Cookie from the WCF Authentication Service</a> <br />Example code:</p>
+<pre class="csharpcode"><span class="kwrd">protected</span> <span class="kwrd">void</span> Application_Start(<span class="kwrd">object</span> sender, EventArgs e)
+{
+<span class="rem">//Handle the CreatingCookie event so that we can create a custom cookie with HttpOnly set to false.</span>
+<span class="rem">//AuthenticationService.CreatingCookie on MSDN :</span>
+<span class="rem">//http://msdn.microsoft.com/enus/library/system.web.applicationservices.authenticationservice.creatingcookie.aspx</span>
+AuthenticationService.CreatingCookie += <span class="kwrd">new</span> EventHandler&lt;CreatingCookieEventArgs&gt;(CreateSilverlightCompatibleHttpCookie);
+}<br /><br /><br /></pre>
+<pre class="csharpcode"><span class="rem">/// &lt;summary&gt;</span>
+<span class="rem">/// Creates a HttpCookie that can be read by the managed CookieContainer in ClientHttpWebRequest in Silverlight</span>
+<span class="rem">/// &lt;/summary&gt;</span>
+<span class="rem">/// &lt;param name="sender"&gt;The calling context for this event&lt;/param&gt;</span>
+<span class="rem">/// &lt;param name="e"&gt;a property bag containing useful information about the HttpCookie to create&lt;/param&gt;</span>
+<span class="kwrd">void</span> CreateSilverlightCompatibleHttpCookie(<span class="kwrd">object</span> sender, System.Web.ApplicationServices.CreatingCookieEventArgs e)
+{
+  <span class="kwrd">int</span> cookieVersion = 1;
+  <span class="rem">//The time at which the cookie was issued by the server</span>
+  DateTime cookieIssueDate = DateTime.Now;
+  <span class="rem">//The relative time from now when the cookie will expire and the client will have to re-authenticate.</span>
+  DateTime cookieExpiryDate = DateTime.Now.AddMinutes(30);
+  <span class="rem">//The Forms Auth ticket which uniquely identifies a user </span>
+  <span class="rem">//FormsAuthenticationTicket on MSDN : http://msdn.microsoft.com/en-us/library/system.web.security.formsauthenticationticket.aspx</span>
+  FormsAuthenticationTicket ticket = <span class="kwrd">new</span> FormsAuthenticationTicket
+                (cookieVersion,
+                 e.UserName,
+                 cookieIssueDate,
+                 cookieExpiryDate,
+                 e.IsPersistent, <span class="rem">/*Indicates whether the authentication cookie should be retained beyond the current session*/</span>
+                 e.CustomCredential,
+                 FormsAuthentication.FormsCookiePath);
+ <span class="rem">//Creates a string containing an encrypted forms-authentication ticket suitable for use in an HTTP cookie.</span>
+ <span class="rem">//FormsAuthentication.Encrypt on MSDN : http://msdn.microsoft.com/en-us/library/system.web.security.formsauthentication.encrypt.aspx</span>
+  <span class="kwrd">string</span> encryptedTicket = FormsAuthentication.Encrypt(ticket);
+  HttpCookie cookie = <span class="kwrd">new</span> HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+  <span class="rem">//set HttpOnly to false so that the managed CookieContainer can read the FormsAuth cookie from the response.</span>
+  cookie.HttpOnly = <span class="kwrd">false</span>;
+  cookie.Expires = cookieExpiryDate;
+  HttpContext.Current.Response.Cookies.Add(cookie);
+  e.CookieIsSet = <span class="kwrd">true</span>;
+ }</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<h3>Silverlight Client Setup</h3>
+<p>We will follow an adapter pattern which is responsible for logging in the user and injecting the FormsAuth cookie as the client library makes requests. <br />To start with,<b> add a Service reference to the WCF Authentication service in the Silverlight Client application or use the one in the sample.</b></p>
+<p>The FormsAuthAdapter will use the client side proxy generated for the WCF Authentication service to login the user <br />and hook into any attached DataServiceContext instance’s SendingRequest event to inject the FormsAuth cookie. <br />An instance of the FormsAuthenticationAdapter is declared at the application level.</p>
+<pre class="csharpcode"><span class="kwrd">public</span> <span class="kwrd">partial</span> <span class="kwrd">class</span> App : Application
+{
+<span class="rem">/// &lt;summary&gt;</span>
+<span class="rem">/// FormsAuthenticationAdapter instance to manage authentication against a WCF Authentication Service</span>
+<span class="rem">/// &lt;/summary&gt;</span>
+<span class="kwrd">public</span> <span class="kwrd">static</span> FormsAuthenticationAdapter FormsAuthAdapter;</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p>This is initialized when the Application starts.</p>
+<pre class="csharpcode"><span class="kwrd">private</span> <span class="kwrd">void</span> Application_Startup(<span class="kwrd">object</span> sender, StartupEventArgs e)
+{
+<span class="kwrd">string</span> authServiceUri = String.Empty;
+<span class="rem">//extract the AuthenticationService Uri from the App.XAML file</span>
+<span class="kwrd">if</span> (<span class="kwrd">this</span>.Resources.Contains(<span class="str">"AuthenticationServiceUri"</span>))
+{
+authServiceUri = <span class="kwrd">this</span>.Resources[<span class="str">"AuthenticationServiceUri"</span>].ToString();
+}
+FormsAuthAdapter = <span class="kwrd">new</span> FormsAuthenticationAdapter(<span class="kwrd">new</span> Uri(authServiceUri, UriKind.RelativeOrAbsolute));
+<span class="rem">//The FormsAuthCookieName  should be the same value as declared in the Web.config of the server</span>
+<span class="rem">//ex: If your web.config on the server requiring Forms Authentication is :</span>
+<span class="rem">//&lt;authentication mode="Forms"&gt;</span>
+<span class="rem">//  &lt;forms loginUrl="LoginForm.aspx" name=".ASPXFormsAUTH" protection="All" path="/" /&gt;</span>
+<span class="rem">//&lt;/authentication&gt;</span>
+    FormsAuthAdapter.FormsAuthCookieName = <span class="str">".ASPXFormsAUTH"</span>;
+    <span class="kwrd">this</span>.RootVisual = <span class="kwrd">new</span> MainPage();
+    <span class="rem">//Uncomment the below 2 lines to show the Loginwindow on application startup</span>
+    <span class="rem">//LoginWindow login = new LoginWindow();</span>
+    <span class="rem">//login.Show();</span>
+}</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p>This is what our client application looks like: <br /><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_2.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_2.png" mce_href="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_2.png"><img style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" title="image" border="0" alt="image" src="{{ site.baseurl }}/assets/image_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb.png" width="580" height="455" mce_src="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb.png" /></a> </p>
+<p>As you can see, along with the “Install me” button, we now have a “Login” button.</p>
+<p>When the page loads, we attach an instance of the DataServiceContext which we want to get the FormsAuth Cookie injected while <br />making requests to the Data Service.</p>
+<pre class="csharpcode"><span class="rem">//Attach the DataServiceContext instance so that we can inject the FormsAuth cookie for each request</span>
+App.FormsAuthAdapter.Attach(publicationContext);
+Where the Attach Method’s signature <span class="kwrd">is</span> :
+<span class="rem">/// &lt;summary&gt;</span>
+<span class="rem">/// Injects the FormsAuth cookie when the contextInstance makes a request to the DataService</span>
+<span class="rem">/// &lt;/summary&gt;</span>
+<span class="rem">/// &lt;param name="contextInstance"&gt;The DataServiceContext instance to observe&lt;/param&gt;</span>
+<span class="kwrd">public</span> <span class="kwrd">void</span> Attach(DataServiceContext contextInstance)</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p>Clicking the login button on the main page opens up a ChildWindow instance that we created which emulates the Login Screen. </p>
+<p>Login button click handler:</p>
+<pre class="csharpcode"><span class="kwrd">void</span> LoginUser(<span class="kwrd">object</span> sender, RoutedEventArgs e)
+{
+    LoginWindow login = <span class="kwrd">new</span> LoginWindow();
+    login.Show();
+    <span class="rem">//The LoginWindow only closes if Authentication succeeds</span>
+    login.Closing += (s, eArgs) =&gt;
+    {
+       <span class="rem">/*If auth succeeds,hide the button*/</span>
+       btnLogin.Visibility = Visibility.Collapsed;
+    };
+  }</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_6.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_6.png" mce_href="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_6.png"><img style="BORDER-RIGHT-WIDTH: 0px; DISPLAY: inline; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px" title="image" border="0" alt="image" src="{{ site.baseurl }}/assets/image_thumb_2.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_2.png" width="582" height="429" mce_src="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/Usi.NETDataServicesSilverlightclientlibr_9C79/image_thumb_2.png" /></a> <br />The LoginWindow’s “Login” button uses the application wide FormsAuthenticationAdapter instance, discussed above, to login the user. </p>
+<pre class="csharpcode"><span class="kwrd">private</span> <span class="kwrd">void</span> LoginUser(<span class="kwrd">object</span> sender, RoutedEventArgs e)
+{
+App.FormsAuthAdapter.LoginAsync(txtUserName.Text, txtPassword.Password,
+    (loginEventArgs) =&gt;
+    {
+<span class="kwrd">      if</span> (loginEventArgs.Result)
+       {
+         <span class="rem">/*Login succeeded*/</span>
+         <span class="kwrd">this</span>.DialogResult = <span class="kwrd">true</span>;
+       }
+<span class="kwrd">       else</span>
+      {
+         <span class="rem">/*Login failed*/</span>
+      }
+    }
+    );
+}
+The LoginAsync method’s signature <span class="kwrd">is</span>:
+  <span class="rem">/// &lt;summary&gt;</span>
+<span class="rem">/// Logs in the User and calls the LoginComplete handler</span>
+<span class="rem">/// &lt;/summary&gt;</span>
+<span class="rem">/// &lt;param name="userName"&gt;UserName to login &lt;/param&gt;</span>
+<span class="rem">/// &lt;param name="passWord"&gt;password for the user account&lt;/param&gt;</span>
+<span class="rem">/// &lt;param name="pLoginComplete"&gt;Called when the login process is complete&lt;/param&gt;</span>
+<span class="kwrd">public</span> <span class="kwrd">void</span> LoginAsync(<span class="kwrd">string</span> userName, <span class="kwrd">string</span> passWord, Action&lt;LoginCompletedEventArgs&gt; pLoginComplete)</pre>
+<style type="text/css">.csharpcode {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	BACKGROUND-COLOR: #ffffff; FONT-FAMILY: consolas, "Courier New", courier, monospace; COLOR: black; FONT-SIZE: small<br />
+}<br />
+.csharpcode PRE {<br />
+	MARGIN: 0em<br />
+}<br />
+.csharpcode .rem {<br />
+	COLOR: #008000<br />
+}<br />
+.csharpcode .kwrd {<br />
+	COLOR: #0000ff<br />
+}<br />
+.csharpcode .str {<br />
+	COLOR: #006080<br />
+}<br />
+.csharpcode .op {<br />
+	COLOR: #0000c0<br />
+}<br />
+.csharpcode .preproc {<br />
+	COLOR: #cc6633<br />
+}<br />
+.csharpcode .asp {<br />
+	BACKGROUND-COLOR: #ffff00<br />
+}<br />
+.csharpcode .html {<br />
+	COLOR: #800000<br />
+}<br />
+.csharpcode .attr {<br />
+	COLOR: #ff0000<br />
+}<br />
+.csharpcode .alt {<br />
+	BACKGROUND-COLOR: #f4f4f4; MARGIN: 0em; WIDTH: 100%<br />
+}<br />
+.csharpcode .lnum {<br />
+	COLOR: #606060<br />
+}<br />
+</style>
+<p>Once the user types in his/her username and password and hits “Login” , the Login window hits the WCF authentication service <br />and extracts the FormsAuth cookie from the response.When the client library makes a request to the Data Service , the FormsAuthenticationAdapter <br />injects the FormsAuth cookie </p>
+<p><b>Common errors:</b></p>
+<p>1. You receive an ArgumentException when trying to set the cookie header in the SendingRequest event.</p>
+<p>a. System.ArgumentException occurred <br />&nbsp; Message="The 'Cookie' header cannot be modified directly.\r\nParameter name: name" <br />&nbsp; StackTrace: <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at System.Net.WebHeaderCollection.ThrowOnRestrictedHeader(String name, String value) <br />&nbsp; InnerException: </p>
+<p><b>Resolution: </b>The reason you get this is because the client library is using the classic networking stack (based on XmlHttpRequest) <br />to make the request. In this case, the Cookie header isn’t accessible and the above exception is valid. <br />This is probably the only case where we would ask you to set the HttpStack property on the Client library. <br />To fix this: <br />//Set the HttpStack on the client Context instance to force the client library </p>
+<p>//to use the ClientHttpWebRequest stack for network access <br />publicationContext.HttpStack = HttpStack.ClientHttp;<b> <br /></b></p>
+<p><b>Additional resources:</b></p>
+<p><b>How do I authenticate my users against the Active Directory from my Silverlight application? <br /></b>In ASP.NET Forms Authentication, the Membership provider is responsible for accessing the Credential store and validating the user name and password. <br />By setting the Membership provider to be the ActiveDirectoryMembershipProvider , you can authenticate the user name and password the user enters <br />with the credentials stored in Active Directory. For more details , please refer to this MSDN article :</p>
+<p><a href="http://msdn.microsoft.com/en-us/library/ms998347.aspx#paght000022_usingtheactivedirectorymembershipprovider" mce_href="http://msdn.microsoft.com/en-us/library/ms998347.aspx#paght000022_usingtheactivedirectorymembershipprovider">Using the ActiveDirectoryMembershipProvider</a> <br /><b>References :</b></p>
+<p><a href="http://msdn.microsoft.com/en-us/library/dd470115(VS.95).aspx" mce_href="http://msdn.microsoft.com/en-us/library/dd470115(VS.95).aspx">About ClientAccessPolicy.xml files</a> <br /><a href="http://msdn.microsoft.com/en-us/library/bb547119.aspx" mce_href="http://msdn.microsoft.com/en-us/library/bb547119.aspx">ASP.NET Application Services.</a> <br /><a href="http://msdn.microsoft.com/en-us/library/aa480476.aspx" mce_href="http://msdn.microsoft.com/en-us/library/aa480476.aspx">ASP.NET Forms Authentication</a> <br /><a href="http://msdn.microsoft.com/en-us/library/sx3h274z.aspx" mce_href="http://msdn.microsoft.com/en-us/library/sx3h274z.aspx">Membership Providers</a></p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/09/89/33/82/DataServicesXDomainSLClient.WithAuth.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-09-89-33-82/DataServicesXDomainSLClient.WithAuth.zip">DataServicesXDomainSLClient.WithAuth.zip</a></p>

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Using the Prototype Model with Microsoft AJAX – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Microsoft Ajax allows you to extend your javaScript Programming framework so that you can emulate OOP practices with Javascript .
+A SImple Example is Here
+The following is a list of stuff you can Use in javascript with Microsoft Ajax Extensions to javascript 
+
+
+Classes
+
+
+Namespaces
+
+
+Inheritance
+
+
+Interfaces
+
+
+Enumerations
+
+
+Reflection
+
+
+Sounds Neat , doesnt it ?
+Well, lets get started ...
+&nbsp;
+We will build a Re-usable Photo Grid Component that you can use in your applications .
+PhotoGrid&nbsp; : It will show a grid of thumbnails with Animations associated with Click of each thumbNail.
+On Click of the ThumbNail , the ThumbNail will move to a specific location and Resize itself .
+The PhotoGird will have the Following Features.
+
+Ability Bind Data in JSON Format  
+Paging Functionality in Numbers and "Next" and "Prev" Links  
+Jump to a&nbsp; specific page  
+Support for Placing the Controls at Specified X and Y Locations  
+Support for Customising the Horizontal and Vertical Offset between thumbnails  
+Support for specifying the Number of images in each page.
+
+It will be written as a Client Side Java Script Re-usable Component
+Th JSON Data format will be like this
+{
+"ResultSet":{"totalResultsAvailable":"50014","totalResultsReturned":7,"firstResultPosition":1,
+"Result" :
+    [
+     {
+        "Title":"The-Incredibles-Poster-C10219976.jpeg",
+        "Summary":"",
+        "Url":"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"
+
+     }
+     {
+        "Title":"The-Incredibles-Poster-C10219976.jpeg",
+        "Summary":"",
+        "Url":"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"
+
+     }
+    ]
+}
+The PhotoGrid Component will convert the Data into something that looks like this 
+ 
+On Clicking of a thumbnail  , it will resize itself automatically , then it will look like this 
+ 
+Now that I  have , hopefully, raised your curiosity . lets build this..
+Creating the PhotoGrid Component using Microsoft AJAX Exntensions
+1.Register the NameSpace
+Type.registerNamespace("AtlasDemo");
+2.Declare the Constructor for your class.
+AtlasDemo.PhotoGrid = function ( leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+this._jsonString        = "";
+this._gridData          ;
+this._pageIndex         = 0;
+this._firstImageIndex   = 0;
+this._leftPosition      = leftPosition;
+this._topPosition       = topPosition;
+this._parentControlId   = parentControlId;
+this._thumbNailTableId  = tableID;
+this._horizontalOffset  = horizontalOffset;
+this._loopIndex         = 0 ;
+this._verticalOffset    = VerticalOffset;
+this._pageSize          =7;
+this._startIndex        =0;
+this._initialStart      =0;
+
+}
+
+
+2. Define the functions of the PhotoGrid using the Prototype model .
+Syntax:
+AtlasDemo.PhotoGrid.prototype = {
+  &lt;functionName1&gt;:function([arguments])
+  {
+    &lt;FunctionBody&gt;
+  }
+  ,
+  &lt;functionName2&gt;:function([arguments])
+  {
+     &lt;FunctionBody&gt;
+  }
+}
+The Code inside the JS function is specified in this  format , pretty neat  and organised 
+Actual Function Definitions:
+Function Name    : pagesAvailable
+Function Purpose : To Return the Number of Pages Available For Paging 
+Return Value     : JSON Object with the total Number of Pages, Pages available in the Forward Direction and Backward Direction
+Input Parameters : None
+Function Code:
+pagesAvailable:function()
+    {
+        var totalPages    = parseInt(this._gridData.ResultSet.totalResultsReturned)/parseInt(this._pageSize);
+        var pagesForward  = parseInt(totalPages) - ( parseInt(this._pageIndex) +1 ) ;
+        var pagesBackWard = parseInt( totalPages - pagesForward );
+        var jsonStringData = "{\"pagesData\":{\"totalPages\":\""+totalPages+"\",\"pagesForward\":\""+pagesForward+"\",\"pagesBackWard\":\""+pagesBackWard+"\"}}"
+        return ( eval( '(' + jsonStringData + ')' ) );
+    }
+The following are functions inside the Prototype function Declaration, the code is omitted for the purpose of clarity.
+&nbsp;
+    setPageSize:function(pageSize)
+    {
+        &lt;Function Body&gt;
+    },
+    setData:function(jsonString)
+    {
+        &lt;Function Body&gt;
+    },
+    resetPositions:function( leftPosition , topPosition , animatorGlobalIndex  )
+    {
+        &lt;Function Body&gt;
+    },
+    resetAll:function ( jsonString ,leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+        &lt;Function Body&gt;
+    },
+    clearResults : function( leftPosition , topPosition , horizontalOffset,VerticalOffset )
+    {
+        &lt;Function Body&gt;
+
+    },
+
+    ShowPager:function(shouldIShowThePager,pagerControlHolder,pagingFunctionName)
+    {
+        &lt;Function Body&gt;
+    },
+    PageForward:function()
+    {
+
+        &lt;Function Body&gt;
+    },
+    __pagingFunction:function()
+    {
+       &lt;Function Body&gt;
+    },
+    CurrentPageIndex : function()
+    {
+        &lt;Function Body&gt;
+    },
+    PageBackward : function()
+    {
+        &lt;Function Body&gt;
+    },
+    AnimateElement:function( imgElement )
+    {
+        &lt;Function Body&gt;
+
+    },
+    CreateNewPhotoCell:function( searchResultItem )
+    {
+        &lt;Function Body&gt;
+    },
+    BindGrid : function()
+    {
+         &lt;Function Body&gt;
+    }
+3. Once you have declared the functions supported by the PhotoGrid Class, lets Go ahead and register the class.
+AtlasDemo.PhotoGrid.registerClass('AtlasDemo.PhotoGrid', null, Sys.IDisposable);
+You can read all about the registerClass Here.
+You are now done!
+Lets go ahead and see how to use this component in our code.
+ASPX Code:
+1. Add the Mandatory Script Manager Control.
+&lt;asp:ScriptManager ID="ScriptManager1" runat="server"&gt;
+&lt;/asp:ScriptManager&gt;
+
+2. Include a reference to your script File in the &lt;BODY&gt; of the ASPX Page
+&lt;script type="text/javascript" src="ClientScripts/PhotoGrid.js"&gt;&lt;/script&gt;
+3. The Parent Control that will hold the ThumbNails
+ &lt;div id="divActualSize" style="left: 10px; overflow: auto; width: 90%; position: absolute;
+            top: 18%; height: 650px" class="grey"&gt;
+            &lt;table id="tblThumbnails"&gt;
+                &lt;tbody&gt;
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+ &lt;/div&gt;
+
+4. The Client Functions to the PhotoGrid Component
+function CreateGrid( JSONDataToBeBound )
+{
+  //Create an instance of the PhotoGrid Control
+  var gridElement = new AtlasDemo.PhotoGrid( leftPosition , topPosition,"",0,"tblThumbnails",horizontalOffset,VerticalOffset) ;
+  //Set the Data for the PhotoGrid Control
+  gridElement.setData(JSONDataToBeBound);
+  //Set the Number of images to be shown in one Page
+  gridElement.setPageSize( pageSize );
+  //Bind the Grid
+  gridElement.BindGrid( );
+
+}
+we are done !
+I have made a sample application that uses this control and shows off all the features possible .
+Please let me know if this control is of any use to you .
+ If yes, then how ?
+ If No , then which features / options would make it useful ?
+You can download the Sample Application here.
+
+
+
+
+ PhotoGrid.zip
+" />
+    <meta property="og:description" content="Microsoft Ajax allows you to extend your javaScript Programming framework so that you can emulate OOP practices with Javascript .
+A SImple Example is Here
+The following is a list of stuff you can Use in javascript with Microsoft Ajax Extensions to javascript 
+
+
+Classes
+
+
+Namespaces
+
+
+Inheritance
+
+
+Interfaces
+
+
+Enumerations
+
+
+Reflection
+
+
+Sounds Neat , doesnt it ?
+Well, lets get started ...
+&nbsp;
+We will build a Re-usable Photo Grid Component that you can use in your applications .
+PhotoGrid&nbsp; : It will show a grid of thumbnails with Animations associated with Click of each thumbNail.
+On Click of the ThumbNail , the ThumbNail will move to a specific location and Resize itself .
+The PhotoGird will have the Following Features.
+
+Ability Bind Data in JSON Format  
+Paging Functionality in Numbers and "Next" and "Prev" Links  
+Jump to a&nbsp; specific page  
+Support for Placing the Controls at Specified X and Y Locations  
+Support for Customising the Horizontal and Vertical Offset between thumbnails  
+Support for specifying the Number of images in each page.
+
+It will be written as a Client Side Java Script Re-usable Component
+Th JSON Data format will be like this
+{
+"ResultSet":{"totalResultsAvailable":"50014","totalResultsReturned":7,"firstResultPosition":1,
+"Result" :
+    [
+     {
+        "Title":"The-Incredibles-Poster-C10219976.jpeg",
+        "Summary":"",
+        "Url":"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"
+
+     }
+     {
+        "Title":"The-Incredibles-Poster-C10219976.jpeg",
+        "Summary":"",
+        "Url":"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"
+
+     }
+    ]
+}
+The PhotoGrid Component will convert the Data into something that looks like this 
+ 
+On Clicking of a thumbnail  , it will resize itself automatically , then it will look like this 
+ 
+Now that I  have , hopefully, raised your curiosity . lets build this..
+Creating the PhotoGrid Component using Microsoft AJAX Exntensions
+1.Register the NameSpace
+Type.registerNamespace("AtlasDemo");
+2.Declare the Constructor for your class.
+AtlasDemo.PhotoGrid = function ( leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+this._jsonString        = "";
+this._gridData          ;
+this._pageIndex         = 0;
+this._firstImageIndex   = 0;
+this._leftPosition      = leftPosition;
+this._topPosition       = topPosition;
+this._parentControlId   = parentControlId;
+this._thumbNailTableId  = tableID;
+this._horizontalOffset  = horizontalOffset;
+this._loopIndex         = 0 ;
+this._verticalOffset    = VerticalOffset;
+this._pageSize          =7;
+this._startIndex        =0;
+this._initialStart      =0;
+
+}
+
+
+2. Define the functions of the PhotoGrid using the Prototype model .
+Syntax:
+AtlasDemo.PhotoGrid.prototype = {
+  &lt;functionName1&gt;:function([arguments])
+  {
+    &lt;FunctionBody&gt;
+  }
+  ,
+  &lt;functionName2&gt;:function([arguments])
+  {
+     &lt;FunctionBody&gt;
+  }
+}
+The Code inside the JS function is specified in this  format , pretty neat  and organised 
+Actual Function Definitions:
+Function Name    : pagesAvailable
+Function Purpose : To Return the Number of Pages Available For Paging 
+Return Value     : JSON Object with the total Number of Pages, Pages available in the Forward Direction and Backward Direction
+Input Parameters : None
+Function Code:
+pagesAvailable:function()
+    {
+        var totalPages    = parseInt(this._gridData.ResultSet.totalResultsReturned)/parseInt(this._pageSize);
+        var pagesForward  = parseInt(totalPages) - ( parseInt(this._pageIndex) +1 ) ;
+        var pagesBackWard = parseInt( totalPages - pagesForward );
+        var jsonStringData = "{\"pagesData\":{\"totalPages\":\""+totalPages+"\",\"pagesForward\":\""+pagesForward+"\",\"pagesBackWard\":\""+pagesBackWard+"\"}}"
+        return ( eval( '(' + jsonStringData + ')' ) );
+    }
+The following are functions inside the Prototype function Declaration, the code is omitted for the purpose of clarity.
+&nbsp;
+    setPageSize:function(pageSize)
+    {
+        &lt;Function Body&gt;
+    },
+    setData:function(jsonString)
+    {
+        &lt;Function Body&gt;
+    },
+    resetPositions:function( leftPosition , topPosition , animatorGlobalIndex  )
+    {
+        &lt;Function Body&gt;
+    },
+    resetAll:function ( jsonString ,leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+        &lt;Function Body&gt;
+    },
+    clearResults : function( leftPosition , topPosition , horizontalOffset,VerticalOffset )
+    {
+        &lt;Function Body&gt;
+
+    },
+
+    ShowPager:function(shouldIShowThePager,pagerControlHolder,pagingFunctionName)
+    {
+        &lt;Function Body&gt;
+    },
+    PageForward:function()
+    {
+
+        &lt;Function Body&gt;
+    },
+    __pagingFunction:function()
+    {
+       &lt;Function Body&gt;
+    },
+    CurrentPageIndex : function()
+    {
+        &lt;Function Body&gt;
+    },
+    PageBackward : function()
+    {
+        &lt;Function Body&gt;
+    },
+    AnimateElement:function( imgElement )
+    {
+        &lt;Function Body&gt;
+
+    },
+    CreateNewPhotoCell:function( searchResultItem )
+    {
+        &lt;Function Body&gt;
+    },
+    BindGrid : function()
+    {
+         &lt;Function Body&gt;
+    }
+3. Once you have declared the functions supported by the PhotoGrid Class, lets Go ahead and register the class.
+AtlasDemo.PhotoGrid.registerClass('AtlasDemo.PhotoGrid', null, Sys.IDisposable);
+You can read all about the registerClass Here.
+You are now done!
+Lets go ahead and see how to use this component in our code.
+ASPX Code:
+1. Add the Mandatory Script Manager Control.
+&lt;asp:ScriptManager ID="ScriptManager1" runat="server"&gt;
+&lt;/asp:ScriptManager&gt;
+
+2. Include a reference to your script File in the &lt;BODY&gt; of the ASPX Page
+&lt;script type="text/javascript" src="ClientScripts/PhotoGrid.js"&gt;&lt;/script&gt;
+3. The Parent Control that will hold the ThumbNails
+ &lt;div id="divActualSize" style="left: 10px; overflow: auto; width: 90%; position: absolute;
+            top: 18%; height: 650px" class="grey"&gt;
+            &lt;table id="tblThumbnails"&gt;
+                &lt;tbody&gt;
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+ &lt;/div&gt;
+
+4. The Client Functions to the PhotoGrid Component
+function CreateGrid( JSONDataToBeBound )
+{
+  //Create an instance of the PhotoGrid Control
+  var gridElement = new AtlasDemo.PhotoGrid( leftPosition , topPosition,"",0,"tblThumbnails",horizontalOffset,VerticalOffset) ;
+  //Set the Data for the PhotoGrid Control
+  gridElement.setData(JSONDataToBeBound);
+  //Set the Number of images to be shown in one Page
+  gridElement.setPageSize( pageSize );
+  //Bind the Grid
+  gridElement.BindGrid( );
+
+}
+we are done !
+I have made a sample application that uses this control and shows off all the features possible .
+Please let me know if this control is of any use to you .
+ If yes, then how ?
+ If No , then which features / options would make it useful ?
+You can download the Sample Application here.
+
+
+
+
+ PhotoGrid.zip
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Using the Prototype Model with Microsoft AJAX" />
+    <meta property="twitter:title" content="Using the Prototype Model with Microsoft AJAX" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Using the Prototype Model with Microsoft AJAX</h1>
+
+  <div class="entry">
+    <p>Microsoft Ajax allows you to extend your javaScript Programming framework so that you can emulate OOP practices with Javascript .</p>
+<p>A SImple Example is <a href="http://ajax.asp.net/docs/tutorials/EnhancingJavaScriptTutorial.aspx">Here</a></p>
+<p>The following is a list of stuff you can Use in javascript with Microsoft Ajax Extensions to javascript </p>
+<ul>
+<li>
+<p>Classes</p>
+</li>
+<li>
+<p>Namespaces</p>
+</li>
+<li>
+<p>Inheritance</p>
+</li>
+<li>
+<p>Interfaces</p>
+</li>
+<li>
+<p>Enumerations</p>
+</li>
+<li>
+<p>Reflection</p>
+</li>
+</ul>
+<p>Sounds Neat , doesnt it ?</p>
+<p>Well, lets get started ...</p>
+<p>&nbsp;</p>
+<p>We will build a Re-usable Photo Grid Component that you can use in your applications .</p>
+<p>PhotoGrid&nbsp; : It will show a grid of thumbnails with Animations associated with Click of each thumbNail.</p>
+<p>On Click of the ThumbNail , the ThumbNail will move to a specific location and Resize itself .</p>
+<p>The PhotoGird will have the Following Features.</p>
+<ol>
+<li>Ability Bind Data in JSON Format  </li>
+<li>Paging Functionality in Numbers and "Next" and "Prev" Links  </li>
+<li>Jump to a&nbsp; specific page  </li>
+<li>Support for Placing the Controls at Specified X and Y Locations  </li>
+<li>Support for Customising the Horizontal and Vertical Offset between thumbnails  </li>
+<li>Support for specifying the Number of images in each page.</li>
+</ol>
+<p>It will be written as a Client Side Java Script Re-usable Component</p>
+<p>Th JSON Data format will be like this</p>
+<pre class="csharpcode">{
+<span class="str">"ResultSet"</span>:{<span class="str">"totalResultsAvailable"</span>:<span class="str">"50014"</span>,<span class="str">"totalResultsReturned"</span>:7,<span class="str">"firstResultPosition"</span>:1,
+<span class="str">"Result"</span> :
+    [
+     {
+        <span class="str">"Title"</span>:<span class="str">"The-Incredibles-Poster-C10219976.jpeg"</span>,
+        <span class="str">"Summary"</span>:<span class="str">""</span>,
+        <span class="str">"Url"</span>:<span class="str">"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"</span>
+
+     }
+     {
+        <span class="str">"Title"</span>:<span class="str">"The-Incredibles-Poster-C10219976.jpeg"</span>,
+        <span class="str">"Summary"</span>:<span class="str">""</span>,
+        <span class="str">"Url"</span>:<span class="str">"http://a1259.g.akamai.net/f/1259/5586/1d/images.art.com/images/-/The-Incredibles-Poster-C10219976.jpeg"</span>
+
+     }
+    ]
+}</pre>
+<pre class="csharpcode">The PhotoGrid Component will convert the Data into something that looks like this </pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/Photo_Grid_Preview4.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/Photo_Grid_Preview4.jpg" atomicselection="true"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="192" src="/assets/Photo_Grid_Preview3.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/Photo_Grid_Preview3.jpg" width="240" border="0" /></a> </pre>
+<pre class="csharpcode">On Clicking of a thumbnail  , it will resize itself automatically , then it will look like this </pre>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/photo_Grid_THumbnail_Expanded1.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/photo_Grid_THumbnail_Expanded1.jpg" atomicselection="true"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="192" src="/assets/photo_Grid_THumbnail_Expanded.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/UsingthePrototypeModelwithMicrosoftAJAX_14A88/photo_Grid_THumbnail_Expanded.jpg" width="240" border="0" /></a> </pre>
+<pre class="csharpcode">Now that I  have , hopefully, <font face="Consolas" size="2">raised your curiosity . lets build this..</font></pre>
+<pre class="csharpcode">Creating the PhotoGrid Component using Microsoft AJAX Exntensions</pre>
+<pre class="csharpcode">1.Register the NameSpace</pre>
+<pre class="csharpcode">Type.registerNamespace(<span class="str">"AtlasDemo"</span>);</pre>
+<pre class="csharpcode">2.Declare the Constructor for your class.</pre>
+<pre class="csharpcode">AtlasDemo.PhotoGrid = <span class="kwrd">function</span> ( leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+<span class="kwrd">this</span>._jsonString        = <span class="str">""</span>;
+<span class="kwrd">this</span>._gridData          ;
+<span class="kwrd">this</span>._pageIndex         = 0;
+<span class="kwrd">this</span>._firstImageIndex   = 0;
+<span class="kwrd">this</span>._leftPosition      = leftPosition;
+<span class="kwrd">this</span>._topPosition       = topPosition;
+<span class="kwrd">this</span>._parentControlId   = parentControlId;
+<span class="kwrd">this</span>._thumbNailTableId  = tableID;
+<span class="kwrd">this</span>._horizontalOffset  = horizontalOffset;
+<span class="kwrd">this</span>._loopIndex         = 0 ;
+<span class="kwrd">this</span>._verticalOffset    = VerticalOffset;
+<span class="kwrd">this</span>._pageSize          =7;
+<span class="kwrd">this</span>._startIndex        =0;
+<span class="kwrd">this</span>._initialStart      =0;
+
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">2. Define the functions of the PhotoGrid using the Prototype model .</pre>
+<pre class="csharpcode"><u><strong>Syntax:</strong></u></pre>
+<pre class="csharpcode">AtlasDemo.PhotoGrid.prototype = {
+  &lt;functionName1&gt;:<span class="kwrd">function</span>([arguments])
+  {
+    &lt;FunctionBody&gt;
+  }
+  ,
+  &lt;functionName2&gt;:<span class="kwrd">function</span>([arguments])
+  {
+     &lt;FunctionBody&gt;
+  }
+}</pre>
+<pre class="csharpcode">The Code inside the JS function is specified in this  format , pretty neat  and organised </pre>
+<pre class="csharpcode"><strong><u>Actual Function Definitions:</u></strong><br /></pre>
+<pre class="csharpcode"><strong>Function Name    : </strong>pagesAvailable</pre>
+<pre class="csharpcode"><strong>Function Purpose : </strong>To Return the Number of Pages Available For Paging<strong> </strong></pre>
+<pre class="csharpcode"><strong>Return Value     :</strong> JSON Object with the total Number of Pages, Pages available in the Forward Direction and Backward Direction</pre>
+<pre class="csharpcode"><strong>Input Parameters : </strong>None</pre>
+<pre class="csharpcode"><strong>Function Code:</strong></pre>
+<pre class="csharpcode">pagesAvailable:<span class="kwrd">function</span>()
+    {
+        <span class="kwrd">var</span> totalPages    = parseInt(<span class="kwrd">this</span>._gridData.ResultSet.totalResultsReturned)/parseInt(<span class="kwrd">this</span>._pageSize);
+        <span class="kwrd">var</span> pagesForward  = parseInt(totalPages) - ( parseInt(<span class="kwrd">this</span>._pageIndex) +1 ) ;
+        <span class="kwrd">var</span> pagesBackWard = parseInt( totalPages - pagesForward );
+        <span class="kwrd">var</span> jsonStringData = <span class="str">"{\"pagesData\":{\"totalPages\":\""</span>+totalPages+<span class="str">"\",\"pagesForward\":\""</span>+pagesForward+<span class="str">"\",\"pagesBackWard\":\""</span>+pagesBackWard+<span class="str">"\"}}"</span>
+        <span class="kwrd">return</span> ( eval( <span class="str">'('</span> + jsonStringData + <span class="str">')'</span> ) );
+    }</pre>
+<pre class="csharpcode">The following are functions inside the Prototype function Declaration, the code is omitted for the purpose of clarity.</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">    setPageSize:<span class="kwrd">function</span>(pageSize)
+    {
+        &lt;Function Body&gt;
+    },
+    setData:<span class="kwrd">function</span>(jsonString)
+    {
+        &lt;Function Body&gt;
+    },
+    resetPositions:<span class="kwrd">function</span>( leftPosition , topPosition , animatorGlobalIndex  )
+    {
+        &lt;Function Body&gt;
+    },
+    resetAll:<span class="kwrd">function</span> ( jsonString ,leftPosition , topPosition ,parentControlId ,animatorGlobalIndex ,tableID, horizontalOffset,VerticalOffset ){
+        &lt;Function Body&gt;
+    },
+    clearResults : <span class="kwrd">function</span>( leftPosition , topPosition , horizontalOffset,VerticalOffset )
+    {
+        &lt;Function Body&gt;
+
+    },
+
+    ShowPager:<span class="kwrd">function</span>(shouldIShowThePager,pagerControlHolder,pagingFunctionName)
+    {
+        &lt;Function Body&gt;
+    },
+    PageForward:<span class="kwrd">function</span>()
+    {
+
+        &lt;Function Body&gt;
+    },
+    __pagingFunction:<span class="kwrd">function</span>()
+    {
+       &lt;Function Body&gt;
+    },
+    CurrentPageIndex : <span class="kwrd">function</span>()
+    {
+        &lt;Function Body&gt;
+    },
+    PageBackward : <span class="kwrd">function</span>()
+    {
+        &lt;Function Body&gt;
+    },
+    AnimateElement:<span class="kwrd">function</span>( imgElement )
+    {
+        &lt;Function Body&gt;
+
+    },
+    CreateNewPhotoCell:<span class="kwrd">function</span>( searchResultItem )
+    {
+        &lt;Function Body&gt;
+    },
+    BindGrid : <span class="kwrd">function</span>()
+    {
+         &lt;Function Body&gt;
+    }</pre>
+<pre class="csharpcode">3. Once you have declared the functions supported by the PhotoGrid Class, lets Go ahead and register the class.</pre>
+<pre class="csharpcode">AtlasDemo.PhotoGrid.registerClass(<span class="str">'AtlasDemo.PhotoGrid'</span>, <span class="kwrd">null</span>, Sys.IDisposable);</pre>
+<pre class="csharpcode">You can read all about the registerClass <a href="http://ajax.asp.net/docs/ClientReference/Global/TypeClass/TypeRegisterClassMethod.aspx">Here</a>.</pre>
+<pre class="csharpcode">You are now done!</pre>
+<pre class="csharpcode">Lets go ahead and see how to use this component in our code.</pre>
+<pre class="csharpcode">ASPX Code:</pre>
+<pre class="csharpcode">1. Add the Mandatory Script Manager Control.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">asp:ScriptManager</span> <span class="attr">ID</span><span class="kwrd">="ScriptManager1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">asp:ScriptManager</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">2. Include a reference to your script File in the <strong><u><font color="#ff0000">&lt;BODY&gt; of the ASPX Page</font></u></strong></pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">type</span><span class="kwrd">="text/javascript"</span> <span class="attr">src</span><span class="kwrd">="ClientScripts/PhotoGrid.js"</span><span class="kwrd">&gt;&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode">3. The Parent Control that will hold the ThumbNails</pre>
+<pre class="csharpcode"> <span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="divActualSize"</span> <span class="attr">style</span><span class="kwrd">="left: 10px; overflow: auto; width: 90%; position: absolute;
+            top: 18%; height: 650px"</span> <span class="attr">class</span><span class="kwrd">="grey"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">table</span> <span class="attr">id</span><span class="kwrd">="tblThumbnails"</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">tbody</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">tbody</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">table</span><span class="kwrd">&gt;</span>
+ <span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>4. The Client Functions to the PhotoGrid Component
+<pre class="csharpcode"><span class="kwrd">function</span> CreateGrid( JSONDataToBeBound )
+{
+  <span class="rem">//Create an instance of the PhotoGrid Control</span>
+  <span class="kwrd">var</span> gridElement = <span class="kwrd">new</span> AtlasDemo.PhotoGrid( leftPosition , topPosition,<span class="str">""</span>,0,<span class="str">"tblThumbnails"</span>,horizontalOffset,VerticalOffset) ;
+  <span class="rem">//Set the Data for the PhotoGrid Control</span>
+  gridElement.setData(JSONDataToBeBound);
+  <span class="rem">//Set the Number of images to be shown in one Page</span>
+  gridElement.setPageSize( pageSize );
+  <span class="rem">//Bind the Grid</span>
+  gridElement.BindGrid( );
+
+}</pre>
+<pre class="csharpcode">we are done !</pre>
+<pre class="csharpcode">I have made a sample application that uses this control and shows off all the features possible .</pre>
+<pre class="csharpcode">Please let me know if this control is of any use to you .</pre>
+<pre class="csharpcode"> If yes, then how ?</pre>
+<pre class="csharpcode"> If No , then which features / options would make it useful ?</pre>
+<pre class="csharpcode">You can download the Sample Application here.</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/01/57/46/73/PhotoGrid.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-01-57-46-73/PhotoGrid.zip"> PhotoGrid.zip</a></p></p>
+
+  </div>
+
+  <div class="date">
+    Written on February  1, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

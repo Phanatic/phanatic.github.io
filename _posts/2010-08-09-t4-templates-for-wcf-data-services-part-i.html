@@ -1,0 +1,55 @@
+---
+layout: post
+title: T4 templates for WCF Data Services, Part -I
+date: 2010-08-09 22:51:22.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Documentation
+- OData
+- Sample
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2010/08/10/t4-templates-for-wcf-data-services-part-i.aspx
+  orig_site_id: '7524'
+  orig_post_id: '10048202'
+  orig_parent_id: '10048202'
+  orig_thread_id: '728752'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2010/08/09/t4-templates-for-wcf-data-services-part-i.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="T4 templates for WCF Data Services, Part -I" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/08/09/t4-templates-for-wcf-data-services-part-i/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Click here to download sample application As part of a series of blog posts about how to enhance the WCF Data Services development experience, I will be releasing some of the T4 templates that I use for generating common code. In this post, I will talk about augmenting the Server-side WCF Data Service by generating..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="T4 templates for WCF Data Services, Part -I" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/08/09/t4-templates-for-wcf-data-services-part-i/" />
+    <meta name="twitter:description" content="Click here to download sample application As part of a series of blog posts about how to enhance the WCF Data Services development experience, I will be releasing some of the T4 templates that I use for generating common code. In this post, I will talk about augmenting the Server-side WCF Data Service by generating..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<h5><a href="http://cid-925c2d2bb2d03c6b.office.live.com/self.aspx/Public/DataServiceCodeGenSample.zip">Click here to download sample application</a> </h5>
+<p>As part of a series of blog posts about how to enhance the WCF Data Services development experience, I will be    <br />releasing some of the T4 templates that I use for generating common code.     <br />In this post, I will talk about augmenting the Server-side WCF Data Service by generating Query/Change Interceptors     <br />for all given entity sets present in a model. As this is&#160; proof of concept code only, this T4 template will only work against     <br />and Entity Framework model and will generate C# code. It shouldn’t be too hard to change the template to generate VB code.     </p>
+<p>To use this template in your project, drop the three files in the zip file into the same project as the Data Service.     </p>
+<p>Specify the following parameters in the .tt file :     </p>
+<p>&#160; string dataServiceClassName =&quot;DataService&quot;;     <br />&#160; string dataServiceClassNamespace =&quot;Ast4oriaT4Templates.Web&quot;;     <br />&#160; bool generateQueryInterceptors = true;     <br />&#160; bool generateChangeInterceptors = true;     <br />&#160; bool generateServiceOperations = true;     <br />&#160; string edmxFilePath =@&quot;C:\temp\EuphoriaClientApp\EuphoriaWeb\northwindModel.edmx&quot;;</p>
+<p>And save the template to trigger the code generation:</p>
+<p>Once the code gen finishes, you should see the following files :</p>
+<p>&lt;dataServiceClassName&gt;.QueryInterceptors.cs : This file contains a query interceptor for every entity set in the Model</p>
+<p>&lt;dataServiceClassName&gt;.ChangeInterceptors.cs : This file contains a change interceptor for every entity set in the Model</p>
+<p>&lt;dataServiceClassName&gt;.ServiceOperations.cs :&#160; This file contains a service operation for every FunctionImport in the Model</p>
+<p>Part II will be client side code generation of Service Operations in the generated proxies.</p>

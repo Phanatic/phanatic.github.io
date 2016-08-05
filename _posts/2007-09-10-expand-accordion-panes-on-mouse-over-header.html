@@ -1,0 +1,158 @@
+---
+layout: post
+title: Expand Accordion Panes On Mouse Over Header
+date: 2007-09-10 15:56:58.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Accordion
+- AJAX
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/09/10/expand-accordion-panes-on-mouse-over-header.aspx
+  orig_site_id: '7524'
+  orig_post_id: '4855913'
+  orig_parent_id: '4855913'
+  orig_thread_id: '534426'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/09/10/expand-accordion-panes-on-mouse-over-header.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Expand Accordion Panes On Mouse Over Header" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/09/10/expand-accordion-panes-on-mouse-over-header/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="This is a common requirement I see&nbsp; among users of the accordion , How do I Open Accordion Panes OnMouseOver of&nbsp; the header and Not on header Click ? The answer is pretty simple . Lets walk through this : a) Setup your Accordion &lt;ajaxToolkit:Accordion ID=&quot;Accordion1&quot; runat=&quot;server&quot; ContentCssClass=&quot;grey&quot; FadeTransitions=&quot;false&quot; FramesPerSecond=&quot;25&quot; TransitionDuration=&quot;250&quot; HeaderCssClass=&quot;dimgreen&quot; EnableViewState=&quot;true&quot;&gt; &lt;Panes&gt; ::::..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Expand Accordion Panes On Mouse Over Header" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/09/10/expand-accordion-panes-on-mouse-over-header/" />
+    <meta name="twitter:description" content="This is a common requirement I see&nbsp; among users of the accordion , How do I Open Accordion Panes OnMouseOver of&nbsp; the header and Not on header Click ? The answer is pretty simple . Lets walk through this : a) Setup your Accordion &lt;ajaxToolkit:Accordion ID=&quot;Accordion1&quot; runat=&quot;server&quot; ContentCssClass=&quot;grey&quot; FadeTransitions=&quot;false&quot; FramesPerSecond=&quot;25&quot; TransitionDuration=&quot;250&quot; HeaderCssClass=&quot;dimgreen&quot; EnableViewState=&quot;true&quot;&gt; &lt;Panes&gt; ::::..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>This is a common requirement I see&nbsp; among users of the accordion , </p>
+<p>How do I Open Accordion Panes OnMouseOver of&nbsp; the header and Not on header Click ?</p>
+<p>The answer is pretty simple .</p>
+<p>Lets walk through this :</p>
+<p>a) Setup your Accordion </p>
+<pre class="csharpcode"> <span class="kwrd">&lt;</span><span class="html">ajaxToolkit:Accordion</span> <span class="attr">ID</span><span class="kwrd">="Accordion1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ContentCssClass</span><span class="kwrd">="grey"</span>
+            <span class="attr">FadeTransitions</span><span class="kwrd">="false"</span>  <span class="attr">FramesPerSecond</span><span class="kwrd">="25"</span> <span class="attr">TransitionDuration</span><span class="kwrd">="250"</span>  </pre>
+<pre class="csharpcode">            <span class="attr">HeaderCssClass</span><span class="kwrd">="dimgreen"</span> <span class="attr">EnableViewState</span><span class="kwrd">="true"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Panes</span><span class="kwrd">&gt;</span>
+               ::::
+            <span class="kwrd">&lt;/</span><span class="html">Panes</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:Accordion</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd">b) Each of the accordion header Pane will have a &lt;SPAN&gt; tag setup for the header.</span></pre>
+<pre class="csharpcode"><span class="kwrd">    On MouseOver of the Span Tag , we will open the Accordion Pane .</span></pre>
+<pre class="csharpcode"><span class="kwrd"></span>&nbsp;</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AccordionPane</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="PaneOne"</span><span class="kwrd">&gt;</span>
+          <span class="kwrd">&lt;</span><span class="html">Header</span><span class="kwrd">&gt;</span>
+<font size="4">               <span class="kwrd">&lt;</span><span class="html">span</span> <span class="attr">onmouseover</span><span class="kwrd">="Openpane('0',event)"</span><span class="kwrd">&gt;</span>Accordion<span class="kwrd">&lt;/</span><span class="html">span</span><span class="kwrd">&gt;</span>
+</font>           <span class="kwrd">&lt;/</span><span class="html">Header</span><span class="kwrd">&gt;</span>
+           <span class="kwrd">&lt;</span><span class="html">Content</span><span class="kwrd">&gt;</span>
+               <span class="kwrd">&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+               <span class="kwrd">&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+               Expand Accordion Panes on Mouse Over :: Pane 1
+               <span class="kwrd">&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+               <span class="kwrd">&lt;</span><span class="html">br</span> <span class="kwrd">/&gt;</span>
+           <span class="kwrd">&lt;/</span><span class="html">Content</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AccordionPane</span><span class="kwrd">&gt;</span></pre>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>
+<p>The Span's onmouseover event is handled by the Openpane Function.</p>
+<p>c) The javaScript Function Openpane .</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">language</span><span class="kwrd">="javascript"</span> <span class="attr">type</span><span class="kwrd">="text/javascript"</span><span class="kwrd">&gt;</span>
+
+<span class="kwrd">function</span> Openpane(paneIndex,eventElement) {
+    <span class="kwrd">var</span> behavior = $get(<span class="str">"Accordion1"</span>).AccordionBehavior;
+    behavior.set_SelectedIndex(paneIndex);
+}
+
+<span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span></pre>
+<p><strong>Download Complete Example : </strong></p>
+<p><iframe style="border-right: #dde5e9 1px solid; padding-right: 0px; border-top: #dde5e9 1px solid; padding-left: 0px; padding-bottom: 0px; margin: 3px; border-left: #dde5e9 1px solid; width: 240px; padding-top: 0px; border-bottom: #dde5e9 1px solid; height: 26px; background-color: #ffffff" marginwidth="0" marginheight="0" src="http://cid-925c2d2bb2d03c6b.skydrive.live.com/embedrow.aspx/Public/Accordion_OnHover.aspx.zip" frameborder="0" scrolling="no"></iframe></p>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>

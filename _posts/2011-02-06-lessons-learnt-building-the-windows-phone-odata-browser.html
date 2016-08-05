@@ -1,0 +1,51 @@
+---
+layout: post
+title: Lessons learnt building the Windows Phone OData browser
+date: 2011-02-06 20:12:08.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Documentation
+- OData
+- Windows Phone
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2011/02/07/lessons-learnt-building-the-windows-phone-odata-browser.aspx
+  orig_site_id: '7524'
+  orig_post_id: '10125530'
+  orig_parent_id: '10125530'
+  orig_thread_id: '752714'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2011/02/06/lessons-learnt-building-the-windows-phone-odata-browser.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Lessons learnt building the Windows Phone OData browser" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2011/02/06/lessons-learnt-building-the-windows-phone-odata-browser/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="One of the reasons for re-building the OData browser for Windows Phone was to experience first hand the issues our developers face when writing an app for the marketplace that uses the client library my team produces. This blog post describes what I learnt as a developer on the OData browser and what feedback the..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Lessons learnt building the Windows Phone OData browser" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2011/02/06/lessons-learnt-building-the-windows-phone-odata-browser/" />
+    <meta name="twitter:description" content="One of the reasons for re-building the OData browser for Windows Phone was to experience first hand the issues our developers face when writing an app for the marketplace that uses the client library my team produces. This blog post describes what I learnt as a developer on the OData browser and what feedback the..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>One of the reasons for re-building the OData browser for Windows Phone was to experience first hand the issues our developers face when writing an app for the marketplace that uses the client library my team produces. This blog post describes what I learnt as a developer on the OData browser and what feedback the team received after this exercise.   </p>
+<p><strong>Disclaimer </strong>: I wrote a lot of the code for the browser such as metadata parsing, dynamic service access without client types and other features for the <a href="http://Silverlight.net/ODataExplorer">Silverlight version of the OData browser.</a> About 40% of the code for the Windows Phone browser was brought over from the Silverlight version. The rest of the 60% of code is in the UI and the tombstoning management of data in the app. </p>
+<h4>The Good : </h4>
+<p><strong>1.</strong> The client library’s events the app depended upon were still present and worked just as well.     <br /><strong>2.</strong> The OData library had no issues at all with feeds of any kind ( paged/non-paged/with count ) , it worked without a hitch.    <br /><strong>3. </strong>The databinding classes worked fine for the Phone environment and completion fired events on the right( UI ) thread.&#160; <br /><strong>4. </strong>Tombstoning for DataServiceCollection and DataServiceContext works quite well for the rows in the app.     <br /><strong>5. </strong>The platform is quite nice for debugging on the physical device. Other than some really convoluted tombstoning issues, VS and the debugger chugged along just fine.</p>
+<h4>The “Needs Improvement”:</h4>
+<p><strong>1.</strong> The <a href="http://msdn.microsoft.com/en-us/library/ee652863(VS.95).aspx">DataServiceCollection.LoadAsync&lt;T&gt;</a> api doesn’t return an IAsyncResult when you call it.The reason this is important is because&#160; the marketplace’s certification requirements state that long running network tasks need a “Cancel” button. And the way to cancel a request made by the OData client library is to call CancelRequest on the DataServiceContext instance being used by the app. Since I was using DataServiceCollection in my app and kicking off requests using the LoadAsync and LoadNextPartialSetAsync apis, I couldn’t cancel the current request without a rewrite. Finally, I had to stop using the LoadAsync API on the collection and moved to using <a href="http://msdn.microsoft.com/en-us/library/cc646724(v=VS.90).aspx">DataServiceContext.BeginExecute&lt;T&gt;</a> which does return an IAsyncResult and I could CancelRequest when the UI shows the “Cancel” button.     <br /><strong>2. </strong>No Credentials support via <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.dataservicecontext.usedefaultcredentials(VS.95).aspx">UseDefaultCredentials</a> and <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.dataservicecontext.credentials(v=VS.95).aspx">Credentials</a> properties on the DataServiceContext&#160; type. This prevented me from adding support in the app for authenticated services.     <br /><strong>3. </strong>The emulator is slow on my laptop, I may have to buy a new laptop if I want to use the emulator for developing apps.And here’s a joke for sticking so far with this blog post.     <br /><em><font face="Tahoma">&#160;&#160;&#160; How slow is it ?        <br />&#160;&#160;&#160; It’s so slow that the January update for the Phone will be released by the time the emulator starts.</font></em></p>
+<p>I am looking for other perspectives on developing apps for the marketplace with the OData client library.    <br />How do you find developing with the client library on the Phone ?     <br />What are your pet peeves ? and What are the top features you love ?</p>

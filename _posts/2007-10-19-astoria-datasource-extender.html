@@ -1,0 +1,521 @@
+---
+layout: post
+title: Astoria DataSource Extender
+date: 2007-10-19 16:18:33.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- Demo
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/10/19/astoria-datasource-extender.aspx
+  orig_site_id: '7524'
+  orig_post_id: '5528265'
+  orig_parent_id: '5528265'
+  orig_thread_id: '541768'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/10/19/astoria-datasource-extender.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Astoria DataSource Extender" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/10/19/astoria-datasource-extender/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Download Source and Example&nbsp; : Most of you must have heard about Astoria. Read More about it here , if you haven&#8217;t already :Microsoft Codename &#8220;Astoria&#8221;.The Astoria Team Blog : It&#8217;s a &#8220;Database in the cloud&#8221;, your db is hosted on the Web and you access it via REST -style URIs.I have written a ControlExtender..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Astoria DataSource Extender" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/10/19/astoria-datasource-extender/" />
+    <meta name="twitter:description" content="Download Source and Example&nbsp; : Most of you must have heard about Astoria. Read More about it here , if you haven&#8217;t already :Microsoft Codename &#8220;Astoria&#8221;.The Astoria Team Blog : It&#8217;s a &#8220;Database in the cloud&#8221;, your db is hosted on the Web and you access it via REST -style URIs.I have written a ControlExtender..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p><font size="2"><strong><u>Download Source and Example&nbsp; :</u></strong></font></p>
+<p><iframe style="border-right: #dde5e9 1px solid; padding-right: 0px; border-top: #dde5e9 1px solid; padding-left: 0px; padding-bottom: 0px; margin: 3px; border-left: #dde5e9 1px solid; width: 240px; padding-top: 0px; border-bottom: #dde5e9 1px solid; height: 26px; background-color: #ffffff" marginwidth="0" marginheight="0" src="http://cid-925c2d2bb2d03c6b.skydrive.live.com/embedrow.aspx/Public/AstoriaClient.zip" frameborder="0" scrolling="no"></iframe></p>
+<p><font size="2">Most of you must have heard about Astoria. Read More about it here , if you haven't already :<br /><a href="http://astoria.mslivelabs.com/" target="_blank">Microsoft Codename "Astoria".</a><br /><a href="http://blogs.msdn.com/astoriateam/" target="_blank">The Astoria Team Blog :</a> </font></p>
+<p><font size="2">It's a "Database in the cloud", your db is hosted on the Web and you access it via REST -style URIs.<br /></font><font size="2"><br />I have written a ControlExtender that helps one retrieve data and post data to a db on Astoria using JavaScript.<br /></font><font size="2">The Extender encapsulates its own Server-Side handler so that&nbsp; you don't have to write a Server-Side proxy to <br /></font><font size="2">avoid Making Cross-Domain Requests from the Client browser.</font></p>
+<p><font size="2">The way it would work is :<br /></font><font size="2">Client Browser&nbsp; =====&gt; Server-Side handler ===&gt; Astoria Servers</font></p>
+<p><font size="2">When the Client Script tries to download the data from the Astoria Servers, the following process is followed</font></p>
+<ol>
+<li><font size="2">Client Script requests a certain page ( dataDownloader.astoria)&nbsp; on the same server as the website with all the Astoria Query related parameters as headers. </font> </li>
+<li><font size="2">The *.astoria extension is mapped to a handler contained in the Extender Control. </font> </li>
+<li><font size="2">Once the handler receives the request , it makes the call to the actual Astoria Servers and passes on the error/Data back to the requesting Client . </font> </li>
+<li><font size="2">The Control notifies any registered event handlers that the Data is now ready for use by the Script</font></li>
+</ol>
+<p><strong><font size="2"><u>What does the Extender NOT do ?</u></font></strong></p>
+<p><font size="2">The Extender does NOT Support the following Scenarios</font></p>
+<ol>
+<li><font size="2">Data Manipulation such as POSTING and Editing Data.</font>  </li>
+<li><font size="2">Bind the Returned Data to HTML controls , this would have to be done manually.</font></li>
+</ol>
+<p>&nbsp;</p>
+<p><strong>Events Supported by the Extender:</strong></p>
+<table cellspacing="0" cellpadding="2" width="908" border="0">
+<tbody>
+<tr>
+<td valign="top" width="118"><strong>Event Name</strong></td>
+<td valign="top" width="273"><strong>Raised When</strong></td>
+<td valign="top" width="347"><strong>Event Args</strong></td>
+<td valign="top" width="164"><strong>Usage</strong></td>
+</tr>
+<tr>
+<td valign="top" width="120">dataReady</td>
+<td valign="top" width="273">When the Data is downloaded and available for use by the client application</td>
+<td valign="top" width="347">EventArgs contains the item( the Control itself) and the Data that the Client application can use</td>
+<td valign="top" width="164">See Example below</td>
+</tr>
+<tr>
+<td valign="top" width="122">dataDownloadBegins</td>
+<td valign="top" width="273">When the Data download starts from the Astoria Servers</td>
+<td valign="top" width="347">EventArgs.Empty</td>
+<td valign="top" width="164">See Example below</td>
+</tr>
+<tr>
+<td valign="top" width="122">dataDownloadEnds</td>
+<td valign="top" width="273">When the Data download Ends from the Astoria Servers . The Data may/may not be ready for use by the Client Application</td>
+<td valign="top" width="347">EventArgs.Empty</td>
+<td valign="top" width="164">See Example below</td>
+</tr>
+<tr>
+<td valign="top" width="122">dataDownloadError</td>
+<td valign="top" width="273">When the Data download from the Astoria Servers results in an error</td>
+<td valign="top" width="347"><u>AstoriaExtenders.DataDownloadErrorEventArgs<br /></u>Contains the Error information </td>
+<td valign="top" width="164">See Example below</td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<p><strong>Subscribing to the Events of the Astoria Data Source Extender :</strong></p>
+<p>The BehaviorID of the Extender added on the page is : "asBehavior"</p>
+<pre class="csharpcode"><span class="rem">//Subscribing to the dataReady event</span>
+$find(<span class="str">"asBehavior"</span>).add_dataReady( dataReadyHandler );
+<span class="rem">//Subscribing to the dataDownloadBegins event</span>
+$find(<span class="str">"asBehavior"</span>).add_dataDownloadBegins(&lt;functionName&gt;);
+<span class="rem">//Subscribing to the dataDownloadEnds event</span>
+$find(<span class="str">"asBehavior"</span>).add_dataDownloadEnds(&lt;functionName&gt;);
+<span class="rem">//Subscribing to the dataDownloadError event</span>
+$find(<span class="str">"asBehavior"</span>).add_dataDownloadError(dwError);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="rem">//The dataReady Event handler</span>
+<span class="kwrd">function</span> dataReadyHandler(sender,eventArgs) {
+   alert(<span class="str">"The Data returned is :: "</span>+eventArgs.get_data());
+}</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="rem">//The dataDownloadError Event handler</span>
+<span class="kwrd">function</span> dwError(sender,eventArgs) {
+    Sys.Debug.trace(<span class="str">"error Code ::"</span>+eventArgs.get_error().ErrorCode);
+    Sys.Debug.trace(<span class="str">"error Message ::"</span>+eventArgs.get_error().ErrorMessage);
+}</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong><font size="3">Attributes Supported by the Extender</font></strong></pre>
+<table cellspacing="0" cellpadding="2" width="852" border="0">
+<tbody>
+<tr>
+<td valign="top" width="150"><strong><font size="2">Attribute Name</font></strong></td>
+<td valign="top" width="457"><strong><font size="2">Description</font></strong></td>
+<td valign="top" width="157"><strong><font size="2">Usage</font></strong></td>
+<td valign="top" width="70"><font size="2">Default</font></td>
+</tr>
+<tr>
+<td valign="top" width="151"><font size="2">PageSize</font></td>
+<td valign="top" width="457"><font size="2">The Number of Records to show in one page</font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="74"><font size="2">5</font></td>
+</tr>
+<tr>
+<td valign="top" width="151"><font size="2">StartPageIndex</font></td>
+<td valign="top" width="457"><font size="2">The Initial page of Data returned</font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="78"><font size="2">0</font></td>
+</tr>
+<tr>
+<td valign="top" width="152"><font size="2">Query</font></td>
+<td valign="top" width="457"><font size="2">The Actual Astoria Query to return Data to the Client </font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="81"><font size="2">None</font></td>
+</tr>
+<tr>
+<td valign="top" width="152"><font size="2">ExpandRecord</font></td>
+<td valign="top" width="457"><font size="2">The Sub-record which has to also expanded along with the parent Rows.</font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="84"><font size="2">None</font></td>
+</tr>
+<tr>
+<td valign="top" width="152"><font size="2">DatabaseURI</font></td>
+<td valign="top" width="457"><font size="2">The Astoria URI to reach the Database </font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="86"><font size="2">None</font></td>
+</tr>
+<tr>
+<td valign="top" width="152"><font size="2">DataFormat</font></td>
+<td valign="top" width="457"><font size="2">The Format in which the Client Requires data : json/xml/rdf</font></td>
+<td valign="top" width="157"><font size="2">See Example below</font></td>
+<td valign="top" width="89"><font size="2">json</font></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage Examples</strong></p>
+<pre class="csharpcode">$find(<span class="str">"asBehavior"</span>).get_currentPageIndex();<br />$find(<span class="str">"asBehavior"</span>).set_currentPageIndex(2);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="rem">//Retrieve the Table 'Categories' from the 'NorthWind' Database</span>
+$find(<span class="str">"asBehavior"</span>).set_dbURI(<span class="str">"http://astoria.sandbox.live.com/northwind/northwind.rse"</span>);
+$find(<span class="str">"asBehavior"</span>).set_query(<span class="str">"/Categories"</span>);</pre>
+<pre class="csharpcode">$find(<span class="str">"asBehavior"</span>).set_dataFormat(<span class="str">"json"</span>);
+$find(<span class="str">"asBehavior"</span>).set_pageSize(10);
+</pre>
+<pre class="csharpcode"><strong><font face="Trebuchet MS">Methods Supported by the Extender</font></strong></pre>
+<table cellspacing="0" cellpadding="2" width="814" border="0">
+<tbody>
+<tr>
+<td valign="top" width="117"><strong><font size="2">Method Name</font></strong></td>
+<td valign="top" width="518"><strong><font size="2">Description</font></strong></td>
+<td valign="top" width="174"><strong><font size="2">Usage</font></strong></td>
+</tr>
+<tr>
+<td valign="top" width="119"><font size="2">DataBind</font></td>
+<td valign="top" width="518"><font size="2">Does what it says : it Downloads the data based on the parameters already specified</font></td>
+<td valign="top" width="174"><font size="2">See Example Below</font></td>
+</tr>
+</tbody>
+</table>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong>Usage&nbsp; Examples</strong></p>
+<blockquote>
+<p><strong>Bind the data to the client :</strong></p>
+<pre class="csharpcode">$find(<span class="str">"asBehavior"</span>).DataBind()</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong>Move to a Specific page of data :</strong></p>
+<pre class="csharpcode"><span class="rem">//Move to the 3rd page</span>
+$find(<span class="str">"asBehavior"</span>).set_currentPageIndex( 2 );
+$find(<span class="str">"asBehavior"</span>).DataBind();</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong>Move to the Next page</strong></p>
+<pre class="csharpcode">$find(<span class="str">"asBehavior"</span>).set_currentPageIndex( <br />               $find(<span class="str">"asBehavior"</span>).get_currentPageIndex() + 1  <br />               );
+$find(<span class="str">"asBehavior"</span>).DataBind();</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><strong>Move to the Previous page</strong></p>
+<pre class="csharpcode">$find(<span class="str">"asBehavior"</span>).set_currentPageIndex( <br />                   $find(<span class="str">"asBehavior"</span>).get_currentPageIndex() - 1  <br />                    );
+$find(<span class="str">"asBehavior"</span>).DataBind();<style type="text/css">.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+</style></pre>
+</blockquote>
+<blockquote></blockquote>
+<pre class="csharpcode"><strong><font size="3">Markup Way of doing the above </font></strong></pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Raj:AstoriaDSExtender</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="asbehaviorPnl"</span>
+<span class="attr">BehaviorID</span><span class="kwrd">="asBehavior"</span>
+<span class="attr">TargetControlID</span><span class="kwrd">="btnAstoria"</span>
+<span class="attr">DatabaseURI</span><span class="kwrd">="http://astoria.sandbox.live.com/northwind/northwind.rse"</span>
+<span class="attr">DataFormat</span><span class="kwrd">="json"</span> <span class="attr">StartPageIndex</span><span class="kwrd">="0"</span> <span class="attr">PageSize</span><span class="kwrd">="1"</span>
+<span class="attr">Query</span><span class="kwrd">="/Categories"</span> <span class="attr">ExpandRecord</span><span class="kwrd">="Products"</span>
+<span class="attr">OnClientDataDownloadError</span><span class="kwrd">="dwError"</span>
+<span class="attr">OnClientDataReady</span><span class="kwrd">="endDownload"</span>
+<span class="attr">ErrorPanelId</span><span class="kwrd">="divContainsErrorInfo"</span> <span class="kwrd">/&gt;</span></pre>
+<pre class="csharpcode"><strong><font size="3">Setting up your project to use the Astoria Extender</font><br /></strong><strong>Web.Config :<br /></strong><font face="Tre">1. Register the Handler for the Extender<br /></font><font face="Tre">Add the Below line to the &lt;httpHandlers&gt; Section of your web.config.<br /></font><span class="kwrd">&lt;</span><span class="html">add</span> <span class="attr">path</span><span class="kwrd">="*.astoria"</span> <span class="attr">verb</span><span class="kwrd">="*"</span> <span class="attr">type</span><span class="kwrd">="AstoriaExtenders.AstoriaHandler"</span><span class="kwrd">/&gt;</span></pre>
+<pre class="csharpcode">2. The Tag Prefix for the Extenders<br />Add this line to the &lt;controls&gt; Section of the &lt;Pages&gt; Section in web.config<br /><span class="kwrd">&lt;</span><span class="html">add</span> <span class="attr">tagPrefix</span><span class="kwrd">="Raj"</span> <span class="attr">namespace</span><span class="kwrd">="AstoriaExtenders"</span> <span class="attr">assembly</span><span class="kwrd">="AstoriaExtenders"</span><span class="kwrd">/&gt;</span></pre>
+<pre class="csharpcode">3. Set up the proxy so that the Web Server can talk to the Astoria Servers.<br /><span class="kwrd">&lt;</span><span class="html">system.net</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">defaultProxy</span><span class="kwrd">&gt;</span>
+      <span class="kwrd">&lt;</span><span class="html">proxy</span> <span class="attr">usesystemdefault</span><span class="kwrd">="False"</span> <span class="attr">proxyaddress</span><span class="kwrd">=<a href="http://proxyServerName">http://proxyServerName</a></span> <span class="attr">bypassonlocal</span><span class="kwrd">="True"</span><span class="kwrd">/&gt;</span>
+    <span class="kwrd">&lt;/</span><span class="html">defaultProxy</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">system.net</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ADO.NET Data Services Silverlight Project Error : System.IO.FileNotFoundException – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Imagine this , you just downloaded the Astoria V1.5 CTP1 and are happily chugging along and decide to make a Silverlight Project    that uses the latest Silverlight client library to make some cool app.     You open an existing Silverlight app&#160; /create a new Silverlight app ,     and generate the client types by running “Add Service Reference” from Visual Studio.     and write some code in the app and hit F5 to run the app .     Now , Instead of seeing the poetic beauty that is a Silverlight app built with Astoria , you see this : 
+ 
+The Exception message is : 
+System.IO.FileNotFoundException occurred    &#160; Message=&quot;Could not load file or assembly 'Microsoft.Data.Services.Client, Version=2.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies.     &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; The system cannot find the file specified.&quot;     &#160; StackTrace:     &#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.Page..ctor()     &#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.App.Application_Startup(Object sender, StartupEventArgs e)     &#160; InnerException: 
+&#160;What just happened ?
+
+When the tools which generate the client code for an Astoria Service for Silverlight applications ran , they added a reference to the new client dll,    Microsoft.Data.Services.Client.dll with “Copy Local” set to false.
+ 
+ If your code looks like this,
+public Page(){
+InitializeComponent();
+nwServiceReference.BlogServiceProvider prov =
+                new SilverlightProject1.nwServiceReference.BlogServiceProvider(new Uri(&quot;http://ServiceEndPoint&quot;));
+}
+
+When the JIT compiler compiles your Page() constructor method, it scans the method, sees that it references a type named BlogServiceProvider , and attempts to load Microsoft.Data.Services.Client.dll so that the reference can be resolved.
+Now , Since we set Copy Local to false , the Client DLL is not copied into the XAP file ,and the Silverlight CLR cannot find the file , it throws the above exception.
+We can verify by opening the xap file in winrar or some other archiving utility.
+ 
+Resolution :
+In your Silverlight project, for the reference to “'Microsoft.Data.Services.Client.dll” ,&#160; Set “Copy Local” to “True” and rebuild your Silverlight XAP.
+What about “Update Service Reference”?
+    Same issue , follow same resolution.
+When will this be fixed?
+    We are tracking this issue and will release a fix in a future release of ADO.NET Data Services v1.5 
+" />
+    <meta property="og:description" content="Imagine this , you just downloaded the Astoria V1.5 CTP1 and are happily chugging along and decide to make a Silverlight Project    that uses the latest Silverlight client library to make some cool app.     You open an existing Silverlight app&#160; /create a new Silverlight app ,     and generate the client types by running “Add Service Reference” from Visual Studio.     and write some code in the app and hit F5 to run the app .     Now , Instead of seeing the poetic beauty that is a Silverlight app built with Astoria , you see this : 
+ 
+The Exception message is : 
+System.IO.FileNotFoundException occurred    &#160; Message=&quot;Could not load file or assembly 'Microsoft.Data.Services.Client, Version=2.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies.     &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; The system cannot find the file specified.&quot;     &#160; StackTrace:     &#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.Page..ctor()     &#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.App.Application_Startup(Object sender, StartupEventArgs e)     &#160; InnerException: 
+&#160;What just happened ?
+
+When the tools which generate the client code for an Astoria Service for Silverlight applications ran , they added a reference to the new client dll,    Microsoft.Data.Services.Client.dll with “Copy Local” set to false.
+ 
+ If your code looks like this,
+public Page(){
+InitializeComponent();
+nwServiceReference.BlogServiceProvider prov =
+                new SilverlightProject1.nwServiceReference.BlogServiceProvider(new Uri(&quot;http://ServiceEndPoint&quot;));
+}
+
+When the JIT compiler compiles your Page() constructor method, it scans the method, sees that it references a type named BlogServiceProvider , and attempts to load Microsoft.Data.Services.Client.dll so that the reference can be resolved.
+Now , Since we set Copy Local to false , the Client DLL is not copied into the XAP file ,and the Silverlight CLR cannot find the file , it throws the above exception.
+We can verify by opening the xap file in winrar or some other archiving utility.
+ 
+Resolution :
+In your Silverlight project, for the reference to “'Microsoft.Data.Services.Client.dll” ,&#160; Set “Copy Local” to “True” and rebuild your Silverlight XAP.
+What about “Update Service Reference”?
+    Same issue , follow same resolution.
+When will this be fixed?
+    We are tracking this issue and will release a fix in a future release of ADO.NET Data Services v1.5 
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="ADO.NET Data Services Silverlight Project Error : System.IO.FileNotFoundException" />
+    <meta property="twitter:title" content="ADO.NET Data Services Silverlight Project Error : System.IO.FileNotFoundException" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>ADO.NET Data Services Silverlight Project Error : System.IO.FileNotFoundException</h1>
+
+  <div class="entry">
+    <p>Imagine this , you just downloaded the Astoria V1.5 CTP1 and are happily chugging along and decide to make a Silverlight Project    <br />that uses the latest Silverlight client library to make some cool app.     <br />You open an existing Silverlight app&#160; /create a new Silverlight app ,     <br />and generate the client types by running “Add Service Reference” from Visual Studio.     <br />and write some code in the app and hit F5 to run the app .     <br />Now , Instead of seeing the poetic beauty that is a Silverlight app built with Astoria , you see this : </p></p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Unhandled_Exception.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Unhandled_Exception.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="M_D_S_C_Unhandled_Exception" border="0" alt="M_D_S_C_Unhandled_Exception" src="/assets/M_D_S_C_Unhandled_Exception_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Unhandled_Exception_thumb.png" width="439" height="484" /></a> </p>
+<p>The Exception message is : </p>
+<p>System.IO.FileNotFoundException occurred    <br />&#160; Message=&quot;Could not load file or assembly 'Microsoft.Data.Services.Client, Version=2.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies.     <br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; The system cannot find the file specified.&quot;     <br />&#160; StackTrace:     <br />&#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.Page..ctor()     <br />&#160;&#160;&#160;&#160;&#160;&#160; at SilverlightProject1.App.Application_Startup(Object sender, StartupEventArgs e)     <br />&#160; InnerException: </p>
+<p>&#160;<strong>What just happened ?</strong></p>
+<p><strong></strong></p>
+<p>When the tools which generate the client code for an Astoria Service for Silverlight applications ran , they added a reference to the new client dll,    <br />Microsoft.Data.Services.Client.dll with “Copy Local” set to false.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Silverlight_Reference_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Silverlight_Reference_1.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="M_D_S_C_Silverlight_Reference" border="0" alt="M_D_S_C_Silverlight_Reference" src="/assets/M_D_S_C_Silverlight_Reference_thumb_1.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/M_D_S_C_Silverlight_Reference_thumb_1.png" width="276" height="484" /></a> </p>
+<p> If your code looks like this,
+<pre class="code"><span style="color: blue">public </span>Page(){
+InitializeComponent();
+nwServiceReference.<span style="color: #2b91af">BlogServiceProvider </span>prov =
+                <span style="color: blue">new </span>SilverlightProject1.nwServiceReference.<span style="color: #2b91af">BlogServiceProvider</span>(<span style="color: blue">new </span><span style="color: #2b91af">Uri</span>(<span style="color: #a31515">&quot;http://ServiceEndPoint&quot;</span>));
+}</pre>
+<p><a href="http://11011.net/software/vspaste"></a><a href="http://11011.net/software/vspaste"></a></p>
+<p>When the JIT compiler compiles your Page() constructor method, it scans the method, sees that it references a type named <span style="color: #2b91af">BlogServiceProvider </span>, and attempts to load Microsoft.Data.Services.Client.dll so that the reference can be resolved.</p>
+<p>Now , Since we set Copy Local to false , the Client DLL is not copied into the XAP file ,and the Silverlight CLR cannot find the file , it throws the above exception.</p>
+<p>We can verify by opening the xap file in winrar or some other archiving utility.</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/Xap_No_CLient_Library.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/Xap_No_CLient_Library.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px" title="Xap_No_CLient_Library" border="0" alt="Xap_No_CLient_Library" src="/assets/Xap_No_CLient_Library_thumb.png" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/cf33f5160cc9_FD05/Xap_No_CLient_Library_thumb.png" width="644" height="327" /></a> </p>
+<p><strong>Resolution :</strong></p>
+<p>In your Silverlight project, for the reference to “'Microsoft.Data.Services.Client.dll” ,&#160; Set “Copy Local” to “True” and rebuild your Silverlight XAP.</p>
+<p><strong>What about “Update Service Reference”?<br />
+    <br /></strong>Same issue , follow same resolution.</p>
+<p><strong>When will this be fixed?<br />
+    <br /></strong>We are tracking this issue and will release a fix in a future release of ADO.NET Data Services v1.5 </p>
+
+  </div>
+
+  <div class="date">
+    Written on March 24, 2009
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

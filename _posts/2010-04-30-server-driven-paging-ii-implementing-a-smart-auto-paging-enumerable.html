@@ -1,0 +1,173 @@
+---
+layout: post
+title: Server Driven Paging II , Implementing a Smart Auto-Paging Enumerable
+date: 2010-04-30 18:24:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- DataServiceContext
+- Demo
+- Documentation
+- Server Driven Paging
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2010/05/01/server-driven-paging-ii-implementing-an-auto-paging-collection.aspx
+  orig_site_id: '7524'
+  orig_post_id: '10005591'
+  orig_parent_id: '10005591'
+  orig_thread_id: '714719'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2010/04/30/server-driven-paging-ii-implementing-a-smart-auto-paging-enumerable.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Server Driven Paging II , Implementing a Smart Auto-Paging Enumerable" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/30/server-driven-paging-ii-implementing-a-smart-auto-paging-enumerable/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Download Sample Application What is this ? How do I use this in my applications ? Cool, I am also interested in learning how this was built 2. What is this ? &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An “Auto-paging Enumerable” is an IEnumerable implementation that allows the application to &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; automatically fetch the next page of results if the..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Server Driven Paging II , Implementing a Smart Auto-Paging Enumerable" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/30/server-driven-paging-ii-implementing-a-smart-auto-paging-enumerable/" />
+    <meta name="twitter:description" content="Download Sample Application What is this ? How do I use this in my applications ? Cool, I am also interested in learning how this was built 2. What is this ? &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An “Auto-paging Enumerable” is an IEnumerable implementation that allows the application to &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; automatically fetch the next page of results if the..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<ol>
+<li><a href="http://cid-925c2d2bb2d03c6b.skydrive.live.com/self.aspx/Blog%20Demos/ServerDrivenPagingServer.zip" mce_href="http://cid-925c2d2bb2d03c6b.skydrive.live.com/self.aspx/Blog%20Demos/ServerDrivenPagingServer.zip">Download Sample Application</a> </li>
+<li><a href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#Definition" mce_href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#Definition">What is this ?</a> </li>
+<li><a href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#UseInApplications" mce_href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#UseInApplications">How do I use this in my applications ?</a> </li>
+<li><a href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#ServerPagedEnumerableCreation" mce_href="http://blogs.msdn.com/controlpanel/blogs/posteditor.aspx?SelectedNavItem=Posts&amp;sectionid=7524&amp;postid=10005591#ServerPagedEnumerableCreation">Cool, I am also interested in learning how this was built</a> </li>
+</ol>
+<h4><a title="Definition" name="Definition"></a>2. What is this ? </h4>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; An “Auto-paging Enumerable” is an IEnumerable implementation that allows the application to <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; automatically fetch the next page of results if the current page of results is enumerated and the application wants more. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; By “Smart”, we mean that we only load the next page when the current page runs out of results.We don’t load a page into memory&nbsp; <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unless the&nbsp; application needs it. </p>
+<h4><a title="UseInApplications" name="UseInApplications"></a>3.How do I use this in my applications ? </h4>
+<p><a title="UseInApplications" name="UseInApplications"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Add the “ServerPagedQueryExtensions.cs” file into your application and use one of the following patterns. </p>
+<ol>
+<li>Binding to User Interface controls
+<p>XAML Code for WPF Listbox: 
+<pre class="code"><span style="COLOR: blue">&lt;</span><span style="COLOR: #a31515">ListBox </span><span style="COLOR: red">DisplayMemberPath</span><span style="COLOR: blue">="Name" </span><span style="COLOR: red">Name</span><span style="COLOR: blue">="lbCustomers" /&gt;
+</span></pre>
+<p>C# code to bind the collection to the listbox: 
+<pre class="code"><span style="COLOR: #2b91af">CLRProvider </span>Context = <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">CLRProvider</span>(<span style="COLOR: blue">new </span><span style="COLOR: #2b91af">Uri</span>(<span style="COLOR: #a31515">"http://localhost:60901/DataService.svc/"</span>));
+<span style="COLOR: green">//Extension method on DataServiceQuery&lt;T&gt;
+</span><span style="COLOR: blue">var </span>pagedCustomerRootQuery = (<span style="COLOR: blue">from </span>c <span style="COLOR: blue">in </span>Context.Customers
+                                <span style="COLOR: blue">select new </span><span style="COLOR: #2b91af">Customer</span>()
+                                {
+                                    Name = c.Name
+                                }) <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">DataServiceQuery</span>&lt;<span style="COLOR: #2b91af">Customer</span>&gt;;
+lbCustomers.ItemsSource = pagedCustomerRootQuery.Page(Context, maxItemsCount);</pre>
+<p></li>
+<li>With anonymous types in projections 
+<pre class="code"><span style="COLOR: #2b91af">CLRProvider </span>Context = <span style="COLOR: blue">new </span><span style="COLOR: #2b91af">CLRProvider</span>(<span style="COLOR: blue">new </span><span style="COLOR: #2b91af">Uri</span>(<span style="COLOR: #a31515">"http://localhost:60901/DataService.svc/"</span>));
+
+<span style="COLOR: blue">short </span>maxItemsCount = 6;
+<span style="COLOR: green">//Factory method
+</span><span style="COLOR: blue">var </span>customerPaged = <span style="COLOR: #2b91af">ServerPagedEnumerableFactory</span>.Create(
+    <span style="COLOR: blue">from </span>c <span style="COLOR: blue">in </span>Context.Customers
+    <span style="COLOR: blue">select new
+    </span>{
+        Name = c.Name
+    }, Context, maxItemsCount);</pre>
+</li>
+<li>In non-user interface backend code 
+<pre class="code"><span style="COLOR: blue">foreach </span>(<span style="COLOR: #2b91af">Customer </span>instance <span style="COLOR: blue">in </span>Context.Customers.Page(Context, maxItemsCount))
+{
+    <span style="COLOR: green">//Do something with instance variable here
+</span>}</pre>
+</li>
+</ol>
+<p></p>
+<h4>4. <a title="ServerPagedEnumerableCreation" name="ServerPagedEnumerableCreation"></a>How this was built </h4>
+<p>At the root of this implementation is the <span style="COLOR: #2b91af">IPagedEnumerator&lt;T&gt;</span> interface which provides a contract for an IEnumerator&lt;T&gt; to signal that it has run out of elements <br />in the page.</p>
+<pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">Provides support for on-demand loading of the next page of results as soon as the current page of results is exhausted
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;</span><span style="COLOR: green">The type of the enumeration</span><span style="COLOR: gray">&lt;/typeparam&gt;
+</span><span style="COLOR: blue">public interface </span><span style="COLOR: #2b91af">IPagedEnumerator</span>&lt;TEntity&gt; : <span style="COLOR: #2b91af">IEnumerator</span>&lt;TEntity&gt;
+{
+    <span style="COLOR: gray">/// &lt;summary&gt;
+    /// </span><span style="COLOR: green">Provides access to the complete set of results
+    </span><span style="COLOR: gray">/// &lt;/summary&gt;
+    </span><span style="COLOR: #2b91af">List</span>&lt;TEntity&gt; CompleteSet { <span style="COLOR: blue">get</span>; }
+    <span style="COLOR: gray">/// &lt;summary&gt;
+    /// </span><span style="COLOR: green">Signals the enumerator to move to the next page of results
+    </span><span style="COLOR: gray">/// &lt;/summary&gt;
+    </span><span style="COLOR: #2b91af">Func</span>&lt;<span style="COLOR: #2b91af">IEnumerable</span>&lt;TEntity&gt;&gt; GetNextPage { <span style="COLOR: blue">get</span>; <span style="COLOR: blue">set</span>; }
+}</pre>
+<p>The <span style="COLOR: #2b91af">ServerPagedEnumerator</span>&lt;TEntity&gt; type implements this interface and calls the GetNextPage method when it has run out of elements in the current page.</p>
+<pre class="code"><span style="COLOR: blue">public bool </span>MoveNext()
+{
+    currentIndex++;
+    <span style="COLOR: blue">if </span>(SourceList.Count &lt;= currentIndex &amp;&amp; GetNextPage != <span style="COLOR: blue">null</span>)
+    {
+        SourceList.AddRange(GetNextPage());
+    }
+    <span style="COLOR: blue">return </span>SourceList.Count &gt; currentIndex;
+}</pre>
+<pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">This class is an IEnumerable&amp;lt;</span><span style="COLOR: gray">&lt;typeparamref name="TEntity"/&gt;</span><span style="COLOR: green">&amp;gt; which signals when the current page of results have been enumerated.
+</span><span style="COLOR: gray">/// </span><span style="COLOR: green">Developers can hook into the PageCompleted handler to return the next page of results
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;</span><span style="COLOR: green">The type of the collection</span><span style="COLOR: gray">&lt;/typeparam&gt;
+</span><span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">ServerPagedEnumerator</span>&lt;TEntity&gt; : <span style="COLOR: #2b91af">IPagedEnumerator</span>&lt;TEntity&gt; {</pre>
+<p>The way we inject the ServerPagedEnumerator<tentity> into the foreach is by implementing an IEnumerable<tentity> that fetches the next page of results, when GetNextPage is called, by using the DataServiceContext and continuation tokens. <br />You can replace this with your implementation of paging which uses client-driven paging or some other custom scheme. </p>
+<p></tentity></tentity></p>
+<pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">This class automatically fetches the next page in an Entity Set once the current page is enumerated completely
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;</span><span style="COLOR: green">The entity type of the request</span><span style="COLOR: gray">&lt;/typeparam&gt;
+</span><span style="COLOR: blue">public class </span><span style="COLOR: #2b91af">ServerPagedEnumerable</span>&lt;TEntity&gt; : <span style="COLOR: #2b91af">IEnumerable</span>&lt;TEntity&gt;
+{
+  <pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">The Enumerator which calls a function whenever the current page of results are exhausted
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+</span><span style="COLOR: #2b91af">ServerPagedEnumerator</span>&lt;TEntity&gt; ServerPagedEnumerator;
+<span style="COLOR: green"><br /></span></pre>
+<pre class="code"><span style="COLOR: green">//Hook up to listen to the GetNextPage call so that we can get the next page when the current page of results are enumerated.
+</span>ServerPagedEnumerator.GetNextPage = GetNextPage;</pre>
+<pre class="code"><span style="COLOR: blue">public </span><span style="COLOR: #2b91af">IEnumerator</span>&lt;TEntity&gt; GetEnumerator()
+{
+    <span style="COLOR: blue">return </span>ServerPagedEnumerator;
+}</pre>
+<pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">Gets the next page in the Entity Set if the Continuation token points to a valid page.If
+</span><span style="COLOR: gray">/// </span><span style="COLOR: green">not, returns an empty collection
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+/// &lt;returns&gt;</span><span style="COLOR: green">The next page of results</span><span style="COLOR: gray">&lt;/returns&gt;
+</span><span style="COLOR: blue">private </span><span style="COLOR: #2b91af">IEnumerable</span>&lt;TEntity&gt; GetNextPage()
+{
+    <span style="COLOR: green">//If the continuation token is not null, we get the next page of results
+    </span><span style="COLOR: blue">if </span>(continuationToken != <span style="COLOR: blue">null</span>)
+    {
+        <span style="COLOR: blue">return </span>ExecuteQuery(continuationToken);
+    }
+    <span style="COLOR: blue">return new </span><span style="COLOR: #2b91af">List</span>&lt;TEntity&gt;();
+}</pre>
+<pre class="code"><span style="COLOR: gray">/// &lt;summary&gt;
+/// </span><span style="COLOR: green">Follows the DataServiceQueryContinuation&amp;lt;</span><span style="COLOR: gray">&lt;typeparamref name="TEntity"/&gt;</span><span style="COLOR: green">&amp;gt; and returns the page of results while updating the continuation token.
+</span><span style="COLOR: gray">/// &lt;/summary&gt;
+/// &lt;param name="QueryContinuation"&gt;</span><span style="COLOR: green">The Continuation token which represents the next page of the Entity Set</span><span style="COLOR: gray">&lt;/param&gt;
+/// &lt;returns&gt;</span><span style="COLOR: green">The results of the query</span><span style="COLOR: gray">&lt;/returns&gt;
+</span><span style="COLOR: blue">private </span><span style="COLOR: #2b91af">IEnumerable</span>&lt;TEntity&gt; ExecuteQuery(<span style="COLOR: #2b91af">DataServiceQueryContinuation</span>&lt;TEntity&gt; QueryContinuation)
+{
+    <span style="COLOR: #2b91af">QueryOperationResponse</span>&lt;TEntity&gt; queryOperationResponse = contextInstance.Execute(QueryContinuation) <span style="COLOR: blue">as </span><span style="COLOR: #2b91af">QueryOperationResponse</span>&lt;TEntity&gt;;
+    <span style="COLOR: #2b91af">List</span>&lt;TEntity&gt; responseList = queryOperationResponse.ToList();
+    continuationToken = queryOperationResponse.GetContinuation();
+    <span style="COLOR: blue">return </span>responseList;
+}</pre>
+<p>In the end, we tie everything together by creating an extension method on DataServiceQuery&lt;T&gt; so that we can use the .Page() extension method to provide an easy-to-use API. </p>
+<pre class="code"><span style="COLOR: blue">public static </span><span style="COLOR: #2b91af">IEnumerable</span>&lt;TEntity&gt; Page&lt;TEntity&gt;(<span style="COLOR: blue">this </span><span style="COLOR: #2b91af">DataServiceQuery</span>&lt;TEntity&gt; query, <span style="COLOR: #2b91af">DataServiceContext </span>ContextInstance)
+{
+    <span style="COLOR: blue">return new </span><span style="COLOR: #2b91af">ServerPagedEnumerable</span>&lt;TEntity&gt;(query, ContextInstance);
+}</pre>

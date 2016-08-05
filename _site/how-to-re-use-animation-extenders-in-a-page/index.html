@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>How to : Re-use Animation Extenders in a page – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Download Sample Code :&nbsp;
+while working with the AnimationExtender on an ASPX Page ,One would run into a scenario wherein you would need to associate the same animation with multiple&nbsp; Elements on the page.
+Some Examples are :
+
+Associate an Animation&nbsp; with the rows of a GridView.  
+Associate an Animation with probably multiple panels on the same page.
+
+Today , we will discuss how to re-use a&nbsp; single AnimationExtender in&nbsp; a few possible Scenarios.
+
+Trigger the same Animation From Different Controls  
+Modify the AnimationTarget on which you want the animation to run  
+Multiple TargetControlIDs and Multiple AnimationTargets
+
+&nbsp;
+&nbsp;a) Trigger the same Animation From Different Controls
+This section will address the scenario wherein you would have an animation which is defined to animate a specific element.
+And you would want different Elements on the Page to trigger the same animation on the element.
+Here , we would be simulating a scenario wherein one would probably want to assign Multiple TargetControlIDs to an animation.
+The TargetControlID Specifies the control that Kicks-off the animation.
+If an AnimationTarget is not Specified , then it is the control which will be animated.
+We will have the Following Elements :
+a) A button to trigger the animation : 
+ &lt;!-- The Trigger Button One--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerOne" Text="Trigger One" OnClientClick="return false;" /&gt;
+
+b) A Div/ASP:Panel which will be animated onClick of the Button 
+ &lt;!-- The Panel which will be animated--&gt;
+&lt;asp:Panel runat="server" ID="pnlAnimated" Style="position: absolute; top: 100px;
+            left: 50px; height: 200px; width: 150px; background-color: #99ccff;"&gt;
+&lt;/asp:Panel&gt;
+The Animation Markup will be as shown below :
+&lt;!-- The Markup for the animation Extender--&gt;
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+The Div pnlAnimated will resize to height and width 400 and
+
+
+back to 380 and then 400 again to provide an Easing effect .
+Let's Say that&nbsp; you need to trigger the same animation by clicking on another button&nbsp; and you would want to do this without having to create a New AnimationExtender on the same page.
+&lt;!-- The Trigger Button two--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerTwo" Text="Trigger Two" /&gt;
+
+&nbsp;
+a.1) Client Side :
+
+Step 1 : Assign a BehaviorID to the AnimationExtender if not already present.
+BehaviorID ="animateMe"
+Step 2: Assign an OnClientClick function to the btnAnimateTriggerTwo button .
+OnClientClick="ChangeAnimationTarget();return false;"
+Step 3: The Function ChangeAnimationTarget() which will trigger the animation to be played.
+&lt;script language ="javascript" type ="text/javascript"&gt;
+   function ChangeAnimationTarget() {
+       $find("animateMe").get_OnClickBehavior().play();
+    }
+ &lt;/script&gt;
+This will cause the animation already defined on the TargetControl of btnAnimateTriggerOne to be played onclick of the 
+button btnAnimateTriggerTwo.
+In a similar way you can add any number of triggers to the same AnimationExtender.
+
+
+
+
+a.2) Server Side :
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Put the Above Controls inside the ContentTemplate of an UpdatePanel .
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the Server-Side you can switch the TargetControl by running the following code.
+private void ChangeAnimationTarget()
+    {
+        AnimationExtender1.TargetControlID = btnAnimateTriggerTwo.ID;
+        btnAnimateTriggerTwo.OnClientClick = "return false;";
+    }
+  Step 3: Now , the TargetControlId has changed and upon clicking on the button btnAnimateTriggerTwo, the animation will run.
+  In this case , you would have to switch the AnimationTarget BEFORE you want the animation to run.
+
+
+&nbsp;
+b)
+Modify the AnimationTarget on which you want the animation to run 
+let's consider a scenario in which you would want the same Animation to run on 2 or more different Elements.
+For the sake of simplicity , lets consider that you would want to run the above ResizeAnimation on 
+another asp:Panel by the name of pnlAnimatedToo  and you want to do this without having to create another AnimationExtender on the same page.
+
+b.1) Client Side :
+Step 1 : You will have to change the markup of the AnimationExtender to look like this :
+ Change the AnimationTarget Attribute to be AnimationTargetScript ="getAnimationTarget();".
+This will cause the function getAnimationTarget() to be called whenever the AnimationExtender runs.
+and getAnimationTarget() will return the ID of the Control that should be animated.
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+
+Step 2 : Assign the Following function as OnClientClick handler of the Button btnAnimateTriggerOne.
+OnClientClick="setAnimationTarget();return false;"
+The Function setAnimationTarget sets the ID of the AnimationTarget for the AnimationExtender.
+Step 3: The Definition of the functions getAnimationTarget() and setAnimationTarget().
+&lt;script language ="javascript" type ="text/javascript"&gt;
+ var currentAnimationTarget ="pnlAnimated";
+
+function getAnimationTarget() {
+    return currentAnimationTarget;
+}
+function setAnimationTarget() {
+  currentAnimationTarget = currentAnimationTarget === "pnlAnimated" ? "pnlAnimatedToo":"pnlAnimated";
+}
+&lt;/script&gt;
+
+In this example, the animationTarget will alternate between pnlAnimated and pnlAnimatedToo.
+You can implement your own logic into the above functions for your implementation.
+
+&nbsp;
+c) Combination of a) and b) , i.e you would want to use the same animationExtender to trigger the same animations on different elements onClick of two different Buttons.
+Multiple TargetControlIDs and Multiple AnimationTargets.
+For instance , in the above example , if you would want to 
+Animate pnlAnimated onClick of btnAnimateTriggerOne
+and 
+Animate pnlAnimatedToo onClick of btnAnimateTriggerTwo.
+And you would want to do all of this Without creating a new AnimationExtender on the same page.
+Step 1: Assign the OnClientClick of the Two buttons to be as below :
+&lt;!-- The Trigger Button One--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerOne" Text="Trigger One"
+OnClientClick="setAnimationTargetValue('pnlAnimated');return false;" /&gt;
+
+&lt;!-- The Trigger Button two--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerTwo" Text="Trigger Two"
+OnClientClick="setAnimationTargetValue('pnlAnimatedToo');SwitchTargetControl();return false;" /&gt;
+
+Step 2: Change the Markup of the AnimationExtender to replace AnimationTarget to be AnimationTargetScript.
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+Step 3: The Definition for the JavaScript Functions.
+&lt;script language ="javascript" type ="text/javascript"&gt;
+            function SwitchTargetControl() {
+                $find("animateMe").get_OnClickBehavior().play();
+            }
+
+            var currentAnimationTarget ="pnlAnimated";
+
+            function getAnimationTarget() {
+                return currentAnimationTarget;
+            }
+
+            function setAnimationTargetValue( value ) {
+                currentAnimationTarget  = value;
+            }
+&lt;/script&gt;
+&nbsp;
+
+
+
+
+" />
+    <meta property="og:description" content="Download Sample Code :&nbsp;
+while working with the AnimationExtender on an ASPX Page ,One would run into a scenario wherein you would need to associate the same animation with multiple&nbsp; Elements on the page.
+Some Examples are :
+
+Associate an Animation&nbsp; with the rows of a GridView.  
+Associate an Animation with probably multiple panels on the same page.
+
+Today , we will discuss how to re-use a&nbsp; single AnimationExtender in&nbsp; a few possible Scenarios.
+
+Trigger the same Animation From Different Controls  
+Modify the AnimationTarget on which you want the animation to run  
+Multiple TargetControlIDs and Multiple AnimationTargets
+
+&nbsp;
+&nbsp;a) Trigger the same Animation From Different Controls
+This section will address the scenario wherein you would have an animation which is defined to animate a specific element.
+And you would want different Elements on the Page to trigger the same animation on the element.
+Here , we would be simulating a scenario wherein one would probably want to assign Multiple TargetControlIDs to an animation.
+The TargetControlID Specifies the control that Kicks-off the animation.
+If an AnimationTarget is not Specified , then it is the control which will be animated.
+We will have the Following Elements :
+a) A button to trigger the animation : 
+ &lt;!-- The Trigger Button One--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerOne" Text="Trigger One" OnClientClick="return false;" /&gt;
+
+b) A Div/ASP:Panel which will be animated onClick of the Button 
+ &lt;!-- The Panel which will be animated--&gt;
+&lt;asp:Panel runat="server" ID="pnlAnimated" Style="position: absolute; top: 100px;
+            left: 50px; height: 200px; width: 150px; background-color: #99ccff;"&gt;
+&lt;/asp:Panel&gt;
+The Animation Markup will be as shown below :
+&lt;!-- The Markup for the animation Extender--&gt;
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTarget="pnlAnimated" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+The Div pnlAnimated will resize to height and width 400 and
+
+
+back to 380 and then 400 again to provide an Easing effect .
+Let's Say that&nbsp; you need to trigger the same animation by clicking on another button&nbsp; and you would want to do this without having to create a New AnimationExtender on the same page.
+&lt;!-- The Trigger Button two--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerTwo" Text="Trigger Two" /&gt;
+
+&nbsp;
+a.1) Client Side :
+
+Step 1 : Assign a BehaviorID to the AnimationExtender if not already present.
+BehaviorID ="animateMe"
+Step 2: Assign an OnClientClick function to the btnAnimateTriggerTwo button .
+OnClientClick="ChangeAnimationTarget();return false;"
+Step 3: The Function ChangeAnimationTarget() which will trigger the animation to be played.
+&lt;script language ="javascript" type ="text/javascript"&gt;
+   function ChangeAnimationTarget() {
+       $find("animateMe").get_OnClickBehavior().play();
+    }
+ &lt;/script&gt;
+This will cause the animation already defined on the TargetControl of btnAnimateTriggerOne to be played onclick of the 
+button btnAnimateTriggerTwo.
+In a similar way you can add any number of triggers to the same AnimationExtender.
+
+
+
+
+a.2) Server Side :
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Put the Above Controls inside the ContentTemplate of an UpdatePanel .
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the Server-Side you can switch the TargetControl by running the following code.
+private void ChangeAnimationTarget()
+    {
+        AnimationExtender1.TargetControlID = btnAnimateTriggerTwo.ID;
+        btnAnimateTriggerTwo.OnClientClick = "return false;";
+    }
+  Step 3: Now , the TargetControlId has changed and upon clicking on the button btnAnimateTriggerTwo, the animation will run.
+  In this case , you would have to switch the AnimationTarget BEFORE you want the animation to run.
+
+
+&nbsp;
+b)
+Modify the AnimationTarget on which you want the animation to run 
+let's consider a scenario in which you would want the same Animation to run on 2 or more different Elements.
+For the sake of simplicity , lets consider that you would want to run the above ResizeAnimation on 
+another asp:Panel by the name of pnlAnimatedToo  and you want to do this without having to create another AnimationExtender on the same page.
+
+b.1) Client Side :
+Step 1 : You will have to change the markup of the AnimationExtender to look like this :
+ Change the AnimationTarget Attribute to be AnimationTargetScript ="getAnimationTarget();".
+This will cause the function getAnimationTarget() to be called whenever the AnimationExtender runs.
+and getAnimationTarget() will return the ID of the Control that should be animated.
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+
+Step 2 : Assign the Following function as OnClientClick handler of the Button btnAnimateTriggerOne.
+OnClientClick="setAnimationTarget();return false;"
+The Function setAnimationTarget sets the ID of the AnimationTarget for the AnimationExtender.
+Step 3: The Definition of the functions getAnimationTarget() and setAnimationTarget().
+&lt;script language ="javascript" type ="text/javascript"&gt;
+ var currentAnimationTarget ="pnlAnimated";
+
+function getAnimationTarget() {
+    return currentAnimationTarget;
+}
+function setAnimationTarget() {
+  currentAnimationTarget = currentAnimationTarget === "pnlAnimated" ? "pnlAnimatedToo":"pnlAnimated";
+}
+&lt;/script&gt;
+
+In this example, the animationTarget will alternate between pnlAnimated and pnlAnimatedToo.
+You can implement your own logic into the above functions for your implementation.
+
+&nbsp;
+c) Combination of a) and b) , i.e you would want to use the same animationExtender to trigger the same animations on different elements onClick of two different Buttons.
+Multiple TargetControlIDs and Multiple AnimationTargets.
+For instance , in the above example , if you would want to 
+Animate pnlAnimated onClick of btnAnimateTriggerOne
+and 
+Animate pnlAnimatedToo onClick of btnAnimateTriggerTwo.
+And you would want to do all of this Without creating a new AnimationExtender on the same page.
+Step 1: Assign the OnClientClick of the Two buttons to be as below :
+&lt;!-- The Trigger Button One--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerOne" Text="Trigger One"
+OnClientClick="setAnimationTargetValue('pnlAnimated');return false;" /&gt;
+
+&lt;!-- The Trigger Button two--&gt;
+&lt;asp:Button runat="server" ID="btnAnimateTriggerTwo" Text="Trigger Two"
+OnClientClick="setAnimationTargetValue('pnlAnimatedToo');SwitchTargetControl();return false;" /&gt;
+
+Step 2: Change the Markup of the AnimationExtender to replace AnimationTarget to be AnimationTargetScript.
+&lt;ajaxToolKit:AnimationExtender BehaviorID ="animateMe" ID="AnimationExtender1" runat="server" TargetControlID="btnAnimateTriggerOne"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                    &lt;Sequence&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="380" width="380" duration ="0.1" fps="45" unit="px" /&gt;
+                        &lt;ReSize AnimationTargetScript="getAnimationTarget();" height="400" width="400" duration ="0.1" fps="45" unit="px" /&gt;
+                    &lt;/Sequence&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolKit:AnimationExtender&gt;
+Step 3: The Definition for the JavaScript Functions.
+&lt;script language ="javascript" type ="text/javascript"&gt;
+            function SwitchTargetControl() {
+                $find("animateMe").get_OnClickBehavior().play();
+            }
+
+            var currentAnimationTarget ="pnlAnimated";
+
+            function getAnimationTarget() {
+                return currentAnimationTarget;
+            }
+
+            function setAnimationTargetValue( value ) {
+                currentAnimationTarget  = value;
+            }
+&lt;/script&gt;
+&nbsp;
+
+
+
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="How to : Re-use Animation Extenders in a page" />
+    <meta property="twitter:title" content="How to : Re-use Animation Extenders in a page" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>How to : Re-use Animation Extenders in a page</h1>
+
+  <div class="entry">
+    <p><a href="http://cid-925c2d2bb2d03c6b.skydrive.live.com/self.aspx/Public/ReuseAnimations.zip" target="_blank">Download Sample Code :</a>&nbsp;</p>
+<p>while working with the AnimationExtender on an ASPX Page ,One would run into a scenario wherein you would need to associate the same animation with multiple&nbsp; Elements on the page.</p>
+<p>Some Examples are :</p>
+<ol>
+<li>Associate an Animation&nbsp; with the rows of a GridView.  </li>
+<li>Associate an Animation with probably multiple panels on the same page.</li>
+</ol>
+<p>Today , we will discuss how to re-use a&nbsp; single AnimationExtender in&nbsp; a few possible Scenarios.</p>
+<ul>
+<li><a href="http://blogs.msdn.com/phaniraj/archive/2007/08/15/how-to-re-use-animation-extenders-in-a-page.aspx#SameAnimationDifferentControls">Trigger the same Animation From Different Controls</a>  </li>
+<li><a href="http://blogs.msdn.com/phaniraj/archive/2007/08/15/how-to-re-use-animation-extenders-in-a-page.aspx#modifyAnimationTarget">Modify the AnimationTarget on which you want the animation to run </a> </li>
+<li><a href="http://blogs.msdn.com/phaniraj/archive/2007/08/15/how-to-re-use-animation-extenders-in-a-page.aspx#CombinationAB">Multiple TargetControlIDs and Multiple AnimationTargets</a></li>
+</ul>
+<p>&nbsp;</p>
+<p>&nbsp;<strong><a name="SameAnimationDifferentControls">a) Trigger the same Animation From Different Controls</a></strong></p>
+<p>This section will address the scenario wherein you would have an animation which is defined to animate a specific element.</p>
+<p>And you would want different Elements on the Page to trigger the same animation on the element.</p>
+<p>Here , we would be simulating a scenario wherein one would probably want to assign <u><strong>Multiple TargetControlIDs </strong></u>to an animation.</p>
+<p>The TargetControlID Specifies the control that Kicks-off the animation.</p>
+<p>If an AnimationTarget is not Specified , then it is the control which will be animated.</p>
+<p>We will have the Following Elements :</p>
+<p>a) A button to trigger the animation : </p>
+<pre class="csharpcode"> <span class="rem">&lt;!-- The Trigger Button One--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnAnimateTriggerOne"</span> <span class="attr">Text</span><span class="kwrd">="Trigger One"</span> <span class="attr">OnClientClick</span><span class="kwrd">="return false;"</span> <span class="kwrd">/&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><span class="kwrd">b) A Div/ASP:Panel which will be animated onClick of the Button </span></pre>
+<pre class="csharpcode"> <span class="rem">&lt;!-- The Panel which will be animated--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Panel</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="pnlAnimated"</span> <span class="attr">Style</span><span class="kwrd">="position: absolute; top: 100px;
+            left: 50px; height: 200px; width: 150px; background-color: #99ccff;"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">asp:Panel</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><span class="kwrd">The Animation Markup will be as shown below :</span></pre>
+<pre class="csharpcode"><span class="kwrd"></span><span class="rem">&lt;!-- The Markup for the animation Extender--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">ajaxToolKit:AnimationExtender</span> <span class="attr">BehaviorID</span> <span class="kwrd">="animateMe"</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnAnimateTriggerOne"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTarget</span><span class="kwrd">="pnlAnimated"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTarget</span><span class="kwrd">="pnlAnimated"</span> <span class="attr">height</span><span class="kwrd">="380"</span> <span class="attr">width</span><span class="kwrd">="380"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTarget</span><span class="kwrd">="pnlAnimated"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                    <span class="kwrd">&lt;/</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<p>The Div pnlAnimated will resize to height and width 400 and</p>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>back to 380 and then 400 again to provide an Easing effect .</p>
+<p>Let's Say that&nbsp; you need to trigger the same animation by clicking on another button&nbsp; and you would want to do this without having to create a New AnimationExtender on the same page.</p>
+<pre class="csharpcode"><span class="rem">&lt;!-- The Trigger Button two--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnAnimateTriggerTwo"</span> <span class="attr">Text</span><span class="kwrd">="Trigger Two"</span> <span class="kwrd">/&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>&nbsp;</p>
+<p><strong>a.1) Client Side :</strong></p>
+<blockquote>
+<p><strong>Step 1</strong> : Assign a BehaviorID to the AnimationExtender if not already present.</p>
+<pre class="csharpcode"><span class="attr">BehaviorID</span> <span class="kwrd">="animateMe"</span></pre>
+<pre class="csharpcode"><span class="kwrd"><strong>Step 2</strong>: Assign an OnClientClick function to the btnAnimateTriggerTwo button .</span></pre>
+<pre class="csharpcode"><span class="attr">OnClientClick</span><span class="kwrd">="ChangeAnimationTarget();return false;"</span></pre>
+<pre class="csharpcode"><span class="kwrd"><strong>Step 3:</strong> The Function ChangeAnimationTarget() which will trigger the animation to be played.</span></pre>
+<pre class="csharpcode">&lt;script language =<span class="str">"javascript"</span> type =<span class="str">"text/javascript"</span>&gt;
+   <span class="kwrd">function</span> ChangeAnimationTarget() {
+       $find(<span class="str">"animateMe"</span>).get_OnClickBehavior().play();
+    }
+ &lt;/script&gt;</pre>
+<pre class="csharpcode">This will cause the animation already defined on the TargetControl of btnAnimateTriggerOne to be played onclick of the </pre>
+<pre class="csharpcode">button btnAnimateTriggerTwo.</pre>
+<pre class="csharpcode">In a similar way you can add any number of triggers to the same AnimationExtender.</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<pre class="csharpcode"><strong>a.2) Server Side :</strong></pre>
+<blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; <strong>Step 1: </strong>Put the Above Controls inside the ContentTemplate of an UpdatePanel .</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; <strong>Step 2: </strong>On the Server-Side you can switch the TargetControl by running the following code.</p>
+<pre class="csharpcode"><span class="kwrd">private</span> <span class="kwrd">void</span> ChangeAnimationTarget()
+    {
+        AnimationExtender1.TargetControlID = btnAnimateTriggerTwo.ID;
+        btnAnimateTriggerTwo.OnClientClick = <span class="str">"return false;"</span>;
+    }</pre>
+<pre class="csharpcode">  <strong>Step 3: </strong>Now , the TargetControlId has changed and upon clicking on the button btnAnimateTriggerTwo, the animation will run.</pre>
+<pre class="csharpcode">  In this case , you would have to switch the AnimationTarget BEFORE you want the animation to run.</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</blockquote>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><strong>b)
+<a name="modifyAnimationTarget">Modify the AnimationTarget on which you want the animation to run</a> </strong></pre>
+<blockquote><pre class="csharpcode">let's consider a scenario in which you would want the same Animation to run on 2 or more different Elements.</pre>
+<pre class="csharpcode">For the sake of simplicity , lets consider that you would want to run the above ResizeAnimation on </pre>
+<pre class="csharpcode">another asp:Panel by the name of <strong>pnlAnimatedToo </strong> and you want to do this without having to create another AnimationExtender on the same page.</pre>
+</blockquote>
+<pre class="csharpcode"><strong>b.1) Client Side :</strong></pre>
+<blockquote><pre class="csharpcode"><strong>Step 1 : </strong>You will have to change the markup of the AnimationExtender to look like this :</pre>
+<pre class="csharpcode"> Change the AnimationTarget Attribute to be AnimationTargetScript ="getAnimationTarget();".</pre>
+<pre class="csharpcode">This will cause the function getAnimationTarget() to be called whenever the AnimationExtender runs.</pre>
+<pre class="csharpcode">and getAnimationTarget() will return the ID of the Control that should be animated.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolKit:AnimationExtender</span> <span class="attr">BehaviorID</span> <span class="kwrd">="animateMe"</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnAnimateTriggerOne"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="380"</span> <span class="attr">width</span><span class="kwrd">="380"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                    <span class="kwrd">&lt;/</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"><strong>Step 2 : </strong>Assign the Following function as OnClientClick handler of the Button btnAnimateTriggerOne.</pre>
+<pre class="csharpcode"><span class="attr">OnClientClick</span><span class="kwrd">="setAnimationTarget();return false;"</span></pre>
+<pre class="csharpcode">The Function setAnimationTarget sets the ID of the AnimationTarget for the AnimationExtender.</pre>
+<pre class="csharpcode"><strong>Step 3: </strong>The Definition of the functions getAnimationTarget() and setAnimationTarget().</pre>
+<pre class="csharpcode">&lt;script language =<span class="str">"javascript"</span> type =<span class="str">"text/javascript"</span>&gt;
+ <span class="kwrd">var</span> currentAnimationTarget =<span class="str">"pnlAnimated"</span>;
+
+<span class="kwrd">function</span> getAnimationTarget() {
+    <span class="kwrd">return</span> currentAnimationTarget;
+}
+<span class="kwrd">function</span> setAnimationTarget() {
+  currentAnimationTarget = currentAnimationTarget === <span class="str">"pnlAnimated"</span> ? <span class="str">"pnlAnimatedToo"</span>:<span class="str">"pnlAnimated"</span>;
+}
+&lt;/script&gt;</pre>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style></p>
+<p><font face="Consolas" color="#000000" size="2">In this example, the animationTarget will alternate between pnlAnimated and pnlAnimatedToo.</font></p>
+<p><font face="Consolas" color="#000000" size="2">You can implement your own logic into the above functions for your implementation.</font></p>
+</blockquote>
+<pre class="csharpcode">&nbsp;</pre>
+<p><font face="Consolas" color="#000000" size="2"><strong>c) Combination of a) and b) </strong>, i.e you would want to use the same animationExtender to trigger the same animations on different elements onClick of two different Buttons.</font></p>
+<p><font face="Consolas" color="#000000" size="2"><strong><a name="CombinationAB">Multiple TargetControlIDs and Multiple AnimationTargets.</a></strong></font></p>
+<p><font face="Consolas" color="#000000" size="2">For instance , in the above example , if you would want to </font></p>
+<p><font face="Consolas" color="#000000" size="2">Animate pnlAnimated onClick of btnAnimateTriggerOne</font></p>
+<p><font face="Consolas" color="#000000" size="2">and </font></p>
+<p><font face="Consolas" color="#000000" size="2"><font face="Consolas" color="#000000" size="2">Animate pnlAnimatedToo onClick of btnAnimateTriggerTwo.</font></font></p>
+<p><font face="Consolas" color="#000000" size="2">And you would want to do all of this Without creating a new AnimationExtender on the same page.</font></p>
+<p><font face="Consolas" color="#000000" size="2"><strong>Step 1: </strong>Assign the OnClientClick of the Two buttons to be as below :</font></p>
+<pre class="csharpcode"><span class="rem">&lt;!-- The Trigger Button One--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnAnimateTriggerOne"</span> <span class="attr">Text</span><span class="kwrd">="Trigger One"</span>
+<span class="attr">OnClientClick</span><span class="kwrd">="<font size="3">setAnimationTargetValue('pnlAnimated');</font>return false;"</span> <span class="kwrd">/&gt;</span>
+
+<span class="rem">&lt;!-- The Trigger Button two--&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">asp:Button</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="btnAnimateTriggerTwo"</span> <span class="attr">Text</span><span class="kwrd">="Trigger Two"</span>
+<span class="attr">OnClientClick</span><span class="kwrd">="<font size="3">setAnimationTargetValue('pnlAnimatedToo');SwitchTargetControl();</font>return false;"</span> <span class="kwrd">/&gt;</span>
+</pre>
+<pre class="csharpcode"><strong>Step 2: </strong>Change the Markup of the AnimationExtender to replace AnimationTarget to be AnimationTargetScript.</pre>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolKit:AnimationExtender</span> <span class="attr">BehaviorID</span> <span class="kwrd">="animateMe"</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnAnimateTriggerOne"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                    <span class="kwrd">&lt;</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="380"</span> <span class="attr">width</span><span class="kwrd">="380"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                        <span class="kwrd">&lt;</span><span class="html">ReSize</span> <span class="attr">AnimationTargetScript</span><span class="kwrd">="getAnimationTarget();"</span> <span class="attr">height</span><span class="kwrd">="400"</span> <span class="attr">width</span><span class="kwrd">="400"</span> <span class="attr">duration</span> <span class="kwrd">="0.1"</span> <span class="attr">fps</span><span class="kwrd">="45"</span> <span class="attr">unit</span><span class="kwrd">="px"</span> <span class="kwrd">/&gt;</span>
+                    <span class="kwrd">&lt;/</span><span class="html">Sequence</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolKit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode"><strong>Step 3: </strong>The Definition for the JavaScript Functions.</pre>
+<pre class="csharpcode">&lt;script language =<span class="str">"javascript"</span> type =<span class="str">"text/javascript"</span>&gt;
+            <span class="kwrd">function</span> SwitchTargetControl() {
+                $find(<span class="str">"animateMe"</span>).get_OnClickBehavior().play();
+            }
+
+            <span class="kwrd">var</span> currentAnimationTarget =<span class="str">"pnlAnimated"</span>;
+
+            <span class="kwrd">function</span> getAnimationTarget() {
+                <span class="kwrd">return</span> currentAnimationTarget;
+            }
+
+            <span class="kwrd">function</span> setAnimationTargetValue( value ) {
+                currentAnimationTarget  = value;
+            }
+&lt;/script&gt;</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+
+  </div>
+
+  <div class="date">
+    Written on August 15, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

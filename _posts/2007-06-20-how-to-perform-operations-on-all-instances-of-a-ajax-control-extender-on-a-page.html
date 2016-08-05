@@ -1,0 +1,153 @@
+---
+layout: post
+title: 'How to : Perform Operations on all instances of a Ajax Control Extender on
+  a page'
+date: 2007-06-20 10:12:14.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- Components
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/06/20/how-to-perform-operations-on-all-instances-of-a-ajax-control-extender-on-a-page.aspx
+  orig_site_id: '7524'
+  orig_post_id: '3424908'
+  orig_parent_id: '3424908'
+  orig_thread_id: '520539'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/06/20/how-to-perform-operations-on-all-instances-of-a-ajax-control-extender-on-a-page.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="How to : Perform Operations on all instances of a Ajax Control Extender on a page" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/06/20/how-to-perform-operations-on-all-instances-of-a-ajax-control-extender-on-a-page/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Consider a scenario wherein you have a lot of control Extenders on a page and you want to conduct operations on all instances Specific Extender or specific instances of an extender. We all know that we can reference certain instances of an Extender by&nbsp;using &nbsp;its BehaviorID and the $find function. Now , consider an implementation..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="How to : Perform Operations on all instances of a Ajax Control Extender on a page" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/06/20/how-to-perform-operations-on-all-instances-of-a-ajax-control-extender-on-a-page/" />
+    <meta name="twitter:description" content="Consider a scenario wherein you have a lot of control Extenders on a page and you want to conduct operations on all instances Specific Extender or specific instances of an extender. We all know that we can reference certain instances of an Extender by&nbsp;using &nbsp;its BehaviorID and the $find function. Now , consider an implementation..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Consider a scenario wherein you have a lot of control Extenders on a page and you want to conduct operations on all instances</p>
+<p>Specific Extender or specific instances of an extender.</p>
+<p>We all know that we can reference certain instances of an Extender by&nbsp;using &nbsp;its BehaviorID and the <a href="http://ajax.asp.net/docs/ClientReference/Global/FindShortcutMethod.aspx" target="_blank">$find</a> function.</p>
+<p>Now , consider an implementation where you want to Collapse/Expand all Collapsible Panels present on a Page.</p>
+<p>You don't know how many CollapsiblePanels will be present on the page and what their IDs will be .</p>
+<p><strong><u>Solution</u></strong></p>
+<p>The ASP.NET Ajax Framework has a couple of really useful functions which will help us here.</p>
+<p>You can get all instances of all behaviors present on the page using the <strong><a href="http://ajax.asp.net/docs/ClientReference/Sys/ApplicationClass/SysApplicationGetComponentsMethod.aspx" target="_blank">Sys.Application.getComponents()</a> </strong>method.</p>
+<p>There&nbsp; , it's &nbsp;that simple !!</p>
+<p><strong>How do you use this to find all instances of a <u>Specific Control Extender </u>on a page ?</strong></p>
+<p>Ans : You can find out the "Type" of any given Behavior by&nbsp;using any of the following code Snippets.</p>
+<h5><strong>1) Using the Object.getType() Method.</strong></h5>
+<p>&nbsp;EX: </p>
+<p>&nbsp;Given that your behavior Instance is : controlYourSelf of type : HoverMenu</p>
+<pre class="csharpcode">Object.getType( controlYourSelf ).getName()</pre>
+<pre class="csharpcode">will give you the name of the AjaxControlToolkit behavior .</pre>
+<pre class="csharpcode">Ex output is :  AjaxControlToolkit.HoverMenuBehavior and so on and so forth.</pre>
+<h5><strong>2) Using the get_name() method on the Behavior Instance.</strong></h5>
+<pre class="csharpcode">Your Behavior Name will not be qualified with AjaxControlToolkit.</pre>
+<pre class="csharpcode">so , if you call get_name() on controlYourSelf Behavior .</pre>
+<pre class="csharpcode">controlYourSelf.get_name() will give you : HoverMenuBehavior</pre>
+<pre class="csharpcode">usage : </pre>
+<pre class="csharpcode">&lt;BehaviorInstance&gt;.get_name()</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>Consider the Following Example which shows you how to <strong><u>Collapse all the Collapsible Panels present on a page</u></strong>:</p>
+<p><strong><u>The Algorithm would be:</u></strong></p>
+<ol>
+<li>&nbsp;Find all instances of the CollapsiblePanel Behavior on the page.
+</li>
+<li>&nbsp;On each of them ,
+</li>
+<li>&nbsp;Check if the Panel is Collapsed by calling the get_Collapsed() function.
+</li>
+<li>&nbsp;If not collapsed&nbsp;, call the collapsePanel Function to collapse the Panel.</li>
+</ol>
+<p><strong><u>The Code would be&nbsp; :</u></strong></p>
+<pre class="csharpcode"><span class="rem">//Function To Collapse all CollapsiblePanels on a page , if not already collapsed.</span>
+<span class="kwrd">function</span> collapseAllCollapsiblePanels() {
+    <span class="kwrd">var</span> currentBehavior = <span class="kwrd">null</span>;
+   <span class="rem">//1) Find all instances of the CollapsiblePanel Behavior on the page.</span>
+    <span class="rem">//Get all the Behaviors Present in the Page</span>
+    <span class="kwrd">var</span> allBehaviors = Sys.Application.getComponents() ;
+    <span class="rem">//Loop Through them</span>
+    <span class="kwrd">for</span>( <span class="kwrd">var</span> loopIndex = 0 ; loopIndex &lt; allBehaviors.length; loopIndex++ ) {
+        currentBehavior = allBehaviors[loopIndex];
+    <span class="rem">//For each behavior , check the Behavior Name </span>
+        <span class="kwrd">if</span>( currentBehavior.get_name() === <span class="str">"CollapsiblePanelBehavior"</span> ) {
+      <span class="rem">//If its of type CollapsiblePanelBehavior</span>
+        <span class="rem">//3) Check if the Panel is Collapsed by calling the get_Collapsed() function.</span>
+            <span class="kwrd">if</span>( !currentBehavior.get_Collapsed() ) {
+            <span class="rem">//4) If not collapsed , call the collapsePanel Function to collapse the Panel.</span>
+                currentBehavior.collapsePanel();
+            }
+        }
+    }
+}</pre>
+<pre class="csharpcode">You can use this approach in your applications  for any myriad number of reasons .</pre>
+<pre class="csharpcode">Hope this helps Someone out there.</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>

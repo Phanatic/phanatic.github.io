@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Working with Associations in ADO.NET Data Services – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="I’ve seen that users are having some question about how to deal with certain types of relations between entities and how to deal with them in the client library.I will outline the a couple of common scenarios of using the client library among a few relationship types. I'll be using the AdventureWorks Database for examples of relations.
+1..1 Associations
+This is the case of entities associated with each other 1..1 . An example from Adventureworks is the relation between Individual and Contact,Customer Entities. 
+An instance of the Individual entity type should have associated Contact and Customer entities, this is another way of saying “ A row in the Individual table should have links to a row in the Contact and Customer table”.    In case of 1..1 relations , the left( child ) ends of the association are expressed as properties on the right ( parent ) end of the relation.This is shown in the metadata of the service as :
+&lt;EntityType Name=&quot;Individual&quot;&gt;
+&lt;Key&gt;
+  &lt;PropertyRef Name=&quot;CustomerID&quot; /&gt;
+&lt;/Key&gt;&lt;!—Primitive &amp; Complex Properties --&gt;
+  &lt;Property Name=&quot;CustomerID&quot; Type=&quot;Edm.Int32&quot; Nullable=&quot;false&quot; /&gt;
+  &lt;Property Name=&quot;Demographics&quot; Type=&quot;Edm.String&quot; Nullable=&quot;true&quot; MaxLength=&quot;Max&quot; Unicode=&quot;true&quot; FixedLength=&quot;false&quot; /&gt;
+  &lt;Property Name=&quot;ModifiedDate&quot; Type=&quot;Edm.DateTime&quot; Nullable=&quot;false&quot; /&gt;
+&lt;!-- Navigation Properties , Signifying related entities of an association --&gt;
+  &lt;NavigationProperty Name=&quot;Contact&quot;
+    Relationship=&quot;AdventureWorks.FK_Individual_Contact_ContactID&quot;
+   FromRole=&quot;Individual&quot; ToRole=&quot;Contact&quot; /&gt;
+  &lt;NavigationProperty Name=&quot;Customer&quot;    Relationship=&quot;AdventureWorks.FK_Individual_Customer_CustomerID&quot;
+   FromRole=&quot;Individual&quot; ToRole=&quot;Customer&quot; /&gt;
+&lt;/EntityType&gt;
+
+This leads the client utility( DataSvcUtil.exe ) to generate a type Individual which has instances of types Customer and Contact as Properties.
+The generated class on the client looks like this :
+public class Individual {
+//Other properties removed for brevity 
+ public Contact Contact {
+            get {
+                return this._Contact;
+            }
+            set {
+                this._Contact = value;
+            }
+        }
+public Customer Customer {
+            get {
+                return this._Customer;
+            }
+            set {
+                this._Customer = value;
+            }
+        }
+}
+Trivia : Properties of a type P in an entity type E which signify that the type E has a 1..1 relation with the type P of the property are called as Reference Properties.
+Now that we have set the stage, lets look at how one would use the client library to interact with the related types.
+Creating the link between the entities 
+You have new instances of Individual , Contact and Customer and you want to persist the new entities and their relation to the store.
+
+Individual individual = new Individual();
+//Initialize all its necessary properties
+Customer newCustomer = new Customer();
+//Initialize all its necessary properties
+Contact contact = new Contact();
+//Initialize all its necessary properties
+
+//Add the newly created entities to be tracked by the client context
+
+TestContext.AddObject(&quot;Individual&quot;, individual);
+TestContext.AddObject(&quot;Customer&quot;, newCustomer);
+TestContext.AddObject(&quot;Contact&quot;, contact);
+
+Now what ?
+Since the entities are created and added to the store can’t I just set the Customer and Contact Property to the Individual object and that will save the relation ?
+individual.Customer = newCustomer;
+individual.Contact = contact;
+TestContext.SaveChanges();
+
+Shouldn’t this be enough ?
+  Nope , that’s not enough to save the relation to the store.
+Why ?
+Remember that the client context only gives you POCO access to entities in the store and any new entities that you create.The Client context does not track any relations unless you explicitly ask it to do so !
+Neat&#160; , now how do I ask it to do that ? 
+Beta 1 Code :
+    You use the AddLink method defined on the context. 
+TestContext.AddLink(individual, &quot;Contact&quot;, contact);
+TestContext.AddLink(individual, &quot;Customer&quot;, newCustomer);
+
+The signature and the intent of the AddLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,
+  “I now bind you into the holy bond of 1..1 relations. You may now change your facebook status“
+okay , jokes aside , this is what it looks like ..
+AddLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)
+RTM Code :
+You use the SetLink method defined on the context. 
+TestContext.SetLink(individual, &quot;Contact&quot;, contact);
+TestContext.SetLink(individual, &quot;Customer&quot;, newCustomer);
+
+The signature and the intent of the SetLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,
+  This is what it looks like ..
+SetLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)
+
+Deleting the parent entity
+Deleting the parent entity means that the relations with the child entities are also removed.
+  Think of this as the argument of “How do I delete an entity that has 1..1 links with other&#160;&#160; entities?”
+
+What happens if I delete the parent entity without deleting the links ?
+It depends on your store . If your database is configured to do a cascade delete on deletion of the parent entity ,you might get away with deleting the entity without removing the links
+The right way to delete the entity is to remove all the links it has with the child entities and then delete the entity itself.
+  The code would look like this..
+
+Individual existingIndividual = TestContext.Individual.Expand(&quot;Customer,Contact&quot;).Take&lt;Individual&gt;(1).First&lt;Individual&gt;();
+
+TestContext.DetachLink(existingIndividual, &quot;Contact&quot;, existingIndividual.Contact);
+TestContext.DetachLink(existingIndividual, &quot;Customer&quot;, existingIndividual.Customer);
+TestContext.DeleteObject(existingIndividual);
+TestContext.SaveChanges();
+
+Wait !! what’s with the expand there ?
+    Well, if you need to delete the relation , the way to identify the relation or the link is to have both the right and the left end of the relations to be materialized. without the expand , the Contact and the Customer property are null , and we don’t know which relation to delete.In case of 1..1 relations it might be easy to predict based on the relation name ,
+but wouldn’t be easy in case of 1..n relations.
+Well, that’s it from me , In the next part , we shall discuss entities with 1..N relations and how to work with them using the astoria context.
+If you have any questions&#160; , leave a comment . If you have any issues with code and need help , please post your query on the astoria forums as I can’t promise that I will be able to reply to emails sent to me directly .The whole team is very active on the forums and the more eyes on a problem the better.
+
+I will update the code used in&#160; this sample and upload it later.
+  
+
+" />
+    <meta property="og:description" content="I’ve seen that users are having some question about how to deal with certain types of relations between entities and how to deal with them in the client library.I will outline the a couple of common scenarios of using the client library among a few relationship types. I'll be using the AdventureWorks Database for examples of relations.
+1..1 Associations
+This is the case of entities associated with each other 1..1 . An example from Adventureworks is the relation between Individual and Contact,Customer Entities. 
+An instance of the Individual entity type should have associated Contact and Customer entities, this is another way of saying “ A row in the Individual table should have links to a row in the Contact and Customer table”.    In case of 1..1 relations , the left( child ) ends of the association are expressed as properties on the right ( parent ) end of the relation.This is shown in the metadata of the service as :
+&lt;EntityType Name=&quot;Individual&quot;&gt;
+&lt;Key&gt;
+  &lt;PropertyRef Name=&quot;CustomerID&quot; /&gt;
+&lt;/Key&gt;&lt;!—Primitive &amp; Complex Properties --&gt;
+  &lt;Property Name=&quot;CustomerID&quot; Type=&quot;Edm.Int32&quot; Nullable=&quot;false&quot; /&gt;
+  &lt;Property Name=&quot;Demographics&quot; Type=&quot;Edm.String&quot; Nullable=&quot;true&quot; MaxLength=&quot;Max&quot; Unicode=&quot;true&quot; FixedLength=&quot;false&quot; /&gt;
+  &lt;Property Name=&quot;ModifiedDate&quot; Type=&quot;Edm.DateTime&quot; Nullable=&quot;false&quot; /&gt;
+&lt;!-- Navigation Properties , Signifying related entities of an association --&gt;
+  &lt;NavigationProperty Name=&quot;Contact&quot;
+    Relationship=&quot;AdventureWorks.FK_Individual_Contact_ContactID&quot;
+   FromRole=&quot;Individual&quot; ToRole=&quot;Contact&quot; /&gt;
+  &lt;NavigationProperty Name=&quot;Customer&quot;    Relationship=&quot;AdventureWorks.FK_Individual_Customer_CustomerID&quot;
+   FromRole=&quot;Individual&quot; ToRole=&quot;Customer&quot; /&gt;
+&lt;/EntityType&gt;
+
+This leads the client utility( DataSvcUtil.exe ) to generate a type Individual which has instances of types Customer and Contact as Properties.
+The generated class on the client looks like this :
+public class Individual {
+//Other properties removed for brevity 
+ public Contact Contact {
+            get {
+                return this._Contact;
+            }
+            set {
+                this._Contact = value;
+            }
+        }
+public Customer Customer {
+            get {
+                return this._Customer;
+            }
+            set {
+                this._Customer = value;
+            }
+        }
+}
+Trivia : Properties of a type P in an entity type E which signify that the type E has a 1..1 relation with the type P of the property are called as Reference Properties.
+Now that we have set the stage, lets look at how one would use the client library to interact with the related types.
+Creating the link between the entities 
+You have new instances of Individual , Contact and Customer and you want to persist the new entities and their relation to the store.
+
+Individual individual = new Individual();
+//Initialize all its necessary properties
+Customer newCustomer = new Customer();
+//Initialize all its necessary properties
+Contact contact = new Contact();
+//Initialize all its necessary properties
+
+//Add the newly created entities to be tracked by the client context
+
+TestContext.AddObject(&quot;Individual&quot;, individual);
+TestContext.AddObject(&quot;Customer&quot;, newCustomer);
+TestContext.AddObject(&quot;Contact&quot;, contact);
+
+Now what ?
+Since the entities are created and added to the store can’t I just set the Customer and Contact Property to the Individual object and that will save the relation ?
+individual.Customer = newCustomer;
+individual.Contact = contact;
+TestContext.SaveChanges();
+
+Shouldn’t this be enough ?
+  Nope , that’s not enough to save the relation to the store.
+Why ?
+Remember that the client context only gives you POCO access to entities in the store and any new entities that you create.The Client context does not track any relations unless you explicitly ask it to do so !
+Neat&#160; , now how do I ask it to do that ? 
+Beta 1 Code :
+    You use the AddLink method defined on the context. 
+TestContext.AddLink(individual, &quot;Contact&quot;, contact);
+TestContext.AddLink(individual, &quot;Customer&quot;, newCustomer);
+
+The signature and the intent of the AddLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,
+  “I now bind you into the holy bond of 1..1 relations. You may now change your facebook status“
+okay , jokes aside , this is what it looks like ..
+AddLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)
+RTM Code :
+You use the SetLink method defined on the context. 
+TestContext.SetLink(individual, &quot;Contact&quot;, contact);
+TestContext.SetLink(individual, &quot;Customer&quot;, newCustomer);
+
+The signature and the intent of the SetLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,
+  This is what it looks like ..
+SetLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)
+
+Deleting the parent entity
+Deleting the parent entity means that the relations with the child entities are also removed.
+  Think of this as the argument of “How do I delete an entity that has 1..1 links with other&#160;&#160; entities?”
+
+What happens if I delete the parent entity without deleting the links ?
+It depends on your store . If your database is configured to do a cascade delete on deletion of the parent entity ,you might get away with deleting the entity without removing the links
+The right way to delete the entity is to remove all the links it has with the child entities and then delete the entity itself.
+  The code would look like this..
+
+Individual existingIndividual = TestContext.Individual.Expand(&quot;Customer,Contact&quot;).Take&lt;Individual&gt;(1).First&lt;Individual&gt;();
+
+TestContext.DetachLink(existingIndividual, &quot;Contact&quot;, existingIndividual.Contact);
+TestContext.DetachLink(existingIndividual, &quot;Customer&quot;, existingIndividual.Customer);
+TestContext.DeleteObject(existingIndividual);
+TestContext.SaveChanges();
+
+Wait !! what’s with the expand there ?
+    Well, if you need to delete the relation , the way to identify the relation or the link is to have both the right and the left end of the relations to be materialized. without the expand , the Contact and the Customer property are null , and we don’t know which relation to delete.In case of 1..1 relations it might be easy to predict based on the relation name ,
+but wouldn’t be easy in case of 1..n relations.
+Well, that’s it from me , In the next part , we shall discuss entities with 1..N relations and how to work with them using the astoria context.
+If you have any questions&#160; , leave a comment . If you have any issues with code and need help , please post your query on the astoria forums as I can’t promise that I will be able to reply to emails sent to me directly .The whole team is very active on the forums and the more eyes on a problem the better.
+
+I will update the code used in&#160; this sample and upload it later.
+  
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Working with Associations in ADO.NET Data Services" />
+    <meta property="twitter:title" content="Working with Associations in ADO.NET Data Services" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Working with Associations in ADO.NET Data Services</h1>
+
+  <div class="entry">
+    <p>I’ve seen that users are having some question about how to deal with certain types of relations between entities and how to deal with them in the client library.I will outline the a couple of common scenarios of using the client library among a few relationship types. I'll be using the AdventureWorks Database for examples of relations.</p>
+<h1>1..1 Associations</h1>
+<p>This is the case of entities associated with each other 1..1 . An example from Adventureworks is the relation between Individual and Contact,Customer Entities. </p>
+<p>An instance of the Individual entity type should have associated Contact and Customer entities, this is another way of saying “ A row in the Individual table should have links to a row in the Contact and Customer table”.    <br />In case of 1..1 relations , the left( child ) ends of the association are expressed as properties on the right ( parent ) end of the relation.This is shown in the metadata of the service as :</p>
+<pre class="darkcsharpcode"><span class="kwrd">&lt;</span><span class="html">EntityType</span> <span class="attr">Name</span><span class="kwrd">=&quot;Individual&quot;</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">Key</span><span class="kwrd">&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">PropertyRef</span> <span class="attr">Name</span><span class="kwrd">=&quot;CustomerID&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">Key</span><span class="kwrd">&gt;<br /></span><span class="rem">&lt;!—Primitive &amp; Complex Properties --&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">Property</span> <span class="attr">Name</span><span class="kwrd">=&quot;CustomerID&quot;</span> <span class="attr">Type</span><span class="kwrd">=&quot;Edm.Int32&quot;</span> <span class="attr">Nullable</span><span class="kwrd">=&quot;false&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">Property</span> <span class="attr">Name</span><span class="kwrd">=&quot;Demographics&quot;</span> <span class="attr">Type</span><span class="kwrd">=&quot;Edm.String&quot;</span> <span class="attr">Nullable</span><span class="kwrd">=&quot;true&quot;</span> <span class="attr">MaxLength</span><span class="kwrd">=&quot;Max&quot;</span> <span class="attr">Unicode</span><span class="kwrd">=&quot;true&quot;</span> <span class="attr">FixedLength</span><span class="kwrd">=&quot;false&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">Property</span> <span class="attr">Name</span><span class="kwrd">=&quot;ModifiedDate&quot;</span> <span class="attr">Type</span><span class="kwrd">=&quot;Edm.DateTime&quot;</span> <span class="attr">Nullable</span><span class="kwrd">=&quot;false&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="rem">&lt;!-- Navigation Properties , Signifying related entities of an association --&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">NavigationProperty</span> <span class="attr">Name</span><span class="kwrd">=&quot;Contact&quot;</span>
+    <span class="attr">Relationship</span><span class="kwrd">=&quot;AdventureWorks.FK_Individual_Contact_ContactID&quot;</span>
+   <span class="attr">FromRole</span><span class="kwrd">=&quot;Individual&quot;</span> <span class="attr">ToRole</span><span class="kwrd">=&quot;Contact&quot;</span> <span class="kwrd">/&gt;</span>
+  <span class="kwrd">&lt;</span><span class="html">NavigationProperty</span> <span class="attr">Name</span><span class="kwrd">=&quot;Customer&quot;</span>    <span class="attr">Relationship</span><span class="kwrd">=&quot;AdventureWorks.FK_Individual_Customer_CustomerID&quot;</span>
+   <span class="attr">FromRole</span><span class="kwrd">=&quot;Individual&quot;</span> <span class="attr">ToRole</span><span class="kwrd">=&quot;Customer&quot;</span> <span class="kwrd">/&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">EntityType</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>This leads the client utility( DataSvcUtil.exe ) to generate a type Individual which has instances of types Customer and Contact as Properties.</p></p>
+<p>The generated class on the client looks like this :</p>
+<pre class="darkcsharpcode"><span class="kwrd">public</span> <span class="kwrd">class</span> Individual {
+<span class="rem">//Other properties removed for brevity </span>
+ <span class="kwrd">public</span> Contact Contact {
+            get {
+                <span class="kwrd">return</span> <span class="kwrd">this</span>._Contact;
+            }
+            set {
+                <span class="kwrd">this</span>._Contact = <span class="kwrd">value</span>;
+            }
+        }
+<span class="kwrd">public</span> Customer Customer {
+            get {
+                <span class="kwrd">return</span> <span class="kwrd">this</span>._Customer;
+            }
+            set {
+                <span class="kwrd">this</span>._Customer = <span class="kwrd">value</span>;
+            }
+        }
+}</pre>
+<p>Trivia : Properties of a type P in an entity type E which signify that the type E has a 1..1 relation with the type P of the property are called as <strong>Reference </strong>Properties.</p>
+<p>Now that we have set the stage, lets look at how one would use the client library to interact with the related types.</p>
+<h5>Creating the link between the entities </h5>
+<p>You have new instances of Individual , Contact and Customer and you want to persist the new entities and their relation to the store.</p>
+<p></p>
+<pre class="darkcsharpcode">Individual individual = <span class="kwrd">new</span> Individual();
+<span class="rem">//Initialize all its necessary properties</span>
+Customer newCustomer = <span class="kwrd">new</span> Customer();
+<span class="rem">//Initialize all its necessary properties</span>
+Contact contact = <span class="kwrd">new</span> Contact();
+<span class="rem">//Initialize all its necessary properties</span>
+
+<span class="rem">//Add the newly created entities to be tracked by the client context</span>
+
+TestContext.AddObject(<span class="str">&quot;Individual&quot;</span>, individual);
+TestContext.AddObject(<span class="str">&quot;Customer&quot;</span>, newCustomer);
+TestContext.AddObject(<span class="str">&quot;Contact&quot;</span>, contact);</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p><strong>Now what ?</strong></p>
+<p>Since the entities are created and added to the store can’t I just set the Customer and Contact Property to the Individual object and that will save the relation ?</p>
+<pre class="darkcsharpcode">individual.Customer = newCustomer;
+individual.Contact = contact;
+TestContext.SaveChanges();</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style></p>
+<p>Shouldn’t this be enough ?<br />
+  <br />Nope , that’s not enough to save the relation to the store.</p>
+<p><strong>Why ?</strong></p></p>
+<p>Remember that the client context only gives you POCO access to entities in the store and any new entities that you create.The Client context <strong>does not track any relations </strong>unless you <strong>explicitly ask it to do so !</strong></p>
+<p><strong>Neat&#160; , now how do I ask it to do that ? </strong></p>
+<p><strong>Beta 1 Code :<br />
+    <br /></strong>You use the AddLink method defined on the context. </p>
+<pre class="darkcsharpcode">TestContext.AddLink(individual, <span class="str">&quot;Contact&quot;</span>, contact);
+TestContext.AddLink(individual, <span class="str">&quot;Customer&quot;</span>, newCustomer);</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>The signature and the intent of the AddLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,<br />
+  <br />“I now bind you into the holy bond of 1..1 relations. You may now change your facebook status“</p></p></p></p>
+<p>okay , jokes aside , this is what it looks like ..</p>
+<p>AddLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)</p>
+<p><strong>RTM Code :</strong></p>
+<p>You use the SetLink method defined on the context. </p>
+<pre class="darkcsharpcode">TestContext.SetLink(individual, <span class="str">&quot;Contact&quot;</span>, contact);
+TestContext.SetLink(individual, <span class="str">&quot;Customer&quot;</span>, newCustomer);</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p>The signature and the intent of the SetLink method is lucid , it binds 2 entities into a relation , its kinda like a priest at a wedding,<br />
+  <br />This is what it looks like ..</p>
+<p>SetLink ( Parentinstance ,”ChildPropertyName”,ChildInstance)</p>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<h5><strong>Deleting the parent entity</strong></h5>
+<p>Deleting the parent entity means that the relations with the child entities are also removed.<br />
+  <br />Think of this as the argument of “How do I delete an entity that has 1..1 links with other&#160;&#160; entities?”</p>
+<p></p>
+<p><strong>What happens if I delete the parent entity without deleting the links ?</strong></p>
+<p>It depends on your store . If your database is configured to do a cascade delete on deletion of the parent entity ,you might get away with deleting the entity without removing the links</p>
+<p>The right way to delete the entity is to remove all the links it has with the child entities and then delete the entity itself.<br />
+  <br />The code would look like this..</p>
+<p></p>
+<pre class="darkcsharpcode">Individual existingIndividual = TestContext.Individual.Expand(<span class="str">&quot;Customer,Contact&quot;</span>).Take&lt;Individual&gt;(1).First&lt;Individual&gt;();
+
+TestContext.DetachLink(existingIndividual, <span class="str">&quot;Contact&quot;</span>, existingIndividual.Contact);
+TestContext.DetachLink(existingIndividual, <span class="str">&quot;Customer&quot;</span>, existingIndividual.Customer);
+TestContext.DeleteObject(existingIndividual);
+TestContext.SaveChanges();</pre>
+<style type="text/css">
+<p>.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }</style>
+<p><strong>Wait !! what’s with the expand there ?<br />
+    <br /></strong>Well, if you need to delete the relation , the way to identify the relation or the link is to have both the right and the left end of the relations to be materialized. without the expand , the Contact and the Customer property are null , and we don’t know which relation to delete.In case of 1..1 relations it might be easy to predict based on the relation name ,</p>
+<p>but wouldn’t be easy in case of 1..n relations.</p>
+<p>Well, that’s it from me , In the next part , we shall discuss entities with 1..N relations and how to work with them using the astoria context.</p>
+<p>If you have any questions&#160; , leave a comment . If you have any issues with code and need help , please post your query on the astoria forums as I can’t promise that I will be able to reply to emails sent to me directly .The whole team is very active on the forums and the more eyes on a problem the better.</p>
+<p></p>
+<p>I will update the code used in&#160; this sample and upload it later.<br />
+  </p>
+<style type="text/css">
+<p>.darkcsharpcode, .darkcsharpcode pre<br />
+{<br />
+	padding-top :10px;<br />
+	font-size: small;<br />
+	color: #d2d200;<br />
+	font-family: consolas, "Courier New" , courier, monospace;<br />
+	background-color: #2e2e2e; /*white-space: pre;*/<br />
+	padding-bottom :10px;<br />
+	padding-left :15px;<br />
+}<br />
+.darkcsharpcode pre<br />
+{<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .rem<br />
+{<br />
+	color: #00ff00;<br />
+}<br />
+.darkcsharpcode .kwrd<br />
+{<br />
+	color: #eaeaac;<br />
+	font-size: 11;<br />
+	font-weight: bold;<br />
+}<br />
+.darkcsharpcode .str<br />
+{<br />
+	color: #cc9393;<br />
+}<br />
+.darkcsharpcode .op<br />
+{<br />
+	color: #0000c0;<br />
+}<br />
+.darkcsharpcode .preproc<br />
+{<br />
+	color: #cc6633;<br />
+}<br />
+.darkcsharpcode .asp<br />
+{<br />
+	background-color: #ffff00;<br />
+}<br />
+.darkcsharpcode .html<br />
+{<br />
+	color: #efefef;<br />
+}<br />
+.darkcsharpcode .attr<br />
+{<br />
+	color: #dfdfbf;<br />
+}<br />
+.darkcsharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.darkcsharpcode .lnum<br />
+{<br />
+	color: #606060;<br />
+}</style>
+
+  </div>
+
+  <div class="date">
+    Written on July  2, 2008
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

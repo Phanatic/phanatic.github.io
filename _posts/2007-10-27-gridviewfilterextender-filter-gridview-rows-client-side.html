@@ -1,0 +1,315 @@
+---
+layout: post
+title: 'GridViewFilterExtender : Filter GridView Rows Client-Side'
+date: 2007-10-27 07:30:38.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Astoria
+- Components
+- JavaScript
+- Prototype
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/10/27/building-an-excel-like-gridview-filter-extender.aspx
+  orig_site_id: '7524'
+  orig_post_id: '5771108'
+  orig_parent_id: '5771108'
+  orig_thread_id: '543538'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/10/27/gridviewfilterextender-filter-gridview-rows-client-side.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="GridViewFilterExtender : Filter GridView Rows Client-Side" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/10/27/gridviewfilterextender-filter-gridview-rows-client-side/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Download Source Code and Sample application&nbsp; :&nbsp; Excel&#8217;s Filter Dialog My GridView Filter Extender &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The above Screen Shots look promising , don&#8217;t they ?So, How would one go about building such a control ? Well, I have it laid out in front of you . 1) Find all unique Strings in..." />
+    <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/Excel_Filter_thumb.jpg" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="GridViewFilterExtender : Filter GridView Rows Client-Side" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/10/27/gridviewfilterextender-filter-gridview-rows-client-side/" />
+    <meta name="twitter:description" content="Download Source Code and Sample application&nbsp; :&nbsp; Excel&#8217;s Filter Dialog My GridView Filter Extender &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The above Screen Shots look promising , don&#8217;t they ?So, How would one go about building such a control ? Well, I have it laid out in front of you . 1) Find all unique Strings in..." />
+    <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/Excel_Filter_thumb.jpg" />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<blockquote>
+<p><strong>Download Source Code and Sample application</strong>&nbsp; :&nbsp; <iframe style="border-right: #dde5e9 1px solid; padding-right: 0px; border-top: #dde5e9 1px solid; padding-left: 0px; padding-bottom: 0px; margin: 3px; border-left: #dde5e9 1px solid; width: 240px; padding-top: 0px; border-bottom: #dde5e9 1px solid; height: 26px; background-color: #ffffff" marginwidth="0" marginheight="0" src="http://cid-925c2d2bb2d03c6b.skydrive.live.com/embedrow.aspx/Public/GridViewFilterExtender.zip" frameborder="0" scrolling="no"></iframe></p>
+<table cellspacing="0" cellpadding="2" width="709" border="0">
+<tbody>
+<tr>
+<td valign="top" width="348"><strong>Excel's Filter Dialog</strong></td>
+<td valign="top" width="359"><strong>My GridView Filter Extender</strong></td>
+</tr>
+<tr>
+<td valign="top" width="351"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/Excel_Filter.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/Excel_Filter.jpg"><br /><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="396" alt="Excel_Filter" src="{{ site.baseurl }}/assets/Excel_Filter_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/Excel_Filter_thumb.jpg" width="339" border="0" /></a></td>
+<td valign="top" width="359">&nbsp;&nbsp; <a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridRowFilterExtender_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridRowFilterExtender_2.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="416" alt="GridRowFilterExtender" src="{{ site.baseurl }}/assets/GridRowFilterExtender_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridRowFilterExtender_thumb.jpg" width="306" border="0" /></a></td>
+</tr>
+<tr>
+<td valign="top" width="354">&nbsp;</td>
+<td valign="top" width="359">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />The above Screen Shots look promising , don't they ?<br />So, How would one go about building such a control ? Well, I have it laid out in front of you .</p>
+<p>1) Find all unique Strings in the same column <br />2) Build a lookup table that stores the Unique string and the row Indices for the rows that contain the Unique String<br />3) Once user builds a Filter Expression and clicks on "Ok" , Filter the Rows in the Table based on the Expression.<br />4) For Now , the Filter Expression can only be&nbsp; a sequence of strings that the user wants to see in the grid.</p>
+<p>Ex : If your grid looks like this :</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridViewSampleData_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridViewSampleData_2.jpg"><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="295" alt="GridViewSampleData" src="{{ site.baseurl }}/assets/GridViewSampleData_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/GridViewSampleData_thumb.jpg" width="194" border="0" /></a> </p>
+<p>The filter expression would be a comma-separated string that contains the unique strings to match in the rows.</p>
+<pre class="csharpcode"><span class="kwrd">var</span> _currentRowFilter = <span class="str">"Ajax,Moo"</span></pre>
+<p><style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>The lookup Table would look like this :</p>
+<pre class="csharpcode">_lookupTable
+        Select All    <span class="str">"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"</span>
+        Ajax    <span class="str">"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16"</span>
+        Moo    <span class="str">"17,18,19,20,21,22,23"</span>    <br />
+so , if we want to filter the rows , we would need to : </pre>
+<p>1) Hide all Rows to begin with . <br /><b>HideRows : this.lookupTable["Select All"]</b></p>
+<p>2) Show only those rows that are found in the lookup table against the filter Terms. <br /><b>ShowRows :this.lookupTable["Ajax"]</b></p>
+<p>That's about the algorithm / design for the extender to work .<br />Getting this working is another matter altogether.<br />Once you have understood this , lets start:</p>
+<p><b>Find all unique Strings in the same column :</b></p>
+<p>once you find all the unique strings in all subsequent rows for the same column , we will need to build the checkbox list that <br />will allows the user to select the filter Terms. <b>I.e this :</b>
+<pre class="csharpcode"><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/FilterExpressionSelector_2.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/FilterExpressionSelector_2.jpg" /></pre>
+<p><img style="border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px; border-right-width: 0px" height="245" alt="FilterExpressionSelector" src="{{ site.baseurl }}/assets/FilterExpressionSelector_thumb.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/BuildinganExcellike_10A47/FilterExpressionSelector_thumb.jpg" width="155" border="0" /> </p>
+<p>This is a bit tricky , the way one would go about doing this would be :</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Find out which Column the Extender is added in .Find the Cell Index of the Column , lets say _cellIndex<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For all subsequent rows in the table, Lookup the innerText of the Cell with CellIndex cellIndex.</p>
+<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For Each Row </strong><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read the innerText of the Cell at CellIndex cellIndex.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF the string read is not yet present in the lookup Table then<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BEGIN<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add it to the lookup Table along with the rowIndex of the current Row<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ELSE if string is already present in the lookupTable then</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Begin <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add the RowIndex to the lookupTable[string] location. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; END IF</p>
+<p>Once you have found all the Unique Strings , build the CheckBoxList and attach the appropriate handlers .</p>
+<p><b>Once user builds a Filter Expression and clicks on "Ok" , Filter the Rows in the Table based on the Expression.</b></p>
+<p>Hide All Rows .<br />Get all the Rows in the Table other than the header and the footer , _rowsInTable.<br />Get the Current Search Filter by adding all the strings that are checked in the CheckBoxList.<br />For each term in the Search Filter , get the appropriate row Indices ,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For each row Index in the Row Indices, <b>_rowIndex<br /></b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; assign the cssClass _inFilterCssClass to the _rowsInTable[_rowIndex].</p>
+<p>&nbsp;
+<p><strong>This is all neat , what if I have multiple columns in my GridView and I want to filter <br />each succeeding Column depending on the previous Column?</strong>&nbsp;</p>
+<p>Well, I have thought about that too ..<br />This is what we would do :<br />Every FilterExtender <strong>(a)</strong> can have a Dependent Filter&nbsp; <strong>(b)</strong> , if filter <strong>(b) </strong>is used to filter data ( it raises the itemFiltered Event ),<br />then&nbsp; the Filter <strong>(a) </strong>has to rebuild its index to remove any index text <br />that was removed as a result of the filter expression on filter <strong>(b)</strong>.<br /><strong><br />Important Note about the DependentFilterID <br /></strong><br />If a FilterExtender <strong>(a)</strong>&nbsp; has a FilterExtender <strong>(b)</strong>&nbsp; as its Dependent Filter ID , they both should have the matching values for the <br />InFilterCssClass and the NotInFilterCssClass attributes.</p>
+<table cellspacing="0" cellpadding="2" width="612" border="0">
+<tbody>
+<tr>
+<td valign="top" width="610"><strong>Set DependentFilterID </strong></td>
+</tr>
+<tr>
+<td valign="top" width="610"><strong>In markup</strong></td>
+</tr>
+<tr>
+<td valign="top" width="610">
+<pre class="csharpcode"><span class="kwrd">&lt;</span>Raj:GridViewFilterExtender  DependentFilterId="optionListPnl"</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</td>
+</tr>
+<tr>
+<td valign="top" width="610"><strong>JavaScript</strong></td>
+</tr>
+<tr>
+<td valign="top" width="610">
+<pre class="csharpcode">$find(&lt;filterBehaviorID&gt;).set_dependentFilterId(&lt;dependentFilterId&gt;)</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Attributes :</strong></p>
+<table cellspacing="0" cellpadding="2" width="757" border="0">
+<tbody>
+<tr>
+<td valign="top" width="111"><strong>Name</strong></td>
+<td valign="top" width="644"><strong>Description</strong></td>
+</tr>
+<tr>
+<td valign="top" width="111">TargetControlID</td>
+<td valign="top" width="644">ID of the control upon clicking on which , the Filter is shown</td>
+</tr>
+<tr>
+<td valign="top" width="111">OkButtonId</td>
+<td valign="top" width="644">ID of the control upon clicking on which , the FilterExpression is applied and the filter is hidden</td>
+</tr>
+<tr>
+<td valign="top" width="111">CancelButtonId</td>
+<td valign="top" width="644">ID of the control upon clicking on which , the FilterExpression is <u>NOT applied </u>and the filter is hidden</td>
+</tr>
+<tr>
+<td valign="top" width="111">EnableSelectAll</td>
+<td valign="top" width="644">If the filter contains an option to "Select All" Rows</td>
+</tr>
+<tr>
+<td valign="top" width="111">InFilterCssClass</td>
+<td valign="top" width="644">The CssClass applied to all rows which are available from the Filter Expression.</td>
+</tr>
+<tr>
+<td valign="top" width="111">NotInFilterCssClass</td>
+<td valign="top" width="644">The CssClass applied to all rows which are NOT available from the Filter Expression.</td>
+</tr>
+<tr>
+<td valign="top" width="111">FilterPanelID</td>
+<td valign="top" width="644">The Panel Control which contains the Filter </td>
+</tr>
+</tbody>
+</table>
+<p><strong>Events :</strong></p>
+<table cellspacing="0" cellpadding="2" width="765" border="0">
+<tbody>
+<tr>
+<td valign="top" width="120"><strong>Name</strong></td>
+<td valign="top" width="640"><strong>Description</strong></td>
+</tr>
+<tr>
+<td valign="top" width="120">itemSelected</td>
+<td valign="top" width="640">When any filter Expression is Selected</td>
+</tr>
+<tr>
+<td valign="top" width="120">itemFiltered</td>
+<td valign="top" width="640">When the filter Expression is applied.</td>
+</tr>
+<tr>
+<td valign="top" width="120">onOk</td>
+<td valign="top" width="640">when the Control Referenced by OkButtonId is clicked</td>
+</tr>
+<tr>
+<td valign="top" width="120">onCancel</td>
+<td valign="top" width="640">when the Control Referenced by CancelButtonId is clicked</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Subscribing to the Events :</p>
+<p>a) Markup :<br /></strong>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">Raj:OptionPickerBehavior</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">ID</span><span class="kwrd">="optionListPnl"</span> <span class="attr">TargetControlID</span><span class="kwrd">="btnToggle"</span>
+         <span class="attr">blah</span> <span class="attr">blah</span> <span class="attr">blah</span>
+         <span class="attr">OnOkScript</span><span class="kwrd">="okClickHandler"</span>
+         <span class="attr">OnCancelScript</span> <span class="kwrd">="cancelClickHandler"</span>
+         <span class="attr">OnClientItemFiltered</span> <span class="kwrd">="itemFilteredHandler"</span>
+         <span class="attr">OnClientItemSelected</span> <span class="kwrd">="itemSelectedHandler"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">Raj:OptionPickerBehavior</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">&lt;script language=<span class="str">"javascript"</span> type=<span class="str">"text/javascript"</span>&gt;
+            <span class="kwrd">function</span> itemSelectedHandler(element,args)  {
+                Sys.Debug.trace( args.get_text() + <span class="str">"   "</span> + args.get_isChecked());
+            }
+            <span class="kwrd">function</span> itemFilteredHandler(element,args)  {
+                Sys.Debug.trace( args.get_item() + <span class="str">"   "</span> + args.get_filterText());
+            }
+            <span class="kwrd">function</span> okClickHandler(element,args)  {
+                Sys.Debug.trace( <span class="str">"Ok Button was clicked"</span> );
+            }
+             <span class="kwrd">function</span> cancelClickHandler(element,args)  {
+                Sys.Debug.trace( <span class="str">"Cancel Button was clicked"</span>);
+            }
+            <span class="kwrd">function</span> traceCall(msg) {
+                $get(<span class="str">"traceDiv"</span>).appendChild(document.createTextNode(msg));
+            }
+ &lt;/script&gt;</pre>
+<pre class="csharpcode"><strong>b) Script <br /></strong></pre>
+<pre class="csharpcode">$find(<span class="str">"BehaviorId"</span>).add_onOk( okClickHandler );
+
+$find(<span class="str">"BehaviorId"</span>).add_onCancel( cancelClickHandler );
+
+$find(<span class="str">"BehaviorId"</span>).add_itemFiltered( itemFilteredHandler );
+
+$find(<span class="str">"BehaviorId"</span>).add_itemSelected( itemSelectedHandler );</pre>
+<pre class="csharpcode" /><font face="Trebuchet MS">That's it for now ! Do give feedback on the control if you get a chance to use it / look at it .<br /></font></p></p></p></p></p></p></p>

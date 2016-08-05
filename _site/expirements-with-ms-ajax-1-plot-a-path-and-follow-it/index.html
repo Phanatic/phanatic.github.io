@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Expirements with Ms AJAX 1 : Plot a Path and follow it – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="
+
+&nbsp;
+While working on some documentation and presentations for MS AJAX Animation ( wait for it , its gonna rock !!&nbsp;) , I made what you see in the demo video.
+Its basic premise is this :
+
+Allow the User to plot points on a plane  
+Then trigger an animation that goes over all the points&nbsp; and stops
+
+Why do this ?
+No&nbsp;Perceptible use , pure fun factor&nbsp;.
+I just though that it'd be cool to control an animation by clicking on points and asking an element to go to those points .
+Well, here you have it .
+Once the demo is hosted, you can see the same as an online app.
+Take a look at a screenshot .
+ 
+Lets see how we can achieve this ..
+We need the following functionality 
+
+&nbsp;&nbsp; Allow the User to plot an arbitrary number of points on a plane  
+&nbsp; Create an animation that moves to all the points.&nbsp;
+
+1.Allow the User to plot an arbitrary number of points on a plane 
+&nbsp;The "Plane"&nbsp; would be a DIV element on the page. 
+&lt;div id="pathPallette"&gt;
+&lt;/div&gt;
+
+&nbsp;The user plots a point on the plane by clicking on the plane.
+We will have a global collection of points called pointsInpath which will be a javaScript array .
+var pointsInPath = new Array();
+
+We can attach an eventhandler to the Click event of the Div by using the $addHandler function of the Ms AJAX framework&nbsp; explained Here&nbsp;.
+Syntax: $addHandler(element, eventName, handler);
+
+$addHandler($get("pathPallette"),"click",markPoint);
+We will now define the function "markPoint".
+
+
+
+function markPoint(eventArg)
+{
+    var evt = window.event || eventArg;   
+    var xCoOrd = evt.clientX ;
+    var yCoOrd = evt.clientY ;
+    
+    Addpoint( xCoOrd , yCoOrd );
+    createMarker( xCoOrd - $get("pathPallette").offsetLeft , yCoOrd - $get("pathPallette").offsetTop );
+}
+
+
+
+
+MarkPoint&nbsp; calls 2 functions .
+
+AddPoint&nbsp; , to add the point to a collection of points
+
+Createmarker ,to&nbsp; mark the spot as a point on the plane which will be visited by the Animated element
+
+AddPoint
+
+
+function Addpoint( xCoOrd,yCoOrd)
+{
+    anyMorePoints= true;
+    pointsInPath[index++] = "{\"X\" : \""+xCoOrd +"\",\"Y\":\""+yCoOrd +"\"}";
+}
+
+
+
+The AddPoint function recieves the X and Y co-ordinates of the Point in the Element's Path.
+Add the Point to the existing points collection.
+Createmarker 
+
+
+function createMarker( xCoOrd,yCoOrd )
+{
+    var newmarker = document.createElement("SPAN");
+    newmarker.id = "marker"+markeridCounter;    
+    newmarker.className ="white";
+    newmarker.innerText = markeridCounter;
+    $get("pathPallette").appendChild( newmarker );
+    Sys.UI.DomElement.setLocation( newmarker , xCoOrd , yCoOrd );
+    markeridCounter++;
+    
+}
+
+
+
+This Function creates a &lt;SPAN&gt; element , writes the point # in the span , and positions it in the plane.
+2.Create an animation that moves to all the points
+&nbsp;Basic algorithm for this step
+
+&nbsp;&nbsp; Get the Point to navigate to
+
+&nbsp;&nbsp; Set the animation to move to the next point
+
+&nbsp; Play the animation until there are no more points left 
+
+The Element that will move to all the points will be another div ( "divMovable" )&nbsp;with a background color&nbsp; assigned to it 
+
+&lt;div id="divMovable" runat="server" style="height: 15px; width: 15px; position: absolute;
+          top: 300px; left: 300px; background-color: #ffcc00;"&gt;
+          &amp;nbsp;
+&lt;/div&gt;
+
+The Animation Markup would be to use the Move Animation to move the Element along the points.
+
+&lt;ajaxToolkit:AnimationExtender ID="AnimationExtender1" BehaviorID="controlledAnimation"
+            runat="server" TargetControlID="divMovable"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                     &lt;Move relative="false"  duration="0.2" fps="40"
+                        horizontalScript ="getX()" verticalScript ="getY()"
+                      AnimationTarget="divMovable" /&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolkit:AnimationExtender&gt;
+
+
+The MoveAnimation would run only once and would also move to only one point , we need to keep changing the destination Points.
+If you notice the horizontalScript ="getX()" verticalScript ="getY()"&nbsp; snippet , the "Script" attribute added to any attribute in the Animation Markup
+would cause the expression to be "eval"ed at runtime allowing us to use Expressions to set properties.
+So, right , the&nbsp; horizontal (X) co-ordinates&nbsp; would be retrieved from the function getX().
+The Vertical (Y) co-ordinates would be retrieved from the function getY().
+The&nbsp; next point the element should move to would be represented by&nbsp; "nextPoint".
+The Function "setNextPoint()" would set the next point in the path.
+function getX()
+{
+    if( nextPoint == null)
+    {
+        setNextPoint();
+    }
+    return nextPoint.X;
+}
+&nbsp;
+function getY()
+{
+    return nextPoint.Y;
+}
+&nbsp;
+Once we get the next point to move to , the animation should repeat with the new values for X and Y Co-Ordinates.
+We do this , by hooking a handler to the Ending event of the Animation.&nbsp;
+
+&lt;script language="javascript"&gt;
+       var OnClickBehavior ;
+       function pageLoad()
+       {
+           OnClickBehavior = $find("controlledAnimation").get_OnClickBehavior().get_animation();
+           OnClickBehavior.add_ended(continueAnimating);
+           $addHandler($get("pathPallette"),"click",markPoint);
+      }
+
+   &lt;/script&gt;
+
+&nbsp;
+We can hook eventhandlers to the ending event of the Animation by&nbsp; using the "add_ended" method.
+Here , we add the "continueAnimating" function as an eventhandler to the Animation Ending&nbsp; event.
+Then , we call the "play" method on the animation just as it ends, to give a seamless&nbsp;feel to the flow as the element moves along different points.
+
+function continueAnimating(){
+     setNextPoint();
+     if( nextPoint!= null){
+        OnClickBehavior.play();
+     }
+}
+
+
+&nbsp;
+Trigger the complete animation sequence by calling the "play" method on the OnclickBehavior 
+
+function playAnimation()
+{
+    ResetPoints();
+    hideAllmarkers();
+    setNextPoint();
+    OnClickBehavior.play();
+}
+
+
+&nbsp;
+There you have it , fun and a pretty&nbsp; neat exercise in geometry and also shows you how easy it is to do complex stuff with the MS Ajax Framework.
+
+" />
+    <meta property="og:description" content="
+
+&nbsp;
+While working on some documentation and presentations for MS AJAX Animation ( wait for it , its gonna rock !!&nbsp;) , I made what you see in the demo video.
+Its basic premise is this :
+
+Allow the User to plot points on a plane  
+Then trigger an animation that goes over all the points&nbsp; and stops
+
+Why do this ?
+No&nbsp;Perceptible use , pure fun factor&nbsp;.
+I just though that it'd be cool to control an animation by clicking on points and asking an element to go to those points .
+Well, here you have it .
+Once the demo is hosted, you can see the same as an online app.
+Take a look at a screenshot .
+ 
+Lets see how we can achieve this ..
+We need the following functionality 
+
+&nbsp;&nbsp; Allow the User to plot an arbitrary number of points on a plane  
+&nbsp; Create an animation that moves to all the points.&nbsp;
+
+1.Allow the User to plot an arbitrary number of points on a plane 
+&nbsp;The "Plane"&nbsp; would be a DIV element on the page. 
+&lt;div id="pathPallette"&gt;
+&lt;/div&gt;
+
+&nbsp;The user plots a point on the plane by clicking on the plane.
+We will have a global collection of points called pointsInpath which will be a javaScript array .
+var pointsInPath = new Array();
+
+We can attach an eventhandler to the Click event of the Div by using the $addHandler function of the Ms AJAX framework&nbsp; explained Here&nbsp;.
+Syntax: $addHandler(element, eventName, handler);
+
+$addHandler($get("pathPallette"),"click",markPoint);
+We will now define the function "markPoint".
+
+
+
+function markPoint(eventArg)
+{
+    var evt = window.event || eventArg;   
+    var xCoOrd = evt.clientX ;
+    var yCoOrd = evt.clientY ;
+    
+    Addpoint( xCoOrd , yCoOrd );
+    createMarker( xCoOrd - $get("pathPallette").offsetLeft , yCoOrd - $get("pathPallette").offsetTop );
+}
+
+
+
+
+MarkPoint&nbsp; calls 2 functions .
+
+AddPoint&nbsp; , to add the point to a collection of points
+
+Createmarker ,to&nbsp; mark the spot as a point on the plane which will be visited by the Animated element
+
+AddPoint
+
+
+function Addpoint( xCoOrd,yCoOrd)
+{
+    anyMorePoints= true;
+    pointsInPath[index++] = "{\"X\" : \""+xCoOrd +"\",\"Y\":\""+yCoOrd +"\"}";
+}
+
+
+
+The AddPoint function recieves the X and Y co-ordinates of the Point in the Element's Path.
+Add the Point to the existing points collection.
+Createmarker 
+
+
+function createMarker( xCoOrd,yCoOrd )
+{
+    var newmarker = document.createElement("SPAN");
+    newmarker.id = "marker"+markeridCounter;    
+    newmarker.className ="white";
+    newmarker.innerText = markeridCounter;
+    $get("pathPallette").appendChild( newmarker );
+    Sys.UI.DomElement.setLocation( newmarker , xCoOrd , yCoOrd );
+    markeridCounter++;
+    
+}
+
+
+
+This Function creates a &lt;SPAN&gt; element , writes the point # in the span , and positions it in the plane.
+2.Create an animation that moves to all the points
+&nbsp;Basic algorithm for this step
+
+&nbsp;&nbsp; Get the Point to navigate to
+
+&nbsp;&nbsp; Set the animation to move to the next point
+
+&nbsp; Play the animation until there are no more points left 
+
+The Element that will move to all the points will be another div ( "divMovable" )&nbsp;with a background color&nbsp; assigned to it 
+
+&lt;div id="divMovable" runat="server" style="height: 15px; width: 15px; position: absolute;
+          top: 300px; left: 300px; background-color: #ffcc00;"&gt;
+          &amp;nbsp;
+&lt;/div&gt;
+
+The Animation Markup would be to use the Move Animation to move the Element along the points.
+
+&lt;ajaxToolkit:AnimationExtender ID="AnimationExtender1" BehaviorID="controlledAnimation"
+            runat="server" TargetControlID="divMovable"&gt;
+            &lt;Animations&gt;
+                &lt;OnClick&gt;
+                     &lt;Move relative="false"  duration="0.2" fps="40"
+                        horizontalScript ="getX()" verticalScript ="getY()"
+                      AnimationTarget="divMovable" /&gt;
+                &lt;/OnClick&gt;
+            &lt;/Animations&gt;
+&lt;/ajaxToolkit:AnimationExtender&gt;
+
+
+The MoveAnimation would run only once and would also move to only one point , we need to keep changing the destination Points.
+If you notice the horizontalScript ="getX()" verticalScript ="getY()"&nbsp; snippet , the "Script" attribute added to any attribute in the Animation Markup
+would cause the expression to be "eval"ed at runtime allowing us to use Expressions to set properties.
+So, right , the&nbsp; horizontal (X) co-ordinates&nbsp; would be retrieved from the function getX().
+The Vertical (Y) co-ordinates would be retrieved from the function getY().
+The&nbsp; next point the element should move to would be represented by&nbsp; "nextPoint".
+The Function "setNextPoint()" would set the next point in the path.
+function getX()
+{
+    if( nextPoint == null)
+    {
+        setNextPoint();
+    }
+    return nextPoint.X;
+}
+&nbsp;
+function getY()
+{
+    return nextPoint.Y;
+}
+&nbsp;
+Once we get the next point to move to , the animation should repeat with the new values for X and Y Co-Ordinates.
+We do this , by hooking a handler to the Ending event of the Animation.&nbsp;
+
+&lt;script language="javascript"&gt;
+       var OnClickBehavior ;
+       function pageLoad()
+       {
+           OnClickBehavior = $find("controlledAnimation").get_OnClickBehavior().get_animation();
+           OnClickBehavior.add_ended(continueAnimating);
+           $addHandler($get("pathPallette"),"click",markPoint);
+      }
+
+   &lt;/script&gt;
+
+&nbsp;
+We can hook eventhandlers to the ending event of the Animation by&nbsp; using the "add_ended" method.
+Here , we add the "continueAnimating" function as an eventhandler to the Animation Ending&nbsp; event.
+Then , we call the "play" method on the animation just as it ends, to give a seamless&nbsp;feel to the flow as the element moves along different points.
+
+function continueAnimating(){
+     setNextPoint();
+     if( nextPoint!= null){
+        OnClickBehavior.play();
+     }
+}
+
+
+&nbsp;
+Trigger the complete animation sequence by calling the "play" method on the OnclickBehavior 
+
+function playAnimation()
+{
+    ResetPoints();
+    hideAllmarkers();
+    setNextPoint();
+    OnClickBehavior.play();
+}
+
+
+&nbsp;
+There you have it , fun and a pretty&nbsp; neat exercise in geometry and also shows you how easy it is to do complex stuff with the MS Ajax Framework.
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Expirements with Ms AJAX 1 : Plot a Path and follow it" />
+    <meta property="twitter:title" content="Expirements with Ms AJAX 1 : Plot a Path and follow it" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Expirements with Ms AJAX 1 : Plot a Path and follow it</h1>
+
+  <div class="entry">
+    </p>
+<div class="wlWriterEditableSmartContent" id="d49da610-fc34-4988-88d9-3c0a788fd878:e1993fb9-3c44-454f-802d-f718bef150d4" contenteditable="false" style="padding-right: 0px; display: inline; padding-left: 0px; padding-bottom: 0px; margin: 0px; padding-top: 0px"><embed name="msn_soapbox" pluginspage="http://macromedia.com/go/getflashplayer" src="http://images.soapbox.msn.com/flash/soapbox1_1.swf" width="412" height="362" type="application/x-shockwave-flash" quality="high" wmode="transparent" flashvars="c=v&amp;v=62373c16-4fc1-49f1-9847-edb2c429952a"></embed></div></p>
+<p>&nbsp;</p>
+<p>While working on some documentation and presentations for MS AJAX Animation ( wait for it , its gonna rock !!&nbsp;) , I made what you see in the demo video.</p>
+<p>Its basic premise is this :</p>
+<ol>
+<li>Allow the User to plot points on a plane  </li>
+<li>Then trigger an animation that goes over all the points&nbsp; and stops</li>
+</ol>
+<p>Why do this ?</p>
+<p>No&nbsp;Perceptible use , pure fun factor&nbsp;.</p>
+<p>I just though that it'd be cool to control an animation by clicking on points and asking an element to go to those points .</p>
+<p>Well, here you have it .</p>
+<p>Once the demo is hosted, you can see the same as an online app.</p>
+<p>Take a look at a screenshot .</p>
+<p><a href="https://msdnshared.blob.core.windows.net/media/TNBlogsFS/BlogFileStorage/blogs_msdn/phaniraj/WindowsLiveWriter/1528719273ab_C948/PlotaPath%5B4%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/1528719273ab_C948/PlotaPath%5B4%5D.jpg" atomicselection="true"><img style="border-right: 0px; border-top: 0px; border-left: 0px; border-bottom: 0px" height="400" src="/assets/PlotaPath_thumb%5B2%5D.jpg" original-url="http://blogs.msdn.com/blogfiles/phaniraj/WindowsLiveWriter/1528719273ab_C948/PlotaPath_thumb%5B2%5D.jpg" width="516" border="0" /></a> </p>
+<p>Lets see how we can achieve this ..</p>
+<p>We need the following functionality </p>
+<ol>
+<li>&nbsp;&nbsp; Allow the User to plot an arbitrary number of points on a plane  </li>
+<li>&nbsp; Create an animation that moves to all the points.&nbsp;</li>
+</ol>
+<p><strong><u>1.Allow the User to plot an arbitrary number of points on a plane </u></strong></p>
+<p>&nbsp;The "Plane"&nbsp; would be a DIV element on the page. </p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="pathPallette"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>&nbsp;The user plots a point on the plane by clicking on the plane.</p>
+<p>We will have a global collection of points called pointsInpath which will be a javaScript array .</p>
+<pre class="csharpcode"><span class="kwrd">var</span> pointsInPath = <span class="kwrd">new</span> Array();</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>We can attach an eventhandler to the Click event of the Div by using the $addHandler function of the Ms AJAX framework&nbsp; explained <a href="http://ajax.asp.net/docs/ClientReference/Global/AddHandlerShortcutMethod.aspx">Here</a>&nbsp;.</p>
+<pre class="csharpcode">Syntax: $addHandler(element, eventName, handler);</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode">$addHandler($get(<span class="str">"pathPallette"</span>),<span class="str">"click"</span>,markPoint);</pre>
+<pre class="csharpcode">We will now define the function "markPoint".</pre>
+<pre class="csharpcode"></pre>
+<div>
+<div class="csharpcode">
+<pre class="alt"><span class="kwrd">function</span> markPoint(eventArg)</pre>
+<pre>{</pre>
+<pre class="alt">    <span class="kwrd">var</span> evt = window.<span class="kwrd">event</span> || eventArg;   </pre>
+<pre>    <span class="kwrd">var</span> xCoOrd = evt.clientX ;</pre>
+<pre class="alt">    <span class="kwrd">var</span> yCoOrd = evt.clientY ;</pre>
+<pre>    </pre>
+<pre class="alt">    Addpoint( xCoOrd , yCoOrd );</pre>
+<pre>    createMarker( xCoOrd - $get(<span class="str">"pathPallette"</span>).offsetLeft , yCoOrd - $get(<span class="str">"pathPallette"</span>).offsetTop );</pre>
+<pre class="alt">}</pre>
+</div>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>MarkPoint&nbsp; calls 2 functions .</p>
+<ol>
+<li>AddPoint&nbsp; , to add the point to a collection of points
+</li>
+<li>Createmarker ,to&nbsp; mark the spot as a point on the plane which will be visited by the Animated element</li>
+</ol>
+<p><strong><u>AddPoint</u></strong></p>
+<div>
+<div class="csharpcode">
+<pre class="alt"><span class="kwrd">function</span> Addpoint( xCoOrd,yCoOrd)</pre>
+<pre>{</pre>
+<pre class="alt">    anyMorePoints= <span class="kwrd">true</span>;</pre>
+<pre>    pointsInPath[index++] = <span class="str">"{\"X\" : \""</span>+xCoOrd +<span class="str">"\",\"Y\":\""</span>+yCoOrd +<span class="str">"\"}"</span>;</pre>
+<pre class="alt">}</pre>
+</div>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>The AddPoint function recieves the X and Y co-ordinates of the Point in the Element's Path.</p>
+<p>Add the Point to the existing points collection.</p>
+<p><strong><u>Createmarker </u></strong></p>
+<div>
+<div class="csharpcode">
+<pre class="alt"><span class="kwrd">function</span> createMarker( xCoOrd,yCoOrd )</pre>
+<pre>{</pre>
+<pre class="alt">    <span class="kwrd">var</span> newmarker = document.createElement(<span class="str">"SPAN"</span>);</pre>
+<pre>    newmarker.id = <span class="str">"marker"</span>+markeridCounter;    </pre>
+<pre class="alt">    newmarker.className =<span class="str">"white"</span>;</pre>
+<pre>    newmarker.innerText = markeridCounter;</pre>
+<pre class="alt">    $get(<span class="str">"pathPallette"</span>).appendChild( newmarker );</pre>
+<pre>    Sys.UI.DomElement.setLocation( newmarker , xCoOrd , yCoOrd );</pre>
+<pre class="alt">    markeridCounter++;</pre>
+<pre>    </pre>
+<pre class="alt">}</pre>
+</div>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>This Function creates a &lt;SPAN&gt; element , writes the point # in the span , and positions it in the plane.</p>
+<p><strong><u>2.Create an animation that moves to all the points</u></strong></p>
+<p>&nbsp;<strong><u>Basic algorithm for this step</u></strong></p>
+<ol>
+<li>&nbsp;&nbsp; Get the Point to navigate to
+</li>
+<li>&nbsp;&nbsp; Set the animation to move to the next point
+</li>
+<li>&nbsp; Play the animation until there are no more points left </li>
+</ol>
+<p>The Element that will move to all the points will be another div ( "divMovable" )&nbsp;with a background color&nbsp; assigned to it </p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">div</span> <span class="attr">id</span><span class="kwrd">="divMovable"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">style</span><span class="kwrd">="height: 15px; width: 15px; position: absolute;
+          top: 300px; left: 300px; background-color: #ffcc00;"</span><span class="kwrd">&gt;</span>
+          <span class="attr">&amp;nbsp;</span>
+<span class="kwrd">&lt;/</span><span class="html">div</span><span class="kwrd">&gt;</span></pre>
+</div>
+<p>The Animation Markup would be to use the Move Animation to move the Element along the points.</p>
+<div>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">ajaxToolkit:AnimationExtender</span> <span class="attr">ID</span><span class="kwrd">="AnimationExtender1"</span> <span class="attr">BehaviorID</span><span class="kwrd">="controlledAnimation"</span>
+            <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="divMovable"</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+                <span class="kwrd">&lt;</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+                     <span class="kwrd">&lt;</span><span class="html">Move</span> <span class="attr">relative</span><span class="kwrd">="false"</span>  <span class="attr">duration</span><span class="kwrd">="0.2"</span> <span class="attr">fps</span><span class="kwrd">="40"</span>
+                        <span class="attr">horizontalScript</span> <span class="kwrd">="getX()"</span> <span class="attr">verticalScript</span> <span class="kwrd">="getY()"</span>
+                      <span class="attr">AnimationTarget</span><span class="kwrd">="divMovable"</span> <span class="kwrd">/&gt;</span>
+                <span class="kwrd">&lt;/</span><span class="html">OnClick</span><span class="kwrd">&gt;</span>
+            <span class="kwrd">&lt;/</span><span class="html">Animations</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">ajaxToolkit:AnimationExtender</span><span class="kwrd">&gt;</span></pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<p>The MoveAnimation would run only once and would also move to only one point , we need to keep changing the destination Points.</p>
+<p>If you notice the horizontalScript ="getX()" verticalScript ="getY()"&nbsp; snippet , the "Script" attribute added to any attribute in the Animation Markup</p>
+<p>would cause the expression to be "eval"ed at runtime allowing us to use Expressions to set properties.</p>
+<p>So, right , the&nbsp; horizontal (X) co-ordinates&nbsp; would be retrieved from the function getX().</p>
+<p>The Vertical (Y) co-ordinates would be retrieved from the function getY().</p>
+<p>The&nbsp; next point the element should move to would be represented by&nbsp; "nextPoint".</p>
+<p>The Function "setNextPoint()" would set the next point in the path.</p>
+<pre class="csharpcode"><span class="kwrd">function</span> getX()
+{
+    <span class="kwrd">if</span>( nextPoint == <span class="kwrd">null</span>)
+    {
+        setNextPoint();
+    }
+    <span class="kwrd">return</span> nextPoint.X;
+}</pre>
+<p>&nbsp;</p>
+<pre class="csharpcode"><p><span class="kwrd">function</span> getY()
+{
+    <span class="kwrd">return</span> nextPoint.Y;
+}
+</p><p>&nbsp;</p></pre>
+<p>Once we get the next point to move to , the animation should repeat with the new values for X and Y Co-Ordinates.</p>
+<p>We do this , by hooking a handler to the Ending event of the Animation.&nbsp;</p>
+<div>
+<pre class="csharpcode">&lt;script language=<span class="str">"javascript"</span>&gt;
+       <span class="kwrd">var</span> OnClickBehavior ;
+       <span class="kwrd">function</span> pageLoad()
+       {
+           OnClickBehavior = $find(<span class="str">"controlledAnimation"</span>).get_OnClickBehavior().get_animation();
+           OnClickBehavior.add_ended(continueAnimating);
+           $addHandler($get(<span class="str">"pathPallette"</span>),<span class="str">"click"</span>,markPoint);
+      }
+
+   &lt;/script&gt;</pre>
+</div>
+<div>&nbsp;</div>
+<div>We can hook eventhandlers to the ending event of the Animation by&nbsp; using the "add_ended" method.</div>
+<div>Here , we add the "continueAnimating" function as an eventhandler to the Animation Ending&nbsp; event.</div>
+<div>Then , we call the "play" method on the animation just as it ends, to give a seamless&nbsp;feel to the flow as the element moves along different points.</div>
+<div>
+<pre class="csharpcode"><span class="kwrd">function</span> continueAnimating(){
+     setNextPoint();
+     <span class="kwrd">if</span>( nextPoint!= <span class="kwrd">null</span>){
+        OnClickBehavior.play();
+     }
+}</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<div>&nbsp;</div>
+<div>Trigger the complete animation sequence by calling the "play" method on the OnclickBehavior </div>
+<div>
+<pre class="csharpcode"><span class="kwrd">function</span> playAnimation()
+{
+    ResetPoints();
+    hideAllmarkers();
+    setNextPoint();
+    OnClickBehavior.play();
+}</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+<div>&nbsp;</div>
+<div>There you have it , fun and a pretty&nbsp; neat exercise in geometry and also shows you how easy it is to do complex stuff with the MS Ajax Framework.</div>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+
+  </div>
+
+  <div class="date">
+    Written on March 26, 2007
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

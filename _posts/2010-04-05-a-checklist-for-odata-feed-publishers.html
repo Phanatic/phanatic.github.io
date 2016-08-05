@@ -1,0 +1,63 @@
+---
+layout: post
+title: A Checklist for OData Feed publishers
+date: 2010-04-05 17:56:35.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Documentation
+- OData
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2010/04/06/a-checklist-for-odata-feed-publishers.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9990861'
+  orig_parent_id: '9990861'
+  orig_thread_id: '709920'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2010/04/05/a-checklist-for-odata-feed-publishers.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="A Checklist for OData Feed publishers" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/05/a-checklist-for-odata-feed-publishers/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Here&#8217;s a minimal checklist to make sure your OData Service is available to a maximum number of clients and very functional out of the box . I&#8217;ll add more items to this list as we go along. Allow Silverlight clients to access your data. Silverlight applications running on a domain other than the one the..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="A Checklist for OData Feed publishers" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/04/05/a-checklist-for-odata-feed-publishers/" />
+    <meta name="twitter:description" content="Here&#8217;s a minimal checklist to make sure your OData Service is available to a maximum number of clients and very functional out of the box . I&#8217;ll add more items to this list as we go along. Allow Silverlight clients to access your data. Silverlight applications running on a domain other than the one the..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<div>
+<p>Here's a minimal checklist to make sure your OData Service is available to a maximum number of clients and very functional out of the box .      <br />I'll add more items to this list as we go along.</p>
+<ol>
+<li>
+<h4 class="yellowBG">Allow Silverlight clients to access your data.</h4>
+<p>Silverlight applications running on a domain other than the one the Data Service is hosted on require a ClientAccessPolicy.xml file at the root of the webserver.         <br />Without a CAP.xml file , an in-browser Silverlight application cannot access the Data Service.         <br />Be nice to your Silverlight client apps, drop a CrossDomain.xml or a ClientAccessPolicy.xml file at the root of the Data Service         <br />Reference : <a href="http://blogs.msdn.com/astoriateam/archive/2009/11/05/enabling-x-domain-access-to-your-data-services.aspx">Enabling X-Domain access to your Data Services</a>         <br />note: SL4 apps can circumvent the need for CAP.xml file by being installed elevated and out of browser on client machines.</p>
+</li>
+<li>
+<h4 class="yellowBG">Server Driven Paging for your entity sets</h4>
+<p>Don't pay for bandwidth if you don't have to.           <br /><a href="http://www.powerpivot.com/">PowerPivot</a> and <a href="http://silverlight.net/ODataExplorer">The OData Explorer</a> support navigating next links , so you arent losing any client capability by enabling paging.           <br />Reference: <a href="http://blogs.msdn.com/astoriateam/archive/2009/03/19/ado-net-data-services-v1-5-ctp1-server-driven-paging.aspx">Blog post on team blog</a> </p>
+</li>
+<li>
+<h4 class="yellowBG">Web Friendly Feed annotations for prettier feeds </h4>
+<p>Put a couple of Feed annotations and generic browsers will love your feeds.           <br />Every feed requires at least an <b>atom:title</b> and/or <b>atom:summary mapping</b> .           <br />Reference for Entity Framework backed Data Services : <a href="http://blogs.msdn.com/phaniraj/archive/2009/03/28/ado-net-data-services-friendly-feeds-mapping-edm-types-i.aspx">Mapping EDM Types</a>           <br />Reference for all other Data Services : <a href="http://blogs.msdn.com/phaniraj/archive/2009/03/21/ado-net-data-services-friendly-feeds-mapping-clr-types.aspx">Mapping CLR Types</a> </p>
+</li>
+<li>
+<h4 class="yellowBG">Make your entity sets read-only.</h4>
+<p>If it shouldn't be edited , then it shouldn't be editable.           <br />Use <a href="http://msdn.microsoft.com/en-us/library/system.data.services.entitysetrights.aspx">EntitySetRights.AllRead</a> in your <a href="http://msdn.microsoft.com/en-us/library/system.data.services.dataserviceconfiguration.aspx">DataServiceConfiguration.SetEntitySetRights</a> call</p>
+</li>
+</ol></div>

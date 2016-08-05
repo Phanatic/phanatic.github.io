@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Batching Queries using the ADO.NET Data Services CLient library – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Did you know you could execute batch queries using the Data Services client library ?
+The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios.
+1) Batching a set of URI Queries .
+The ExecuteBatch API accepts an array of DataServiceRequest objects. Consider this example , you want to batch queries to be sent to the “Products” and “Categories” entity sets of a northwind service.
+
+2) Batching Linq Queries
+If you want to use strongly types Linq queries instead of string based URI queries , you can use the linq support to generate the linq query 
+
+3) How do I Identify the response if I make duplicate requests with the same ElementType ?
+Consider this situation , You make 2 requests both of type DataServiceRequest&lt;Products&gt;&nbsp; , how do you identify which response is for which request ?
+One of the scenarios&nbsp; I can think of , is that the entity set contains multiple types related via inheritance .
+ex: Customers entity set contains instances of types HappyCustomers and HappierCustomers inheriting from Customers.
+The QueryOperationResponse type contains a Query property which returns the DataServiceRequest that this response corresponds to .
+You can pass along the requests you made in the batch as a state to the callback and then compare the Query property of the QueryOperationResponse to match the response to the request.
+ex: 
+
+" />
+    <meta property="og:description" content="Did you know you could execute batch queries using the Data Services client library ?
+The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios.
+1) Batching a set of URI Queries .
+The ExecuteBatch API accepts an array of DataServiceRequest objects. Consider this example , you want to batch queries to be sent to the “Products” and “Categories” entity sets of a northwind service.
+
+2) Batching Linq Queries
+If you want to use strongly types Linq queries instead of string based URI queries , you can use the linq support to generate the linq query 
+
+3) How do I Identify the response if I make duplicate requests with the same ElementType ?
+Consider this situation , You make 2 requests both of type DataServiceRequest&lt;Products&gt;&nbsp; , how do you identify which response is for which request ?
+One of the scenarios&nbsp; I can think of , is that the entity set contains multiple types related via inheritance .
+ex: Customers entity set contains instances of types HappyCustomers and HappierCustomers inheriting from Customers.
+The QueryOperationResponse type contains a Query property which returns the DataServiceRequest that this response corresponds to .
+You can pass along the requests you made in the batch as a state to the callback and then compare the Query property of the QueryOperationResponse to match the response to the request.
+ex: 
+
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Batching Queries using the ADO.NET Data Services CLient library" />
+    <meta property="twitter:title" content="Batching Queries using the ADO.NET Data Services CLient library" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Batching Queries using the ADO.NET Data Services CLient library</h1>
+
+  <div class="entry">
+    <p>Did you know you could execute batch queries using the Data Services client library ?</p>
+<p>The API is ExecuteBatch for Synchronous access and Begin/End ExecuteBatch for asynchronous scenarios.</p>
+<p><strong>1) Batching a set of URI Queries .</strong></p>
+<p>The ExecuteBatch API accepts an array of <a href="http://msdn.microsoft.com/en-us/library/cc646604.aspx" mce_href="http://msdn.microsoft.com/en-us/library/cc646604.aspx">DataServiceRequest</a> objects. <br />Consider this example , you want to batch queries to be sent to the “Products” and “Categories” entity sets of a northwind service.</p>
+<p><script src="http://gist.github.com/113153.js"></script></p>
+<p><strong>2) Batching Linq Queries</strong></p>
+<p>If you want to use strongly types Linq queries instead of string based URI queries , you can use the linq support to generate the linq query </p>
+<p><script src="http://gist.github.com/113154.js"></script></p>
+<p><strong>3) How do I Identify the response if I make duplicate requests with the same ElementType ?</strong></p>
+<p>Consider this situation , You make 2 requests both of type DataServiceRequest&lt;Products&gt;&nbsp; , how do you identify <br />which response is for which request ?</p>
+<p>One of the scenarios&nbsp; I can think of , is that the entity set contains multiple types related via inheritance .</p>
+<p>ex: Customers entity set contains instances of types HappyCustomers and HappierCustomers inheriting from Customers.</p>
+<p>The QueryOperationResponse type contains a <a href="http://msdn.microsoft.com/en-us/library/system.data.services.client.queryoperationresponse.query(VS.95).aspx" mce_href="http://msdn.microsoft.com/en-us/library/system.data.services.client.queryoperationresponse.query(VS.95).aspx">Query</a> property which returns the DataServiceRequest that this response corresponds to .</p>
+<p>You can pass along the requests you made in the batch as a state to the callback and then compare the Query property of the QueryOperationResponse <br />to match the response to the request.</p>
+<p>ex: </p>
+<p><script src="http://gist.github.com/113156.js"></script></p>
+
+  </div>
+
+  <div class="date">
+    Written on March 15, 2009
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

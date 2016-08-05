@@ -1,0 +1,369 @@
+---
+layout: post
+title: Using MS Ajax Animations From the Client-Side
+date: 2007-03-12 11:17:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- Animation
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/03/12/using-ms-ajax-animations-from-the-client-side.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1865612'
+  orig_parent_id: '1865612'
+  orig_thread_id: '500777'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '1'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/03/12/using-ms-ajax-animations-from-the-client-side.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Using MS Ajax Animations From the Client-Side" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/03/12/using-ms-ajax-animations-from-the-client-side/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="We&nbsp; will talk about how to use the MS-Ajax Animation Framework without any server-side code. The sample completely illustrates how to instantiate and use the Animation Controls by including the proper script references. 1) Include the following scripts in your HTML Page MicrosoftAjax.js&nbsp; ( download from Here&nbsp;) Timer.js ( downlod from Here&nbsp;) BaseScripts.js Common.js Animations.js..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Using MS Ajax Animations From the Client-Side" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/03/12/using-ms-ajax-animations-from-the-client-side/" />
+    <meta name="twitter:description" content="We&nbsp; will talk about how to use the MS-Ajax Animation Framework without any server-side code. The sample completely illustrates how to instantiate and use the Animation Controls by including the proper script references. 1) Include the following scripts in your HTML Page MicrosoftAjax.js&nbsp; ( download from Here&nbsp;) Timer.js ( downlod from Here&nbsp;) BaseScripts.js Common.js Animations.js..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>We&nbsp; will talk about how to use the MS-Ajax Animation Framework <u>without any server-side code.</u></p>
+<p>The sample completely illustrates how to instantiate and use the Animation Controls by including the proper script references.</p>
+<p>1) Include the following scripts in your HTML Page</p>
+<blockquote>
+<p>MicrosoftAjax.js&nbsp; ( download from <a title="Download Location" href="http://ajax.asp.net/downloads/library/default.aspx?tabid=47&amp;subtabid=471" mce_href="http://ajax.asp.net/downloads/library/default.aspx?tabid=47&amp;subtabid=471">Here</a>&nbsp;)</p>
+<p>Timer.js ( downlod from <a title="Download Location" href="http://www.codeplex.com/AtlasControlToolkit/Project/FileDownload.aspx?DownloadId=7711" mce_href="http://www.codeplex.com/AtlasControlToolkit/Project/FileDownload.aspx?DownloadId=7711">Here</a>&nbsp;)</p>
+<p>BaseScripts.js</p>
+<p>Common.js </p>
+<p>Animations.js</p>
+<p>AnimationBehavior.js</p>
+</blockquote>
+<p><strong><u>Actual HTML </u></strong></p>
+<blockquote><pre class="csharpcode"></pre>
+<div class="csharpcode-wrapper">
+<pre class="csharpcode">&lt;script src=<span class="str">"ClientScripts/MicrosoftAjax.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="str">"ClientScripts/Timer.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="str">"ClientScripts/BaseScripts.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="str">"ClientScripts/Animations.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="str">"ClientScripts/Common.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+&lt;script src=<span class="str">"ClientScripts/AnimationBehavior.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+</blockquote>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p>2) Call the "Initialize()" function to initialize the Scripts in the HTML Page.</p>
+<blockquote>
+<div class="csharpcode-wrapper">
+<pre class="csharpcode">&lt;script type=<span class="str">"text/javascript"</span>&gt;
+&lt;!--
+Sys.Application.initialize();
+--&gt;
+&lt;/script&gt;</pre>
+<style type="text/css">.csharpcode-wrapper, .csharpcode-wrapper pre {<br />
+  background-color: #f4f4f4;<br />
+  border: solid 1px gray;<br />
+  cursor: text;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  margin: 20px 0px 10px 0px;<br />
+  max-height: 200px;<br />
+  overflow: auto;<br />
+  padding: 4px 4px 4px 4px;<br />
+  width: 97.5%;<br />
+}<br />
+.csharpcode-wrapper pre {<br />
+  border-style: none;<br />
+  margin: 0px 0px 0px 0px;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+}<br />
+.csharpcode, .csharpcode pre, .csharpcode .alt {<br />
+  background-color: #f4f4f4;<br />
+  border-style: none;<br />
+  color: black;<br />
+  font-family: consolas, 'Courier New', courier, monospace;<br />
+  font-size: 8pt;<br />
+  line-height: 12pt;<br />
+  overflow: visible;<br />
+  padding: 0px 0px 0px 0px;<br />
+  width: 100%;<br />
+}<br />
+.csharpcode pre {<br />
+  margin: 0em;<br />
+}<br />
+.csharpcode .alt {<br />
+  background-color: white;<br />
+}<br />
+.csharpcode .asp {<br />
+  background-color: #ffff00;<br />
+}<br />
+.csharpcode .attr {<br />
+  color: #ff0000;<br />
+}<br />
+.csharpcode .html {<br />
+  color: #800000;<br />
+}<br />
+.csharpcode .kwrd {<br />
+  color: #0000ff;<br />
+}<br />
+.csharpcode .lnum {<br />
+  color: #606060;<br />
+}<br />
+.csharpcode .op {<br />
+  color: #0000c0;<br />
+}<br />
+.csharpcode .preproc {<br />
+  color: #cc6633;<br />
+}<br />
+.csharpcode .rem {<br />
+  color: #008000;<br />
+}<br />
+.csharpcode .str {<br />
+  color: #006080;<br />
+}<br />
+</style>
+</div>
+</blockquote>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">3) Create  your animation using the $create Method or use the Static methods of the Animation Library to create animations.</pre>
+<pre class="csharpcode"><strong><u>Sample HTML</u></strong></pre>
+<blockquote><pre class="csharpcode"><span class="kwrd">&lt;!</span><span class="html">DOCTYPE</span> <span class="attr">html</span> <span class="attr">PUBLIC</span> <span class="kwrd">"-//W3C//DTD XHTML 1.0 Transitional//EN"</span> <span class="kwrd">"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">html</span> <span class="attr">xmlns</span><span class="kwrd">="http://www.w3.org/1999/xhtml"</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">head</span><span class="kwrd">&gt;</span>
+    <span class="kwrd">&lt;</span><span class="html">title</span><span class="kwrd">&gt;</span>Animation Repro<span class="kwrd">&lt;/</span><span class="html">title</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">head</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;</span><span class="html">body</span><span class="kwrd">&gt;</span>
+
+    <span class="kwrd">&lt;</span><span class="html">script</span> <span class="attr">src</span><span class="kwrd">="ClientScripts/MicrosoftAjax.debug.js"</span> <span class="attr">type</span><span class="kwrd">="text/javascript"</span><span class="kwrd">&gt;&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+    &lt;script src=<span class="str">"ClientScripts/Timer.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;script src=<span class="str">"ClientScripts/MicrosoftAjaxWebForms.debug.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;script src=<span class="str">"ClientScripts/BaseScripts.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;script src=<span class="str">"ClientScripts/Animations.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;script src=<span class="str">"ClientScripts/Common.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;script src=<span class="str">"ClientScripts/AnimationBehavior.js"</span> type=<span class="str">"text/javascript"</span>&gt;&lt;/script&gt;
+
+    &lt;input type=<span class="str">"button"</span> onclick=<span class="str">"Expand(event)"</span> value=<span class="str">"Expand"</span> style=<span class="str">"display: block"</span>
+        id=<span class="str">"btnExpand"</span> /&gt;
+    &lt;input type=<span class="str">"button"</span> onclick=<span class="str">"Contract(event)"</span> value=<span class="str">"Contract"</span> style=<span class="str">"display: none"</span>
+        id=<span class="str">"btnContract"</span> /&gt;
+    &lt;div id=<span class="str">"popup"</span> style=<span class="str">"display: block; cursor: hand; background-color: #ffcc00; height: 100px;
+        width: 200px;"</span> title=<span class="str">"click to hide"</span>&gt;
+        &lt;table style=<span class="str">"width: 100%; height: 100%;"</span>&gt;
+            &lt;tr&gt;
+                &lt;td style=<span class="str">"text-align: center; vertical-align: middle;"</span>&gt;
+                    TEST
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;script type=<span class="str">"text/javascript"</span>&gt;
+
+
+&lt;!--
+
+Sys.Application.initialize();
+
+<span class="kwrd">function</span> Contract(eventArgument) {
+
+   <span class="rem">//Hack for FireFox</span>
+    <span class="kwrd">if</span>( eventArgument == <span class="kwrd">null</span> )
+    {
+        eventArgument = <span class="kwrd">event</span>;
+    }
+    $get(<span class="str">"btnExpand"</span>).style.display = <span class="str">"block"</span>;
+    $get(<span class="str">"btnContract"</span>).style.display = <span class="str">"none"</span>;
+
+    <span class="rem">//ResizeAnimation.play(target, duration, fps, width, height, unit);</span>
+    AjaxControlToolkit.Animation.ResizeAnimation.play($get(<span class="str">"popup"</span>), 0.3 , 25 , 200 , 100 , <span class="str">"px"</span> );
+
+}
+
+<span class="kwrd">function</span> Expand(eventArgument) {
+
+<span class="rem">//Hack for FireFox </span>
+    <span class="kwrd">if</span>( eventArgument == <span class="kwrd">null</span> )
+    {
+        eventArgument = <span class="kwrd">event</span>;
+    }
+
+    $get(<span class="str">"btnExpand"</span>).style.display = <span class="str">"none"</span>;
+    $get(<span class="str">"btnContract"</span>).style.display = <span class="str">"block"</span>;
+
+    <span class="rem">//ResizeAnimation.play(target, duration, fps, width, height, unit);</span>
+    AjaxControlToolkit.Animation.ResizeAnimation.play($get(<span class="str">"popup"</span>), 0.3 , 25 , 400 , 400 , <span class="str">"px"</span> );
+
+
+}
+--&gt;
+    <span class="kwrd">&lt;/</span><span class="html">script</span><span class="kwrd">&gt;</span>
+
+<span class="kwrd">&lt;/</span><span class="html">body</span><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">html</span><span class="kwrd">&gt;</span>
+</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<pre class="csharpcode"></pre>
+<div>&nbsp;</div>
+</blockquote>
+<pre class="csharpcode">Check out the Sample Attached to get a feel of how this works.</pre>
+<pre class="csharpcode">Any questions/comments are welcome </pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><a href="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Components.PostAttachments/00/01/86/56/12/Client-Side%20Animations.zip" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-components-postattachments/00-01-86-56-12/Client_2D00_Side-Animations.zip">Client-Side Animations.zip</a></p>

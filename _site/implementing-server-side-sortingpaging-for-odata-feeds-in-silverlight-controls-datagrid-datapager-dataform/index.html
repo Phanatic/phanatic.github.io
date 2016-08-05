@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Implementing Server-side Sorting/Paging for OData feeds in Silverlight Controls ( DataGrid, DataPager, DataForm ) – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Download sample application and source here 
+This blog post was written almost a year ago, but lethargy and constant revision has made me realize that good blog posts are hard to write.
+
+
+Background
+
+
+Nuts and Bolts
+
+
+Using this in your applications:
+
+
+Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type
+
+
+Background
+When the DataGrid shipped in Silverlight 3 SDK, there were a lot of cool things you could do with it. You could sort items by a column by clicking on the header, you could group items by writing some code, you could hook up a datapager to the control and have the grid bind to pages of data instead of a really long list. In short, pretty cool stuff. Around the same time, I started investigating what would it take to achieve the same effect with remote data sources, most importantly, an Astoria ( / WCF Data Services / OData / This week&rsquo;s name ) service. Imagine clicking a datagrid bound to an Astoria feed and clicking on a column header would cause us to ask the server to sort the collection and return the results. Having spent a weekend investigating what it would take to get the entire gamut of the Silverlight toolkit&rsquo;s UI controls , such as DataGrid/DataPager/DataForm/Charts , to bind to an Astoria feed and have this kind of interaction , I figured out that not only was this easy to do,but that there&rsquo;s a lot of value in doing this for Silverlight controls. After this investigation and the initial excitement, We got to work on the Astoria V2 release and this work was lost in that noise. 
+Recently, since I have a bit of time to step back and think a bit, I decided to revive this work and release the source code and samples so that someone out there can use it in their applications and make some sense of it. As Steve Jobs ( as quoted by&nbsp; Alex James ) says &ldquo;Real artists ship&rdquo;.
+Nuts and Bolts
+Let&rsquo;s start with this MSDN document :How to: Group, Sort, and Filter Data in the DataGrid Control It states how one can use the PagedCollectionView&nbsp; to implement sorting/grouping/paging support in the DataGrid. Piqued by similar documentation that existed back in the day, I reflected over this collection type and realized that it implemented a couple of interfaces that were the secret sauce to getting this to work. 1. ICollectionView : this interface has definitions of methods for sorting/grouping a collection of items 2. IPagedCollectionView : this interface has methods for paging a collection, the DataPager control uses this to &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trigger paging calls on the underlying collection. 3. IEditableCollectionView : this interface has methods for editing a collection, the dataform control uses this interface to add/remove items 
+Having understood what makes the datagrid&rsquo;s sorting/paging tick, I set to work on building an implementation of these interfaces which used a datasource to query the OData Service to perform most of these operations. 
+The sorting calls were made by the $orderby query option and the paging calls were made by a combination of $skip and $top options. 
+OrderBy query option : http://www.odata.org/developers/protocols/uri-conventions#OrderBySystemQueryOption
+Discussions with some people led me to believe that a datasource which was intrinsic to the collection types themselves seemed &ldquo;evil&rdquo; to a lot of people. After multiple iterations, this is what the code looks like today . 
+We have&nbsp; collection type called : ODataServiceCollection&lt;T&gt; which implements all the above interfaces and uses an IDataSource&lt;TEntity&gt; instance to perform the majority of the heavy lifting required for doing the actual sorting/paging calls. At a glance, this is what the IDataSource&lt;TEntity&gt; looks like : 
+/// &lt;summary&gt;
+/// This interface defines the behavior for a type which acts as the DataSource for an ODataServiceCollection.
+/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;The Entity Type&lt;/typeparam&gt;
+public interface IDataSource&lt;TEntity&gt; where TEntity : class
+{
+    /// &lt;summary&gt;
+    /// This method is called to sort the SourceCollection on the ODataServiceCollection.
+    /// &lt;/summary&gt;
+    /// &lt;param name="sortDescriptions"&gt;A collection that contains the SortDescriptions&lt;/param&gt;
+    void Sort(SortDescriptionCollection sortDescriptions);
+
+    /// &lt;summary&gt;
+    /// This method is called to load the &lt;paramref name="pageIndex"/&gt; page of the SourceCollection.
+    /// &lt;/summary&gt;
+    /// &lt;param name="pageIndex"&gt;The page index for the new page of results that the collection should fetch&lt;/param&gt;
+    void GoToPage(int pageIndex);
+
+    /// &lt;summary&gt;
+    /// This method is called to calculate the TotalCount of entities in the SourceCollection.
+    /// &lt;/summary&gt;
+    void GetTotalCount();
+
+    /// &lt;summary&gt;
+    /// The number of items to show in each page of results
+    /// &lt;/summary&gt;
+    short PageSize { get; set; }
+
+    /// &lt;summary&gt;
+    /// A boolean value which specifies if the DataSource is loading a page of results.
+    /// &lt;/summary&gt;
+    bool IsLoading { get; }
+
+    /// &lt;summary&gt;
+    /// This event is fired when the GetTotalCount function finishes execution.
+    /// &lt;/summary&gt;
+    event EventHandler&lt;CountEventArgs&gt; GetTotalCountCompleted;
+
+    /// &lt;summary&gt;
+    /// This event is fired when the DataSource has completed loading a page of results.
+    /// &lt;/summary&gt;
+    event EventHandler&lt;EntityEventArgs&lt;TEntity&gt;&gt; EntitiesDownloaded;
+}
+Depending on the implementation of the IDataSource.Sort method, you can do all of these operations in-memory or query a data service to do the operations on the server-side. 
+Using this in your applications
+The sample code contains an IDataSource implementation which calls an OData Server for sorting operations.
+// This is the Data Source that does query maintenance and listens to sorting and // paging calls from the ODataServiceCollection
+// You can swap this out to use your own in-memory DataSource for unit testing.
+ODataDataSource&lt;Title&gt; titlesDataSource = new ODataDataSource&lt;NetFlix.Title&gt;(
+                new Uri("http://odata.netflix.com/Catalog"), /*Base Uri of the Data Service */
+                "Titles", /*Name of the Entity Set */
+                5 /*number of entities to be loaded in each page*/);
+
+ODataServiceCollection&lt;Title&gt; titlesCollection = new ODataServiceCollection&lt;Title&gt;(titlesDataSource);
+and then you hook up the DataGrid by setting the ItemsSource.
+dgTitles.ItemsSource = titlesCollection;
+From this point on, any actions performed on the DataGrid such as Sorting/Paging on the DataPager are taken care of by the collection and the results are updated on the screen.
+Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type
+Click here to enter a suggestion on our Connect site if you want to see this support in the DataServiceCollection&lt;TEntity&gt; type that we ship in the Silverlight client library.A lot of this experimentation is to satisfy my own curiosity to learn these UI technologies and inner workings, If you feel that&nbsp; you want the team to build support for Sorting/Paging into the product, make a suggestion on the above link and get your voice heard.
+" />
+    <meta property="og:description" content="Download sample application and source here 
+This blog post was written almost a year ago, but lethargy and constant revision has made me realize that good blog posts are hard to write.
+
+
+Background
+
+
+Nuts and Bolts
+
+
+Using this in your applications:
+
+
+Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type
+
+
+Background
+When the DataGrid shipped in Silverlight 3 SDK, there were a lot of cool things you could do with it. You could sort items by a column by clicking on the header, you could group items by writing some code, you could hook up a datapager to the control and have the grid bind to pages of data instead of a really long list. In short, pretty cool stuff. Around the same time, I started investigating what would it take to achieve the same effect with remote data sources, most importantly, an Astoria ( / WCF Data Services / OData / This week&rsquo;s name ) service. Imagine clicking a datagrid bound to an Astoria feed and clicking on a column header would cause us to ask the server to sort the collection and return the results. Having spent a weekend investigating what it would take to get the entire gamut of the Silverlight toolkit&rsquo;s UI controls , such as DataGrid/DataPager/DataForm/Charts , to bind to an Astoria feed and have this kind of interaction , I figured out that not only was this easy to do,but that there&rsquo;s a lot of value in doing this for Silverlight controls. After this investigation and the initial excitement, We got to work on the Astoria V2 release and this work was lost in that noise. 
+Recently, since I have a bit of time to step back and think a bit, I decided to revive this work and release the source code and samples so that someone out there can use it in their applications and make some sense of it. As Steve Jobs ( as quoted by&nbsp; Alex James ) says &ldquo;Real artists ship&rdquo;.
+Nuts and Bolts
+Let&rsquo;s start with this MSDN document :How to: Group, Sort, and Filter Data in the DataGrid Control It states how one can use the PagedCollectionView&nbsp; to implement sorting/grouping/paging support in the DataGrid. Piqued by similar documentation that existed back in the day, I reflected over this collection type and realized that it implemented a couple of interfaces that were the secret sauce to getting this to work. 1. ICollectionView : this interface has definitions of methods for sorting/grouping a collection of items 2. IPagedCollectionView : this interface has methods for paging a collection, the DataPager control uses this to &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trigger paging calls on the underlying collection. 3. IEditableCollectionView : this interface has methods for editing a collection, the dataform control uses this interface to add/remove items 
+Having understood what makes the datagrid&rsquo;s sorting/paging tick, I set to work on building an implementation of these interfaces which used a datasource to query the OData Service to perform most of these operations. 
+The sorting calls were made by the $orderby query option and the paging calls were made by a combination of $skip and $top options. 
+OrderBy query option : http://www.odata.org/developers/protocols/uri-conventions#OrderBySystemQueryOption
+Discussions with some people led me to believe that a datasource which was intrinsic to the collection types themselves seemed &ldquo;evil&rdquo; to a lot of people. After multiple iterations, this is what the code looks like today . 
+We have&nbsp; collection type called : ODataServiceCollection&lt;T&gt; which implements all the above interfaces and uses an IDataSource&lt;TEntity&gt; instance to perform the majority of the heavy lifting required for doing the actual sorting/paging calls. At a glance, this is what the IDataSource&lt;TEntity&gt; looks like : 
+/// &lt;summary&gt;
+/// This interface defines the behavior for a type which acts as the DataSource for an ODataServiceCollection.
+/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;The Entity Type&lt;/typeparam&gt;
+public interface IDataSource&lt;TEntity&gt; where TEntity : class
+{
+    /// &lt;summary&gt;
+    /// This method is called to sort the SourceCollection on the ODataServiceCollection.
+    /// &lt;/summary&gt;
+    /// &lt;param name="sortDescriptions"&gt;A collection that contains the SortDescriptions&lt;/param&gt;
+    void Sort(SortDescriptionCollection sortDescriptions);
+
+    /// &lt;summary&gt;
+    /// This method is called to load the &lt;paramref name="pageIndex"/&gt; page of the SourceCollection.
+    /// &lt;/summary&gt;
+    /// &lt;param name="pageIndex"&gt;The page index for the new page of results that the collection should fetch&lt;/param&gt;
+    void GoToPage(int pageIndex);
+
+    /// &lt;summary&gt;
+    /// This method is called to calculate the TotalCount of entities in the SourceCollection.
+    /// &lt;/summary&gt;
+    void GetTotalCount();
+
+    /// &lt;summary&gt;
+    /// The number of items to show in each page of results
+    /// &lt;/summary&gt;
+    short PageSize { get; set; }
+
+    /// &lt;summary&gt;
+    /// A boolean value which specifies if the DataSource is loading a page of results.
+    /// &lt;/summary&gt;
+    bool IsLoading { get; }
+
+    /// &lt;summary&gt;
+    /// This event is fired when the GetTotalCount function finishes execution.
+    /// &lt;/summary&gt;
+    event EventHandler&lt;CountEventArgs&gt; GetTotalCountCompleted;
+
+    /// &lt;summary&gt;
+    /// This event is fired when the DataSource has completed loading a page of results.
+    /// &lt;/summary&gt;
+    event EventHandler&lt;EntityEventArgs&lt;TEntity&gt;&gt; EntitiesDownloaded;
+}
+Depending on the implementation of the IDataSource.Sort method, you can do all of these operations in-memory or query a data service to do the operations on the server-side. 
+Using this in your applications
+The sample code contains an IDataSource implementation which calls an OData Server for sorting operations.
+// This is the Data Source that does query maintenance and listens to sorting and // paging calls from the ODataServiceCollection
+// You can swap this out to use your own in-memory DataSource for unit testing.
+ODataDataSource&lt;Title&gt; titlesDataSource = new ODataDataSource&lt;NetFlix.Title&gt;(
+                new Uri("http://odata.netflix.com/Catalog"), /*Base Uri of the Data Service */
+                "Titles", /*Name of the Entity Set */
+                5 /*number of entities to be loaded in each page*/);
+
+ODataServiceCollection&lt;Title&gt; titlesCollection = new ODataServiceCollection&lt;Title&gt;(titlesDataSource);
+and then you hook up the DataGrid by setting the ItemsSource.
+dgTitles.ItemsSource = titlesCollection;
+From this point on, any actions performed on the DataGrid such as Sorting/Paging on the DataPager are taken care of by the collection and the results are updated on the screen.
+Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type
+Click here to enter a suggestion on our Connect site if you want to see this support in the DataServiceCollection&lt;TEntity&gt; type that we ship in the Silverlight client library.A lot of this experimentation is to satisfy my own curiosity to learn these UI technologies and inner workings, If you feel that&nbsp; you want the team to build support for Sorting/Paging into the product, make a suggestion on the above link and get your voice heard.
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Implementing Server-side Sorting/Paging for OData feeds in Silverlight Controls ( DataGrid, DataPager, DataForm )" />
+    <meta property="twitter:title" content="Implementing Server-side Sorting/Paging for OData feeds in Silverlight Controls ( DataGrid, DataPager, DataForm )" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Implementing Server-side Sorting/Paging for OData feeds in Silverlight Controls ( DataGrid, DataPager, DataForm )</h1>
+
+  <div class="entry">
+    <h4><a href="http://cid-925c2d2bb2d03c6b.office.live.com/self.aspx/Public/EuphoriaClientApp.zip">Download sample application and source here </a></h4>
+<p>This blog post was written almost a year ago, but lethargy and constant revision has made me realize that good blog posts are hard to write.</p>
+<ol>
+<li>
+<h3><a href="#Background">Background</a></h3>
+</li>
+<li>
+<h3><a href="#NutsandBolts">Nuts and Bolts</a></h3>
+</li>
+<li>
+<h3><a href="#Usage">Using this in your applications:</a></h3>
+</li>
+<li>
+<h3><a href="#JoinMeForThisFeature">Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type</a></h3>
+</li>
+</ol>
+<h3><a name="Background">Background</a></h3>
+<p>When the DataGrid shipped in Silverlight 3 SDK, there were a lot of cool things you could do with it. <br />You could sort items by a column by clicking on the header, you could group items by writing some code, you could hook up a datapager to the control <br />and have the grid bind to pages of data instead of a really long list. In short, pretty cool stuff. Around the same time, I started investigating what would it <br />take to achieve the same effect with remote data sources, most importantly, an Astoria ( / WCF Data Services / OData / This week&rsquo;s name ) service. <br />Imagine clicking a datagrid bound to an Astoria feed and clicking on a column header would cause us to ask the server to sort the collection and return the results. Having spent a weekend investigating what it would take to get the entire gamut of the Silverlight toolkit&rsquo;s UI controls , such as DataGrid/DataPager/DataForm/Charts , to bind to an Astoria feed and have this kind of interaction , I figured out that not only was this easy to do,but that <br />there&rsquo;s a lot of value in doing this for Silverlight controls. After this investigation and the initial excitement, We got to work on the Astoria V2 release and this work was lost in that noise. </p>
+<p>Recently, since I have a bit of time to step back and think a bit, I decided to revive this work and release the source code and samples so that someone out there can use it in their applications and make some sense of it. As Steve Jobs ( as quoted by&nbsp; Alex James ) says &ldquo;Real artists ship&rdquo;.</p>
+<h3><a name="NutsandBolts">Nuts and Bolts</a></h3>
+<p>Let&rsquo;s start with this MSDN document :<a href="http://msdn.microsoft.com/en-us/library/dd833072(VS.95).aspx">How to: Group, Sort, and Filter Data in the DataGrid Control</a> <br />It states how one can use the PagedCollectionView&nbsp; to implement sorting/grouping/paging support in the DataGrid. <br />Piqued by similar documentation that existed back in the day, I reflected over this collection type and realized that it implemented <br />a couple of interfaces that were the secret sauce to getting this to work. <br />1. ICollectionView : this interface has definitions of methods for sorting/grouping a collection of items <br />2. IPagedCollectionView : this interface has methods for paging a collection, the DataPager control uses this to <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trigger paging calls on the underlying collection. <br />3. IEditableCollectionView : this interface has methods for editing a collection, the dataform control uses this interface to add/remove items </p>
+<p>Having understood what makes the datagrid&rsquo;s sorting/paging tick, I set to work on building an implementation of these interfaces which used a <br />datasource to query the OData Service to perform most of these operations. </p>
+<p>The sorting calls were made by the $orderby query option and the paging calls were made by a combination of $skip and $top options. </p>
+<p>OrderBy query option : <a href="http://www.odata.org/developers/protocols/uri-conventions#OrderBySystemQueryOption" title="http://www.odata.org/developers/protocols/uri-conventions#OrderBySystemQueryOption">http://www.odata.org/developers/protocols/uri-conventions#OrderBySystemQueryOption</a></p>
+<p>Discussions with some people led me to believe that a datasource which was intrinsic to the collection types themselves seemed &ldquo;evil&rdquo; to a lot of people. <br />After multiple iterations, this is what the code looks like today . </p>
+<p>We have&nbsp; collection type called : ODataServiceCollection&lt;T&gt; which implements all the above interfaces and uses an IDataSource&lt;TEntity&gt; instance <br />to perform the majority of the heavy lifting required for doing the actual sorting/paging calls. <br />At a glance, this is what the IDataSource&lt;TEntity&gt; looks like : </p>
+<pre class="code"><span style="color: gray">/// &lt;summary&gt;
+/// </span><span style="color: green">This interface defines the behavior for a type which acts as the DataSource for an ODataServiceCollection.
+</span><span style="color: gray">/// &lt;/summary&gt;
+/// &lt;typeparam name="TEntity"&gt;</span><span style="color: green">The Entity Type</span><span style="color: gray">&lt;/typeparam&gt;
+</span><span style="color: blue">public interface </span><span style="color: #2b91af">IDataSource</span>&lt;TEntity&gt; <span style="color: blue">where </span>TEntity : <span style="color: blue">class
+</span>{
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">This method is called to sort the SourceCollection on the ODataServiceCollection.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    /// &lt;param name="sortDescriptions"&gt;</span><span style="color: green">A collection that contains the SortDescriptions</span><span style="color: gray">&lt;/param&gt;
+    </span><span style="color: blue">void </span>Sort(<span style="color: #2b91af">SortDescriptionCollection </span>sortDescriptions);
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">This method is called to load the </span><span style="color: gray">&lt;paramref name="pageIndex"/&gt; </span><span style="color: green">page of the SourceCollection.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    /// &lt;param name="pageIndex"&gt;</span><span style="color: green">The page index for the new page of results that the collection should fetch</span><span style="color: gray">&lt;/param&gt;
+    </span><span style="color: blue">void </span>GoToPage(<span style="color: blue">int </span>pageIndex);
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">This method is called to calculate the TotalCount of entities in the SourceCollection.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    </span><span style="color: blue">void </span>GetTotalCount();
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">The number of items to show in each page of results
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    </span><span style="color: blue">short </span>PageSize { <span style="color: blue">get</span>; <span style="color: blue">set</span>; }
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">A boolean value which specifies if the DataSource is loading a page of results.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    </span><span style="color: blue">bool </span>IsLoading { <span style="color: blue">get</span>; }
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">This event is fired when the GetTotalCount function finishes execution.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    </span><span style="color: blue">event </span><span style="color: #2b91af">EventHandler</span>&lt;<span style="color: #2b91af">CountEventArgs</span>&gt; GetTotalCountCompleted;
+
+    <span style="color: gray">/// &lt;summary&gt;
+    /// </span><span style="color: green">This event is fired when the DataSource has completed loading a page of results.
+    </span><span style="color: gray">/// &lt;/summary&gt;
+    </span><span style="color: blue">event </span><span style="color: #2b91af">EventHandler</span>&lt;<span style="color: #2b91af">EntityEventArgs</span>&lt;TEntity&gt;&gt; EntitiesDownloaded;
+}</pre>
+<p>Depending on the implementation of the IDataSource.Sort method, you can do all of these operations in-memory or <br />query a data service to do the operations on the server-side. </p>
+<h3><a name="Usage">Using this in your applications</a></h3>
+<p>The sample code contains an IDataSource implementation which calls an OData Server for sorting operations.</p>
+<pre class="code"><span style="color: green">// This is the Data Source that does query maintenance and listens to sorting and <br /><span style="color: green">// </span>paging calls from the ODataServiceCollection
+// You can swap this out to use your own in-memory DataSource for unit testing.
+</span><span style="color: #2b91af">ODataDataSource</span>&lt;<span style="color: #2b91af">Title</span>&gt; titlesDataSource = <span style="color: blue">new </span><span style="color: #2b91af">ODataDataSource</span>&lt;NetFlix.<span style="color: #2b91af">Title</span>&gt;(
+                <span style="color: blue">new </span><span style="color: #2b91af">Uri</span>(<span style="color: #a31515">"http://odata.netflix.com/Catalog"</span>), <span style="color: green">/*Base Uri of the Data Service */
+                </span><span style="color: #a31515">"Titles"</span>, <span style="color: green">/*Name of the Entity Set */
+                </span>5 <span style="color: green">/*number of entities to be loaded in each page*/</span>);
+
+<span style="color: #2b91af">ODataServiceCollection</span>&lt;<span style="color: #2b91af">Title</span>&gt; titlesCollection = <span style="color: blue">new </span><span style="color: #2b91af">ODataServiceCollection</span>&lt;<span style="color: #2b91af">Title</span>&gt;(titlesDataSource);</pre>
+<p>and then you hook up the DataGrid by setting the ItemsSource.</p>
+<pre class="code">dgTitles.ItemsSource = titlesCollection;</pre>
+<p>From this point on, any actions performed on the DataGrid such as Sorting/Paging on the DataPager are taken care of by the collection <br />and the results are updated on the screen.</p>
+<h3><a name="JoinMeForThisFeature">Vote to get these features in the DataServiceCollection&lt;TEntity&gt; type</a></h3>
+<p>Click <a href="https://connect.microsoft.com/data/feedback/CreateFeedbackForm.aspx?FeedbackFormConfigurationID=3978&amp;FeedbackType=2">here</a> to enter a suggestion on our Connect site if you want to see this support in the DataServiceCollection&lt;TEntity&gt; type that we ship in the <br />Silverlight client library.A lot of this experimentation is to satisfy my own curiosity to learn these UI technologies and inner workings, <br />If you feel that&nbsp; you want the team to build support for Sorting/Paging into the product, make a suggestion on the above link and get your voice heard.</p>
+
+  </div>
+
+  <div class="date">
+    Written on August 18, 2010
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

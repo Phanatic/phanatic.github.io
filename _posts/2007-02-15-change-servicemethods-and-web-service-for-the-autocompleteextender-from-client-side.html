@@ -1,0 +1,137 @@
+---
+layout: post
+title: Change ServiceMethods and Web Service for the AutoCompleteExtender From Client
+  Side
+date: 2007-02-15 23:25:00.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- AJAX
+- AutoCompleteExtender
+- Components
+- JavaScript
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2007/02/16/change-servicemethods-and-web-service-for-the-autocompleteextender-from-client-side.aspx
+  orig_site_id: '7524'
+  orig_post_id: '1686950'
+  orig_parent_id: '1686950'
+  orig_thread_id: '495998'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2007/02/15/change-servicemethods-and-web-service-for-the-autocompleteextender-from-client-side.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Change ServiceMethods and Web Service for the AutoCompleteExtender From Client Side" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/15/change-servicemethods-and-web-service-for-the-autocompleteextender-from-client-side/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="This is quite a common requirement and guess the Docs are not really clear as to how you can achieve this . Lemme see how I can help You want to&nbsp; change the Webmethod that the AutoComplete Extender Talks to from the Client Side. You want to&nbsp; change the WebService that the AutoComplete Extender Talks..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Change ServiceMethods and Web Service for the AutoCompleteExtender From Client Side" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2007/02/15/change-servicemethods-and-web-service-for-the-autocompleteextender-from-client-side/" />
+    <meta name="twitter:description" content="This is quite a common requirement and guess the Docs are not really clear as to how you can achieve this . Lemme see how I can help You want to&nbsp; change the Webmethod that the AutoComplete Extender Talks to from the Client Side. You want to&nbsp; change the WebService that the AutoComplete Extender Talks..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>This is quite a common requirement and guess the Docs are not really clear as to how you can achieve this .</p>
+<p>Lemme see how I can help</p>
+<ol>
+<li>You want to&nbsp; change the Webmethod that the AutoComplete Extender Talks to from the Client Side.</li>
+<li>You want to&nbsp; change the WebService that the AutoComplete Extender Talks to from the Client Side.</li>
+</ol>
+<p>You can achieve this easily using the Functions Provided by the Extenders on the Client Side.</p>
+<p>Follow these Simple Steps.</p>
+<p>1) Assign a BehaviourID to the AutoCompleteExtender.</p>
+<p mce_keep="true">&nbsp;</p>
+<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">cc1:AutoCompleteExtender</span>
+               <span class="attr">ID</span><span class="kwrd">="AutoCompleteImagesExtender1"</span> <span class="attr">runat</span><span class="kwrd">="server"</span> <span class="attr">TargetControlID</span><span class="kwrd">="myTextBox"</span>
+                <span class="attr">ServicePath</span><span class="kwrd">="AutoComplete.asmx"</span> <span class="attr">ServiceMethod</span><span class="kwrd">="GetCompletionList"</span> <span class="attr">MinimumPrefixLength</span><span class="kwrd">="2"</span>
+                <span class="attr">CompletionInterval</span><span class="kwrd">="1000"</span> <span class="attr">EnableCaching</span><span class="kwrd">="true"</span>
+                <span class="attr">CompletionListElementID</span><span class="kwrd">="divCompletionImages"</span>
+                <span class="attr">CompletionSetCount</span><span class="kwrd">="12"</span>
+                <strong><font size="3"><span class="attr">BehaviorID</span><span class="kwrd">="autoCompleteExtender"</span></font></strong><span class="kwrd">&gt;</span>
+<span class="kwrd">&lt;/</span><span class="html">cc1:AutoCompleteExtender</span><span class="kwrd">&gt;</span></pre>
+<pre class="csharpcode">2) You can change the Web Service that the AutoCompleteExtender Talks to by using the Following JavaScript.</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode"><span class="kwrd">function</span> ChangeServicePath(){
+        <span class="kwrd">var</span> autoComplete = $find(<span class="str">"<font size="3"><strong>autoCompleteExtender</strong></font>"</span>);
+        autoComplete.set_servicePath( &lt;NewServicePath&gt;);
+        }</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">As you can see the $find  method is called on the behaviourID of the AutoCompleteExtender.</pre>
+<pre class="csharpcode">The "set_servicePath" method allows you to Set the path to the Web Service that the Extender talks to .</pre>
+<pre class="csharpcode">3) You can change the Web Service that the AutoCompleteExtender Talks to by using the Following JavaScript.</pre>
+<pre class="csharpcode"><span class="kwrd">function</span> ChangeServiceMethod(){
+        <span class="kwrd">var</span> autoComplete = $find(<span class="str">"<font size="6"><font size="3"><strong>autoCompleteExtender</strong></font></font>"</span>);
+        autoComplete.set_serviceMethod( &lt;NewServiceMethodName&gt;);
+        }</pre>
+<pre class="csharpcode">&nbsp;</pre>
+<pre class="csharpcode">The "set_serviceMethod" method allows you to Set the path to the Web Service that the Extender talks to .</pre>
+<pre class="csharpcode">Hope this Helps </pre>
+<pre class="csharpcode">&nbsp;</pre>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<style type="text/css">.csharpcode, .csharpcode pre<br />
+{<br />
+	font-size: small;<br />
+	color: black;<br />
+	font-family: consolas, "Courier New", courier, monospace;<br />
+	background-color: #ffffff;<br />
+	/*white-space: pre;*/<br />
+}<br />
+.csharpcode pre { margin: 0em; }<br />
+.csharpcode .rem { color: #008000; }<br />
+.csharpcode .kwrd { color: #0000ff; }<br />
+.csharpcode .str { color: #006080; }<br />
+.csharpcode .op { color: #0000c0; }<br />
+.csharpcode .preproc { color: #cc6633; }<br />
+.csharpcode .asp { background-color: #ffff00; }<br />
+.csharpcode .html { color: #800000; }<br />
+.csharpcode .attr { color: #ff0000; }<br />
+.csharpcode .alt<br />
+{<br />
+	background-color: #f4f4f4;<br />
+	width: 100%;<br />
+	margin: 0em;<br />
+}<br />
+.csharpcode .lnum { color: #606060; }<br />
+</style>
+<p><script type="text/javascript"><br />
+    if (typeof window.Delicious == "undefined") window.Delicious = {};<br />
+    Delicious.BLOGBADGE_DEFAULT_CLASS = 'delicious-blogbadge-line';<br />
+</script></p>
+<p><script src="http://images.del.icio.us/static/js/blogbadge.js" mce_src="http://images.del.icio.us/static/js/blogbadge.js"></script></p>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Reporting with ADO.NET Data Services and Telerik Report Viewer – Phani Raj – Technical Lead at HP Cloud</title>
+
+        <meta charset="utf-8" />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+    
+    <meta name="description" content="Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here :
+ADO.NET Data Services with Telerik Controls
+Kevin Babcock has a great post over at Telerik where he talks about using ADO.NET Data Services with Telerik Reporting suite .
+I wanted to address one small point in the blog post which I felt can be improved upon. 
+
+“You might be curious why I chose to iterate through the list of categories in the report parameter value, calling the web service for each one and appending the results to a collection. The reason is that, due to the limitations of ADO.NET Data Services, you can’t use methods like Contains to filter data in your LINQ queries.“
+Yes , this is absolutely correct. We don't support the “Contains” operator to select a primitive property of the Entity Type from a given range of values. The client linq implementation doesn't support Contains on Navigation properties is because we don't have a URI Query operator&nbsp; that corresponds to the "Contains" function to select a value from a set. But you can semantically achieve the same effect by “OR”ing a couple of “EQUALS” expressions.
+ex: 
+If A={0,1,2,3}&nbsp; , then A.Contains(B) is equivalent to ( B == A[0] OR B ==A[1] OR B == A[2])
+I wrote about achieving this effect here :&nbsp; Set Based Operations in Ado.net Data Services
+Now, in this sample , we are filtering an Entity Set (Products) based on the value of a primitive property ( CategoryID ) of a Navigation Property (Categories). Now , since this is the Northwind model Schema, Products are related to categories in a 1..M association and Categories to Products in a 1..M association. 
+What this means is that the above query can be expressed as :&nbsp; 
+
+Now , this is still not as optimal as it can be , but we reduced the number of round trips as we download only relevant categories and their associated Products. To make this even easier , we use the IsIn&lt;T&gt; extension method I wrote from Set Based Operations in Ado.net Data Services.
+
+So , there you have it , we reduced the number of network calls and also the lines of code to achieve this filtering.
+On a side note , Kevin has left Telerik and now blogs at : http://www.myviewstate.net/blog/
+All the best for your future endeavours Kevin !!
+" />
+    <meta property="og:description" content="Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here :
+ADO.NET Data Services with Telerik Controls
+Kevin Babcock has a great post over at Telerik where he talks about using ADO.NET Data Services with Telerik Reporting suite .
+I wanted to address one small point in the blog post which I felt can be improved upon. 
+
+“You might be curious why I chose to iterate through the list of categories in the report parameter value, calling the web service for each one and appending the results to a collection. The reason is that, due to the limitations of ADO.NET Data Services, you can’t use methods like Contains to filter data in your LINQ queries.“
+Yes , this is absolutely correct. We don't support the “Contains” operator to select a primitive property of the Entity Type from a given range of values. The client linq implementation doesn't support Contains on Navigation properties is because we don't have a URI Query operator&nbsp; that corresponds to the "Contains" function to select a value from a set. But you can semantically achieve the same effect by “OR”ing a couple of “EQUALS” expressions.
+ex: 
+If A={0,1,2,3}&nbsp; , then A.Contains(B) is equivalent to ( B == A[0] OR B ==A[1] OR B == A[2])
+I wrote about achieving this effect here :&nbsp; Set Based Operations in Ado.net Data Services
+Now, in this sample , we are filtering an Entity Set (Products) based on the value of a primitive property ( CategoryID ) of a Navigation Property (Categories). Now , since this is the Northwind model Schema, Products are related to categories in a 1..M association and Categories to Products in a 1..M association. 
+What this means is that the above query can be expressed as :&nbsp; 
+
+Now , this is still not as optimal as it can be , but we reduced the number of round trips as we download only relevant categories and their associated Products. To make this even easier , we use the IsIn&lt;T&gt; extension method I wrote from Set Based Operations in Ado.net Data Services.
+
+So , there you have it , we reduced the number of network calls and also the lines of code to achieve this filtering.
+On a side note , Kevin has left Telerik and now blogs at : http://www.myviewstate.net/blog/
+All the best for your future endeavours Kevin !!
+" />
+    
+    <meta name="author" content="Phani Raj" />
+
+    
+    <meta property="og:title" content="Reporting with ADO.NET Data Services and Telerik Report Viewer" />
+    <meta property="twitter:title" content="Reporting with ADO.NET Data Services and Telerik Report Viewer" />
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="alternate" type="application/rss+xml" title="Phani Raj - Technical Lead at HP Cloud" href="/feed.xml" />
+
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Phani Raj</a></h1>
+            <p class="site-description">Technical Lead at HP Cloud</p>
+          </div>
+
+          <nav>
+            <a href="/">Blog</a>
+            <a href="/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>Reporting with ADO.NET Data Services and Telerik Report Viewer</h1>
+
+  <div class="entry">
+    <p>Telerik has a range of controls that work with ADO.NET Data Services as the data source . Take a look at them here :</p>
+<p><a href="http://blogs.telerik.com/SearchResults.aspx?IndexCatalogue=Blogs&amp;SearchQuery=ado.net%20data%20services" target="_blank" mce_href="http://blogs.telerik.com/SearchResults.aspx?IndexCatalogue=Blogs&amp;SearchQuery=ado.net%20data%20services">ADO.NET Data Services with Telerik Controls</a></p>
+<p><a href="http://www.myviewstate.net/blog/post/2009/05/01/A-fresh-starte280a6.aspx" target="_blank" mce_href="http://www.myviewstate.net/blog/post/2009/05/01/A-fresh-starte280a6.aspx">Kevin Babcock</a> has a great post over at Telerik where he talks about <a href="http://blogs.telerik.com/kevinbabcock/posts/09-04-24/connecting_the_dots_ado_net_data_services_and_telerik_reporting.aspx" target="_blank" mce_href="http://blogs.telerik.com/kevinbabcock/posts/09-04-24/connecting_the_dots_ado_net_data_services_and_telerik_reporting.aspx">using ADO.NET Data Services with Telerik Reporting suite</a> .</p>
+<p>I wanted to address one small point in the blog post which I felt can be improved upon. </p>
+<p><script src="http://gist.github.com/109416.js" mce_src="http://gist.github.com/109416.js"></script></p>
+<p>“You might be curious why I chose to iterate through the list of categories in the report parameter value, calling the web service for each one and appending the results to a collection. <br />The reason is that, due to the limitations of ADO.NET Data Services, you can’t use methods like Contains to filter data in your LINQ queries.“</p>
+<p>Yes , this is absolutely correct. <br />We don't support the “Contains” operator to select a primitive property of the Entity Type from a given range of values. <br />The client linq implementation doesn't support Contains on Navigation properties is because we don't have a URI Query operator&nbsp; that corresponds to the "Contains" function to select a value from a set. But you can semantically achieve the same effect by “OR”ing a couple of “EQUALS” expressions.</p>
+<p>ex: </p>
+<p>If A={0,1,2,3}&nbsp; , then A.Contains(B) is equivalent to ( B == A[0] OR B ==A[1] OR B == A[2])</p>
+<p>I wrote about achieving this effect here :&nbsp; <a href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx">Set Based Operations in Ado.net Data Services</a></p>
+<p>Now, in this sample , we are filtering an Entity Set (Products) based on the value of a primitive property ( CategoryID ) of a Navigation Property (Categories). <br />Now , since this is the Northwind model Schema, Products are related to categories in a 1..M association and Categories to Products in a 1..M association. </p>
+<p>What this means is that the above query can be expressed as :&nbsp; <br /><span style="COLOR: green"></span></p>
+<p><script src="http://gist.github.com/109412.js" mce_src="http://gist.github.com/109412.js"></script></p>
+<p>Now , this is still not as optimal as it can be , but we reduced the number of round trips as we download only relevant categories and their associated Products. <br />To make this even easier , we use the IsIn&lt;T&gt; extension method I wrote from <a href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx" mce_href="http://blogs.msdn.com/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx">Set Based Operations in Ado.net Data Services</a>.</p>
+<p><script src="http://gist.github.com/109419.js" mce_src="http://gist.github.com/109419.js"></script></p>
+<p>So , there you have it , we reduced the number of network calls and also the lines of code to achieve this filtering.</p>
+<p>On a side note , <a href="http://blogs.telerik.com/blogs/09-05-02/saying_goodbye_hellip.aspx" target="_blank" mce_href="http://blogs.telerik.com/blogs/09-05-02/saying_goodbye_hellip.aspx">Kevin has left Telerik</a> and now blogs at : <a title="http://www.myviewstate.net/blog/" href="http://www.myviewstate.net/blog/" mce_href="http://www.myviewstate.net/blog/">http://www.myviewstate.net/blog/</a></p>
+<p>All the best for your future endeavours Kevin !!</p>
+
+  </div>
+
+  <div class="date">
+    Written on May  4, 2009
+  </div>
+
+  
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/barryclark/jekyll-now"><i class="svg-icon github"></i></a>
+
+
+
+
+<a href="https://www.twitter.com/jekyllrb"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+
+  </body>
+</html>

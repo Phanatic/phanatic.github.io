@@ -1,0 +1,56 @@
+---
+layout: post
+title: Issues building the OData Explorer sources
+date: 2010-03-21 16:29:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- Explorer
+- OData
+- Sample
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2010/03/22/issues-building-the-odata-explorer-sources.aspx
+  orig_site_id: '7524'
+  orig_post_id: '9982665'
+  orig_parent_id: '9982665'
+  orig_thread_id: '707551'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2010/03/21/issues-building-the-odata-explorer-sources.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Issues building the OData Explorer sources" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/03/21/issues-building-the-odata-explorer-sources/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . In the meantime , here are the four..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Issues building the OData Explorer sources" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2010/03/21/issues-building-the-odata-explorer-sources/" />
+    <meta name="twitter:description" content="When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . In the meantime , here are the four..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>When we put out the sources for the OData Explorer on the OData.org site , we broke something in the sources which prevent them from building on your machine. <br />We will be updating&nbsp; the&nbsp; sources on the OData SDK link quickly once the work week begins . <br />In the meantime , here are the four issues that need to be fixed for the sources to build on your machine</p>
+<p><strong>Issue&nbsp; #1 : The dependency on the Silverlight toolkit is not present in the readme.htm file.</strong></p>
+<p>Solution : We will be updating the htm file to reflect this change , in the meantime You can download the <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; November release of the Silverlight toolkit <a href="http://silverlight.codeplex.com/releases/view/36060#DownloadId=93513" mce_href="http://silverlight.codeplex.com/releases/view/36060#DownloadId=93513">here</a>. </p>
+<p><strong>Issue #2 : The OData Explorer project will not build because of an error during compilation : <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Specifically, the error is : “The name 'ErrorTextBox' does not exist in the current context” in&nbsp; the ErrorWindow.xaml.cs&nbsp;&nbsp; file. </strong></p>
+<p>Solution :&nbsp;&nbsp; In the ErrorWindow.xaml page , change the name of the textbox “txtUserMessage” to “ErrorTextBox” and rebuild.</p>
+<p><strong>Issue #3 : Xap packaging will fail when building the ODataExplorer project <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Error&nbsp;&nbsp;&nbsp; 6&nbsp;&nbsp;&nbsp; Xap packaging failed. Could not find file 'ReadMe.txt' “</strong></p>
+<p>Solution : When packaging the explorer sources we moved the readme to the root of the source tree and didnt update the item reference in the project. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remove the reference to the Readme.txt file by right-clicking the “readme.txt”&nbsp; icon in the ODataExplorer project&nbsp; and selecting “Exclude From Project”</p>
+<p><strong>Issue #4 : The ODataExplorer Project will not build because of an error in the web.config file. <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; “Unexpected XML declaration. The XML declaration must be the first node in the document and no white space characters are allowed to appear before it. “</strong></p>
+<p>Solution : For now , Delete the “web.config” file from the ODataExplorerHost project .</p>
+<p>Again ,I would like to apologize to anyone who ran into these issues and spent time trying to figure out what went wrong with the sources.</p>
+<p>Special thanks to <a href="http://www.bizcoder.com/" mce_href="http://www.bizcoder.com/">Darrel Miller</a> on <a href="https://twitter.com/DarrelMiller" mce_href="https://twitter.com/DarrelMiller">twitter</a> for working through some of these issues and giving us frank feedback. </p>
+<p>We will make sure that the sources on the project are updated as soon as possible and I will update this blog post to reflect the same. </p>

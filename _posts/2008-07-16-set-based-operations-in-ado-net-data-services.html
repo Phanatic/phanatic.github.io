@@ -1,0 +1,127 @@
+---
+layout: post
+title: Set Based Operations in Ado.net Data Services
+date: 2008-07-16 19:51:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _encloseme: '1'
+  orig_url: http://blogs.msdn.microsoft.com/b/phaniraj/archive/2008/07/17/set-based-operations-in-ado-net-data-services.aspx
+  orig_site_id: '7524'
+  orig_post_id: '8741079'
+  orig_parent_id: '8741079'
+  orig_thread_id: '595239'
+  _wds_ratings_users: '0'
+  orig_application_key: phaniraj
+  orig_post_author_id: '56365'
+  orig_post_author_username: PhaniRajuYN
+  orig_post_author_created: Nov 10 2006 05:47:39:000PM
+  orig_is_approved: '1'
+  orig_attachment_count: '0'
+  orig_url_title: http://blogs.msdn.com/b/phaniraj/archive/2008/07/16/set-based-operations-in-ado-net-data-services.aspx
+  opengraph_tags: |
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Set Based Operations in Ado.net Data Services" />
+    <meta property="og:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/07/16/set-based-operations-in-ado-net-data-services/" />
+    <meta property="og:site_name" content="With Great Power comes Great Response.write(&#039;Ability&#039;)" />
+    <meta property="og:description" content="Today&#8217;s Post is co-Authored by Linq Ninja and my Colleague MarceloLinq to Astoria does not support Set based queries , which means that this query is invalid List&lt;string&gt; citiesIWillVisit = new List&lt;string&gt;(){ &#8220;London&#8221;, &#8220;Berlin&#8221;, &#8220;Prague&#8221; }; var customersAround = nwContext.Customers.Where&lt;Customers&gt;(cx =&gt; citiesIWillVisit.Contains(cx.City));The above example would use the IN operator to search for a property ina..." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Set Based Operations in Ado.net Data Services" />
+    <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/phaniraj/2008/07/16/set-based-operations-in-ado-net-data-services/" />
+    <meta name="twitter:description" content="Today&#8217;s Post is co-Authored by Linq Ninja and my Colleague MarceloLinq to Astoria does not support Set based queries , which means that this query is invalid List&lt;string&gt; citiesIWillVisit = new List&lt;string&gt;(){ &#8220;London&#8221;, &#8220;Berlin&#8221;, &#8220;Prague&#8221; }; var customersAround = nwContext.Customers.Where&lt;Customers&gt;(cx =&gt; citiesIWillVisit.Contains(cx.City));The above example would use the IN operator to search for a property ina..." />
+author:
+  login: phanirajuyn
+  email: PhaniRaj@Microsoft.com
+  display_name: Phani Raju MSFT
+  first_name: ''
+  last_name: ''
+---
+<p>Today's Post is co-Authored by Linq Ninja and my Colleague <a href="http://blogs.msdn.com/Marcelolr" mce_href="http://blogs.msdn.com/Marcelolr">Marcelo</a><br />Linq to Astoria does not support Set based queries , which means that this query is invalid
+<pre class="darkcsharpcode">List&lt;<span class="kwrd">string</span>&gt; citiesIWillVisit = <span class="kwrd">new</span> List&lt;<span class="kwrd">string</span>&gt;(){
+                        <span class="str">"London"</span>,
+                        <span class="str">"Berlin"</span>,
+                        <span class="str">"Prague"</span>
+                        };
+var customersAround = nwContext.Customers.Where&lt;Customers&gt;(cx =&gt; citiesIWillVisit.Contains(cx.City));</pre>
+<p>The above example would use the IN operator to search for a property in<br />a given set of values.You can achieve the same query using <br />Dynamic Linq Queries to filter over a set of values by creating Dynamic Linq Queries <br />at runtime based on your logic and Set .Lets take the same example as before .<br />Of all the Customers in the Northwind store , lets say that you want to visit customers living in cities<br />thatare on your itinerary.
+<pre></pre>
+<pre class="darkcsharpcode"> List&lt;<span class="kwrd">object</span>&gt; citiesIWillVisit = <span class="kwrd">new</span> List&lt;<span class="kwrd">object</span>&gt;(){
+                        <span class="str">"London"</span>,
+                        <span class="str">"Berlin"</span>,
+                        <span class="str">"Prague"</span>
+                        };</pre>
+<p>The Customer Entity contains a property called "City" on which we want to filter.<br />if you already know the cities and they wont change , a normal Filter query would look like this 
+<pre class="darkcsharpcode"><span class="rem">            //Create the Northwind Client Context</span>
+            northwindContext nwContext = <span class="kwrd">new</span> northwindContext(
+                <span class="kwrd">new</span> Uri(<span class="str">"http://ServiceEndPoint/Northwind.svc"</span>)
+                );
+
+            var customersAround = from cx <span class="kwrd">in</span> nwContext.Customers
+                                  <span class="kwrd">where</span> cx.City == <span class="str">"London"</span>
+                                  || cx.City == <span class="str">"Berlin"</span>
+                                  || cx.City == <span class="str">"Prague"</span>
+                                  select cx;
+
+            <span class="kwrd">foreach</span> (Customers coHabitant <span class="kwrd">in</span> customersAround) {
+                System.Console.WriteLine(coHabitant.ContactName);
+            }</pre>
+<p>Now , what if the cities you visit is dynamic ? In such a case you cannot write <br />queries for all possible combinations and expect it to work.<br />Its just too wasteful to do that , there is a better way to do this , Dynamic Filter Expressions.<br />Once you have a dynamic filter expression, you can call the "Where" method on <br />the appropriate DataServiceQuery&lt;T&gt; object to get the results. Lets look at how to build a dynamic filter expression.<br />An Expression has the following basic components.
+<pre class="darkcsharpcode">nwContext.Customers.Where&lt;Customers&gt;(cx =&gt; cx.City == <span class="str">"London"</span>)</pre>
+<pre class="darkcsharpcode">Parameter : "cx"<br /><br />Left Hand Side Of Expression : cx.City<br />Constant : "London"<br /></pre>
+<p>If you were to build the same using Dynamic Linq Queries , you would write
+<pre class="darkcsharpcode"><span class="rem">//The parameter expression containing the Entity Type</span>
+<span class="rem">//cx</span>
+ParameterExpression param = Expression.Parameter(<span class="kwrd">typeof</span>(Customers), <span class="str">"cx"</span>);
+<span class="rem">//The Left Hand Side of the Filter Expression</span>
+<span class="rem">//cx=&gt; cx.City</span>
+MemberExpression left = Expression.Property(param, <span class="str">"City"</span>);
+<span class="rem">//The constant to compare against </span>
+ConstantExpression constant = Expression.Constant(<span class="str">"London"</span>)
+<span class="rem">//Build the Filter </span>
+<span class="rem">//cx=&gt; cx.City == "London"</span>
+Expression.Equal( left , constant )
+<span class="rem">//Build the LambdaExpression to pass to the Where Method</span>
+<span class="rem">//.Where(cx=&gt; cx.City == "London")</span>
+var lambda = Expression.Lambda&lt;Func&lt;Customers, <span class="kwrd">bool</span>&gt;&gt;(filterExpression, param);
+<span class="rem">//Execute the Filter </span>
+var customersAround = nwContext.Customers.Where&lt;Customers&gt;(lambda);
+</pre>
+<p>Now , in the case we just described , the expression just compares the value of city to a constant "City". If we had <br />to create a query comparing the value of City to more constant values , we would have had to create expressions with OR .
+<pre class="darkcsharpcode">Expression filterPredicate = <span class="kwrd">null</span>;
+    <span class="kwrd">foreach</span> (var id <span class="kwrd">in</span> set) {
+        <span class="rem">//Build a comparison expression which equates the Id of the Entity with this value in the IDs list</span>
+        <span class="rem">// ex : e.Id == 1</span>
+        Expression comparison = Expression.Equal(left, Expression.Constant(id));
+        <span class="rem">//Add this to the complete Filter Expression</span>
+       <span class="rem">// e.Id == 1 or e.Id == 3</span>
+        filterPredicate = (filterPredicate == <span class="kwrd">null</span>) ? comparison : Expression.Or(filterPredicate, comparison);
+ }</pre>
+<p>This is what the complete Function looks like ..
+<pre class="darkcsharpcode"><br /><span class="kwrd">static</span> Expression&lt;Func&lt;Customers, <span class="kwrd">bool</span>&gt;&gt; ContainedInSet(<span class="kwrd">IEnumerable </span>Set, <span class="kwrd">string</span> Property, Type EntityType)
+        {
+            <span class="rem">//The Filter Predicate that contains the Filter criteria</span>
+            Expression filterPredicate = <span class="kwrd">null</span>;
+            <span class="rem">//The parameter expression containing the Entity Type</span>
+            ParameterExpression param = Expression.Parameter(EntityType, <span class="str">"l"</span>);
+            <span class="rem">//The Left Hand Side of the Filter Expression</span>
+            Expression left = Expression.Property(param, Property);
+
+            <span class="rem">//Build a Dynamic Linq Query for finding an entity whose ID is in the list</span>
+            <span class="kwrd">foreach</span> (var id <span class="kwrd">in</span> Set) {
+                <span class="rem">//Build a comparision expression which equats the Id of the ENtity with this value in the IDs list</span>
+                <span class="rem">// ex : e.Id == 1</span>
+                Expression comparison = Expression.Equal(left, Expression.Constant(id));
+                <span class="rem">//Add this to the complete Filter Expression</span>
+                <span class="rem">// e.Id == 1 or e.Id == 3</span>
+                filterPredicate = (filterPredicate == <span class="kwrd">null</span>) ? comparison : Expression.Or(filterPredicate, comparison);
+            }
+            <span class="rem">//Convert the Filter Expression into a Lambda expression of type Func&lt;Lists,bool&gt;</span>
+            <span class="rem">// which means that this lambda expression takes an instance of type EntityType and returns a Bool</span>
+            var lambdaFilterExpression = Expression.Lambda&lt;Func&lt;Customers, <span class="kwrd">bool</span>&gt;&gt;(filterPredicate, param);
+            <span class="kwrd">return</span> lambdaFilterExpression;
+        }</pre>
+<p>But , it's not fun unless its an Extension Method , so we have the complete sample as :<br />
+<script src="http://gist.github.com/113142.js" mce_src="http://gist.github.com/113142.js"></script></p>
