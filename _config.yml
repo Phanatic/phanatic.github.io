@@ -16,3 +16,7 @@ github_username:  phanatic
 
 # Build settings
 markdown: kramdown
+
+gems:
+  - jekyll-paginate
+paginate: 7
