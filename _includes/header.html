@@ -5,7 +5,9 @@
 <div class="wrapper site-description">
 <center>  {{site.description}} </center>
 </div>
+
 <div class="wrapper">
+
   <div class="trigger site-navigation">
     <a class="page-link" href="{{site.url}}{{site.baseurl}}">HOME</a><span class="exclamationMark">/</span>
 
@@ -16,4 +18,19 @@
     {% endif %}
     {% endfor %}
   </div>
+</div>
+
+<div class="wrapper">
+  <script>
+    (function() {
+      var cx = '016157328419858142813:rebkkdodwus';
+      var gcse = document.createElement('script');
+      gcse.type = 'text/javascript';
+      gcse.async = true;
+      gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(gcse, s);
+    })();
+  </script>
+  <gcse:searchbox-only></gcse:searchbox-only>
 </div>
