@@ -20,4 +20,5 @@ markdown: kramdown
 gems:
   - jekyll-paginate
   - jekyll-seo-tag
+  - jemoji
 paginate: 7
