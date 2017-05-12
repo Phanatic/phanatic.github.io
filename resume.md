@@ -3,8 +3,9 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
+#### **Senior Software Engineer** at GitHub (May 2017 - Current)
 
-#### **Principal Engineer/Technical Lead** at Hewlett Packard (April 2014 - Current)
+#### **Principal Engineer/Technical Lead** at Hewlett Packard (April 2014 - May 2017)
 * Lead developer & architect of a cloud service written from the ground up using nodeJS, RabbitMQ, Angular for UX and a bunch of other amazing technologies.
 * We're building a CI/CD system for customer application workloads that run on top of Helion Cloud Foundry.
 * :star: Received **Bias for Action!** recognition award.
