@@ -105,7 +105,7 @@ so that they could see my screen and follow along as I coded up the solution.
 We had a fun 80 minutes going through the problem, proposing the changes required to make
 the new feature work with the existing code base, and the usual trial & error
 of actually getting a program running. They were really fun to talk to,
-and mercifully laughed at a few of my jokes about. I was able to get the solution to the problem
+and mercifully laughed at a few of my jokes. I was able to get the solution to the problem
 early on and we spent a few extra minutes modifying the existing tests and adding new ones
 so that the new feature could be tested and no older features were broken.
 After a wrap-up, I had a chance to ask a few questions off of my interviewers.
