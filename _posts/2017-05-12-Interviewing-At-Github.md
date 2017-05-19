@@ -10,6 +10,7 @@ tags: [Github, interviewing]
 ---
 This blog post is a timeline of my journey from submitting my application to receiving and accepting an offer at GitHub.
 
+If you're interested in working at Github, feel free to email me at Phanatic At GitHub Dot Com
 ### March 15th - I apply for the job.
  Apply for a job that looks very enticing on the GitHub Jobs Board.
 ### March 15th - Initial contact with the recruiter.
