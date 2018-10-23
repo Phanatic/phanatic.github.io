@@ -3,6 +3,16 @@ layout: page
 title : Projects
 permalink: /projects/
 ---
+
+#### [GitHub Actions](https://developer.github.com/actions/)
+
+GitHub Actions allow you to implement custom logic without having to create an app to perform the task you need. You can combine GitHub Actions to create workflows using an action defined in your repository, a public repository on GitHub, or a published Docker container image. GitHub Actions are customizable and can use the GitHub API and any publicly available third-party APIs to interact with a repository. For example, an action can publish npm modules, send SMS alerts when urgent issues are created, or deploy production ready code. You can discover, create, and share your GitHub Actions with the GitHub community.
+
+#### [GitHub Dependency Graph & Security Alerts](https://help.github.com/articles/listing-the-packages-that-a-repository-depends-on/)
+
+ With security vulnerability alerts, organization owners and repository admins receive a notification when any of their projects has a dependency with a known vulnerability. Organization owners can also share the responsibility by selecting additional individuals and teams to receive notifications when a vulnerability occurs.
+
+
 #### [HPE Helion Code Engine](https://docs.hpcloud.com/stackato/index.html#stackato/ops/quickstart_hce.html)
 
 HPE Helion Cloud Engine allows enterprise developers to automate the build/test/deploy cycle triggered by checkins into Git repositories and into our Cloud Foundry runtime, with intermediate artifacts that are pushed to the Docker Hub or an organization’s Docker Trusted Registry. In addition, HPE Helion Code Engine also integrates HPE Software’s StormRunner tool for load testing a microservice once it’s been deployed to a staging environment—so out of the box, we not only streamline the process, we simplify the load testing, a common and needed safety check in an enterprise CI/CD process.
