@@ -4,6 +4,10 @@ title : Projects
 permalink: /projects/
 ---
 
+#### [GitHub Package Registry](https://help.github.com/en/articles/about-github-package-registry)
+
+GitHub Package Registry is a software package hosting service, similar to npmjs.org, rubygems.org, or hub.docker.com, that allows you to host your packages and code in one place. You can host software packages privately or publicly and use them as dependencies in your projects.
+
 #### [GitHub Actions](https://developer.github.com/actions/)
 
 GitHub Actions allow you to implement custom logic without having to create an app to perform the task you need. You can combine GitHub Actions to create workflows using an action defined in your repository, a public repository on GitHub, or a published Docker container image. GitHub Actions are customizable and can use the GitHub API and any publicly available third-party APIs to interact with a repository. For example, an action can publish npm modules, send SMS alerts when urgent issues are created, or deploy production ready code. You can discover, create, and share your GitHub Actions with the GitHub community.
