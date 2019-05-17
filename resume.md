@@ -3,7 +3,10 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
-#### **Senior Software Engineer** at GitHub (May 2017 - Current)
+#### **Staff Software Engineer** at GitHub (May 2017 - Current)
+* Lead Engineer on [GitHub Package Registry](https://youtu.be/N_-Cu9_2YAA)
+
+* Lead Engineer on [GitHub Dependency Graph](https://help.github.com/en/articles/listing-the-packages-that-a-repository-depends-on)
 
 #### **Principal Engineer/Technical Lead** at Hewlett Packard (April 2014 - May 2017)
 * Lead developer & architect of a cloud service written from the ground up using nodeJS, RabbitMQ, Angular for UX and a bunch of other amazing technologies.
