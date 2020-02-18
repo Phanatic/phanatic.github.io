@@ -3,7 +3,7 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
-#### **Staff Software Engineer** at GitHub (May 2017 - Current)
+#### **Principal Software Engineer** at GitHub (May 2017 - Current)
 * Lead Engineer on [GitHub Package Registry](https://youtu.be/N_-Cu9_2YAA)
 * Staff Engineer on [GitHub Actions](https://developer.github.com/actions/)
 * Lead Engineer on [GitHub Dependency Graph](https://help.github.com/en/articles/listing-the-packages-that-a-repository-depends-on)
