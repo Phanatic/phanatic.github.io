@@ -3,7 +3,11 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
-#### **Principal Software Engineer** at GitHub (May 2017 - Current)
+#### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - Present)
+* More to come. 
+
+#### **Principal Software Engineer** at GitHub (May 2017 - May 2021)
+* Lead Engineer on bringing Actions & Packages to GHES 3.0
 * Lead Engineer on [GitHub Package Registry](https://youtu.be/N_-Cu9_2YAA)
 * Staff Engineer on [GitHub Actions](https://developer.github.com/actions/)
 * Lead Engineer on [GitHub Dependency Graph](https://help.github.com/en/articles/listing-the-packages-that-a-repository-depends-on)
