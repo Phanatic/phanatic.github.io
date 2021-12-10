@@ -6,7 +6,7 @@ permalink: /resume/
 #### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - Present)
 * [Multi-Factor Authentication](https://docs.planetscale.com/concepts/mfa) for the masses on PlanetScale.com
 * [Connection Strings](https://planetscale.com/blog/connect-any-mysql-client-to-planetscale-using-connection-strings), implementing mysql password authentication support for PlanetScale Databases
-* Zero down time [Data Imports into PlanetScale](https://planetscale.com/blog/bring-your-mysql-data-to-planetscale)
+* Zero down time [Data Imports into PlanetScale](https://planetscale.com/blog/import-your-mysql-data-to-planetscale)
 
 #### **Principal Software Engineer** at GitHub (May 2017 - May 2021)
 * Lead Engineer on bringing Actions & Packages to GHES 3.0
