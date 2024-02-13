@@ -3,10 +3,24 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
+Hi, I'm a Software Engineer at PlanetScale.
+
+For over 20 years, I've been a software engineer/architect for cloud services used by millions of developers.
+
+More recently, if you’ve:
+1. Pushed/Pulled a package from GitHub 
+2. Accepted a dependabot PR
+3. Run workflows on GitHub Actions
+4. Connected to a PlanetScale Database.
+
+You’ve used code that I’ve written and services I’ve built.
+
 #### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - Present)
 * [Multi-Factor Authentication](https://docs.planetscale.com/concepts/mfa) for the masses on PlanetScale.com
 * [Connection Strings](https://planetscale.com/blog/connect-any-mysql-client-to-planetscale-using-connection-strings), implementing mysql password authentication support for PlanetScale Databases
 * Zero down time [Data Imports into PlanetScale](https://planetscale.com/blog/import-your-mysql-data-to-planetscale)
+* [ELT support](https://planetscale.com/blog/extract-load-and-transform-your-data-with-planetscale-connect) for PlanetScale databases
+* [Granular access](https://docs.planetscale.com/concepts/password-roles) to PlanetScale databases via passwords & certificates. 
 
 #### **Principal Software Engineer** at GitHub (May 2017 - May 2021)
 * Lead Engineer on bringing Actions & Packages to GHES 3.0
