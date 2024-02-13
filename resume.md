@@ -3,6 +3,8 @@ layout: page
 title : Resume
 permalink: /resume/
 ---
+
+
 Hi, I'm a Software Engineer at PlanetScale.
 
 For over 20 years, I've been a software engineer/architect for cloud services used by millions of developers.
