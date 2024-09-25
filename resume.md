@@ -5,7 +5,7 @@ permalink: /resume/
 ---
 
 
-Hi, I'm a Software Engineer at PlanetScale.
+Hi, I'm a Software Engineer at PostHog.
 
 For over 20 years, I've been a software engineer/architect for cloud services used by millions of developers.
 
@@ -17,7 +17,14 @@ More recently, if you’ve:
 
 You’ve used code that I’ve written and services I’ve built.
 
-#### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - Present)
+### **Technical Lead at PostHog** 
+Technical Lead on the Feature Success team at PostHog. 
+The team owns :
+1. Feature flags as a service. 
+2. User facing surveys
+3. Experiments aka A/B testing.
+
+#### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - May 2024)
 * [Multi-Factor Authentication](https://docs.planetscale.com/concepts/mfa) for the masses on PlanetScale.com
 * [Connection Strings](https://planetscale.com/blog/connect-any-mysql-client-to-planetscale-using-connection-strings), implementing mysql password authentication support for PlanetScale Databases
 * Zero down time [Data Imports into PlanetScale](https://planetscale.com/blog/import-your-mysql-data-to-planetscale)
