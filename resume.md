@@ -5,9 +5,9 @@ permalink: /resume/
 ---
 
 
-Hi, I'm a Software Engineer at PostHog.
+Hi, I'm a Software Engineer at Supernormal.
 
-For over 20 years, I've been a software engineer/architect for cloud services used by millions of developers.
+For over 23 years, I've been a software engineer/architect for cloud services used by millions of developers.
 
 More recently, if you’ve:
 1. Pushed/Pulled a package from GitHub 
@@ -17,14 +17,10 @@ More recently, if you’ve:
 
 You’ve used code that I’ve written and services I’ve built.
 
-### **Technical Lead at PostHog** 
-Technical Lead on the Feature Success team at PostHog. 
-The team owns :
-1. Feature flags as a service. 
-2. User facing surveys
-3. Experiments aka A/B testing.
+#### **Staff Software Engineer/Engineering Lead** at [Supernormal](http://supernormal.com/)
+* Working on some secret sauce, yet to be announced.
 
-#### **Software Engineer** at [PlanetScale](https://www.planetscale.com) (May 2021 - May 2024)
+#### **Engineering Lead** at [PlanetScale](https://www.planetscale.com) (May 2021 - May 2024)
 * [Multi-Factor Authentication](https://docs.planetscale.com/concepts/mfa) for the masses on PlanetScale.com
 * [Connection Strings](https://planetscale.com/blog/connect-any-mysql-client-to-planetscale-using-connection-strings), implementing mysql password authentication support for PlanetScale Databases
 * Zero down time [Data Imports into PlanetScale](https://planetscale.com/blog/import-your-mysql-data-to-planetscale)
