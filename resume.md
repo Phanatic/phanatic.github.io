@@ -14,11 +14,18 @@ More recently, if you’ve:
 2. Accepted a dependabot PR
 3. Run workflows on GitHub Actions
 4. Connected to a PlanetScale Database.
+5. Captured a meeting in Radiant
 
 You’ve used code that I’ve written and services I’ve built.
 
 #### **Staff Software Engineer/Engineering Lead** at [Supernormal](http://supernormal.com/)
-* Working on some secret sauce, yet to be announced.
+* Building [Radiant](https://radiantapp.com/)
+* Leading engineering efforts on **real‑time AI‑powered meeting transcription and artifact generation** used by thousands of customers daily.
+* Architected and implemented a **streaming artifact pipeline** (Rust, Tauri v2, React) that powers Supernormal’s new desktop experience.
+* Built and maintained **high‑scale backend services** (NodeJS, Rails, PostgreSQL) to handle secure ingestion and storage of meeting data.
+* Implemented **GitHub Actions–driven CI/CD pipelines** to build and ship desktop application releases.
+* Mentoring a small team of engineers, setting coding standards, and guiding architectural decisions for upcoming product launches.
+* Working closely with product and design on **“secret sauce” features**—soon to be announced—that push the boundaries of AI‑assisted productivity.
 
 #### **Engineering Lead** at [PlanetScale](https://www.planetscale.com) (May 2021 - May 2024)
 * [Multi-Factor Authentication](https://docs.planetscale.com/concepts/mfa) for the masses on PlanetScale.com
