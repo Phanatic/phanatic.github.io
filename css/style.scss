@@ -279,7 +279,6 @@ code, kbd, samp { font-family: var(--font-mono); }
 .hook {
   background: var(--bg-elev);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
   border-radius: var(--radius);
   padding: 18px 20px;
   box-shadow: var(--shadow);
@@ -348,13 +347,12 @@ code, kbd, samp { font-family: var(--font-mono); }
   border-radius: var(--radius);
   padding: 16px;
   color: var(--fg);
-  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  transition: border-color var(--transition), transform var(--transition);
 }
 .work-card:hover {
   border-color: var(--border-strong);
   border-bottom-color: var(--border-strong);
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
 }
 .work-card .name { color: var(--accent-2); font-weight: 700; }
 .work-card .name::before { content: "› "; color: var(--fg-faint); }
