@@ -5,16 +5,13 @@
     <a class="brand" href="{{ site.url }}{{ site.baseurl }}/"><span class="sigil">~/</span>{{ site.github_username | default: "phani" }}</a>
 
     <nav class="site-nav" aria-label="Primary">
-      <a class="page-link" href="{{ site.url }}{{ site.baseurl }}/">home</a>
-      {% assign nav_order = "resume,writing,recommendations" | split: "," %}
-      {% for slug in nav_order %}
-        {% for p in site.pages %}
-          {% if p.title and p.nav_slug == slug %}
-            <span class="sep" aria-hidden="true">/</span>
-            <a class="page-link" href="{{ p.url | prepend: site.baseurl }}">{{ p.title | downcase }}</a>
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
+      <a class="page-link" href="{{ site.baseurl }}/">home</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a class="page-link" href="{{ site.baseurl }}/resume/">resume</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a class="page-link" href="{{ site.baseurl }}/writing/">writing</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a class="page-link" href="{{ site.baseurl }}/recommendations/">recommendations</a>
 
       <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme" title="Toggle theme">◐</button>
     </nav>
