@@ -1,10 +1,12 @@
 ---
 layout: page
-title : recommendations
+title: Recommendations
+nav_slug: recommendations
+prompt: cat recommendations.md
+tagline: Things colleagues have said about working with me.
 permalink: /recommendations/
 ---
 
-####  Things people have said about me.
 "Phani's a fantastic developer. His greatest strengths are strong design skills and customer focus. He is one of the rare breed of developers who can make the right offs and balance both the technical challenges and experience aspects of software development. Phani will be an asset to any team."
   -  [Augustine Mathews](https://www.linkedin.com/profile/view?id=AAEAAAzGRT4BtPa0nQDcn3o1_TegqNRa9N72vxI&authType=name&authToken=J-iM)
 

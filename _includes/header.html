@@ -1,36 +1,35 @@
+<header class="site-header">
+  <div class="bar">
+    <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
 
-<div class="wrapper">
-  <center> <a href="/index.html"><div class="site-title">   {{site.title}} </div></a></center>
-</div>
-<div class="wrapper site-description">
-<center>  {{site.description}} </center>
-</div>
+    <a class="brand" href="{{ site.url }}{{ site.baseurl }}/"><span class="sigil">~/</span>{{ site.github_username | default: "phani" }}</a>
 
-<div class="wrapper">
+    <nav class="site-nav" aria-label="Primary">
+      <a class="page-link" href="{{ site.url }}{{ site.baseurl }}/">home</a>
+      {% assign nav_order = "resume,projects,writing,recommendations" | split: "," %}
+      {% for slug in nav_order %}
+        {% for p in site.pages %}
+          {% if p.title and p.nav_slug == slug %}
+            <span class="sep" aria-hidden="true">/</span>
+            <a class="page-link" href="{{ p.url | prepend: site.baseurl }}">{{ p.title | downcase }}</a>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
 
-  <div class="trigger site-navigation">
-    <a class="page-link" href="{{site.url}}{{site.baseurl}}">HOME</a><span class="exclamationMark">/</span>
-
-    {% for sitePage in site.pages %}
-    {% if sitePage.title %}
-
-    <a class="page-link" href="{{sitePage.url | prepend: site.baseurl }}">{{sitePage.title}}</a><span class="exclamationMark">/</span>
-    {% endif %}
-    {% endfor %}
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle color theme" title="Toggle theme">◐</button>
+    </nav>
   </div>
-</div>
+</header>
 
-<div class="wrapper">
-  <script>
-    (function() {
-      var cx = '016157328419858142813:rebkkdodwus';
-      var gcse = document.createElement('script');
-      gcse.type = 'text/javascript';
-      gcse.async = true;
-      gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(gcse, s);
-    })();
-  </script>
-  <gcse:searchbox-only></gcse:searchbox-only>
-</div>
+<script>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      var next = cur === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+  })();
+</script>

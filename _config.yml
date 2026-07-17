@@ -17,8 +17,20 @@ github_username:  phanatic
 # Build settings
 markdown: kramdown
 
-gems:
+plugins:
   - jekyll-paginate
   - jekyll-seo-tag
   - jemoji
-paginate: 7
+
+# Blog pagination now lives at /writing/
+paginate: 12
+paginate_path: "/writing/page:num/"
+
+# Exclude dev tooling and legacy theme assets from the build
+exclude:
+  - Dockerfile
+  - start.sh
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor

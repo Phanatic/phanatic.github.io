@@ -4,14 +4,12 @@ layout: default
 <article class="post">
 
   <header class="post-header">
-  <!--  <h1 class="post-title">{{ page.title }}</h1>-->
+    {% if page.prompt %}
+      <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">{{ page.prompt }}</span></div>
+    {% endif %}
+    <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.tagline %}<p class="post-meta">{{ page.tagline }}</p>{% endif %}
   </header>
-
-  {{%if page.tagline%}}
-  <div class="tagline">
-  <span class="page-title">{{page.title}}</span> <span class="page-tagline"><em>{{page.tagline}}</em></span>
-  </div>
-  {{% endif %}}
 
   <div class="post-content">
     {{ content }}

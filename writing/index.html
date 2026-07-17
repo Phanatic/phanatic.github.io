@@ -1,0 +1,40 @@
+---
+layout: default
+title: Writing
+nav_slug: writing
+permalink: /writing/
+---
+
+<article class="post">
+  <header class="post-header">
+    <div class="prompt"><span class="sep">:</span><span class="path">~/writing</span><span class="sep">$</span> <span class="cmd">ls -lt *.md</span></div>
+    <h1 class="post-title">Writing</h1>
+    <p class="post-meta">Notes on shipping developer infrastructure, drawn from 100+ posts written between 2006 and today.</p>
+  </header>
+
+  <div class="post-list">
+    {% for post in paginator.posts %}
+      <div class="post-row">
+        <div class="date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time></div>
+        <div>
+          <a class="post-link" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+          <div class="excerpt">{{ post.content | strip_html | truncatewords: 28 }}</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <nav class="pagination" aria-label="Pagination">
+    {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | prepend: site.baseurl }}" class="previous">newer</a>
+    {% else %}
+      <span class="previous">newer</span>
+    {% endif %}
+    <span class="page_number">{{ paginator.page }} / {{ paginator.total_pages }}</span>
+    {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | prepend: site.baseurl }}" class="next">older</a>
+    {% else %}
+      <span class="next">older</span>
+    {% endif %}
+  </nav>
+</article>

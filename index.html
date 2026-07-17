@@ -4,51 +4,132 @@ layout: default
 
 <div class="home">
 
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">whoami</span></div>
 
-  {% for post in paginator.posts%}
-  <div class="post postContent">
-    <div  class="postDate"><time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">{{ post.date | date: "%b %-d, %Y" }}</time>
-    </div>
-    <div class="postDay">
-      {{post.tag}}
-    </div>
-    <br>
-    <div class="postTitle">
-    <a class='postLink' href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a>
-    </div>
-    <div class="postExt">
-   {{ post.content | strip_html | truncatewords:80}}
-    </div>
-  </div>
+    <p class="id-line"><span class="accent">phani@radiant</span> · staff / principal software engineer · 23 years shipping developer infrastructure</p>
 
+    <h1>Phani Raj</h1>
+    <p class="role">Staff Software Engineer &amp; Engineering Lead <span class="at">@ Supernormal</span><span class="cursor" aria-hidden="true"></span></p>
 
-  {% endfor %}
-  <!-- Pagination links -->
-<div class="pagination">
-  {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" class="previous">Previous</a>
-  {% else %}
-    <span class="previous">Previous</span>
-  {% endif %}
-  <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
-  {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path }}" class="next">Next</a>
-  {% else %}
-    <span class="next ">Next</span>
-  {% endif %}
-</div>
-  <!--<ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta-main">{{ post.date | date: "%b %-d, %Y" }}</span>
+    <p class="tagline">
+      For over two decades I've designed and built cloud services and developer
+      tools used by millions of engineers &mdash; at GitHub, PlanetScale,
+      Hewlett&nbsp;Packard, Microsoft, and now Supernormal.
+    </p>
 
-        <h2>
-          <a class="post-link-main" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
+    <div class="socials">
+      <a href="https://github.com/{{ site.github_username }}"><span class="k">gh:</span> {{ site.github_username }}</a>
+      <a href="https://twitter.com/{{ site.twitter_username }}"><span class="k">x:</span> @{{ site.twitter_username }}</a>
+      <a href="mailto:{{ site.email }}"><span class="k">mail:</span> {{ site.email }}</a>
+      <a href="{{ site.baseurl }}/resume/"><span class="k">cat</span> resume.md</a>
+    </div>
+  </section>
+
+  <!-- ===================== THE HOOK ===================== -->
+  <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">cat impact.txt</span></div>
+  <section class="hook">
+    <p>You've almost certainly run my code. If you've ever&hellip;</p>
+    <ul>
+      <li>pushed or pulled a package from <strong>GitHub Packages</strong></li>
+      <li>merged a <strong>Dependabot</strong> pull request</li>
+      <li>run a workflow on <strong>GitHub Actions</strong></li>
+      <li>connected to a <strong>PlanetScale</strong> database</li>
+      <li>captured a meeting in <strong>Radiant</strong></li>
+    </ul>
+    <p class="kicker">&hellip;then you've used software I designed, built, and shipped.</p>
+  </section>
+
+  <!-- ===================== CAREER LOG ===================== -->
+  <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">git log --oneline career/</span></div>
+  <section class="career">
+
+    <div class="role-entry">
+      <div class="when">2024 &mdash; now</div>
+      <div>
+        <div class="title">Staff Engineer / Eng Lead <span class="org">· Supernormal</span></div>
+        <div class="what">Leading real-time, AI-powered meeting transcription in <strong>Radiant</strong>. Built a streaming artifact pipeline in Rust + Tauri v2 + React over high-scale Node/Rails/Postgres backends.</div>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="when">2021 &mdash; 2024</div>
+      <div>
+        <div class="title">Engineering Lead <span class="org">· PlanetScale</span></div>
+        <div class="what">Shipped MFA, connection strings (MySQL auth), zero-downtime data imports, ELT, and granular password/certificate access for serverless MySQL.</div>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="when">2017 &mdash; 2021</div>
+      <div>
+        <div class="title">Principal Software Engineer <span class="org">· GitHub</span></div>
+        <div class="what">Lead engineer on GitHub Package Registry, Actions, and the Dependency Graph; brought Actions &amp; Packages to GitHub Enterprise Server 3.0.</div>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="when">2014 &mdash; 2017</div>
+      <div>
+        <div class="title">Principal Engineer / Tech Lead <span class="org">· Hewlett Packard</span></div>
+        <div class="what">Architected Helion Code Engine, a CI/CD system for Cloud Foundry workloads (Node.js, RabbitMQ, Angular). Two engineering excellence awards.</div>
+      </div>
+    </div>
+
+    <div class="role-entry">
+      <div class="when">2006 &mdash; 2014</div>
+      <div>
+        <div class="title">Senior / Software Design Engineer <span class="org">· Microsoft</span></div>
+        <div class="what">Azure HDInsight SDKs &amp; provisioning UX, OData client libraries (Windows Phone / Store / Silverlight / JS), and WCF Data Services. Multiple Gold Star awards; recognized as high-potential.</div>
+      </div>
+    </div>
+
+    <div class="comment" style="margin-top:.9rem"><a href="{{ site.baseurl }}/resume/">full history &rarr; resume.md</a></div>
+  </section>
+
+  <!-- ===================== SELECTED WORK ===================== -->
+  <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">ls selected-work/</span></div>
+  <section class="work-grid">
+    <a class="work-card" href="https://github.com/features/packages">
+      <div class="name">github packages</div>
+      <div class="desc">Package hosting for npm, RubyGems, Docker &amp; more, integrated into GitHub.</div>
+    </a>
+    <a class="work-card" href="https://github.com/features/actions">
+      <div class="name">github actions</div>
+      <div class="desc">Workflow automation &amp; CI/CD running billions of jobs across the ecosystem.</div>
+    </a>
+    <a class="work-card" href="https://github.com/features/security">
+      <div class="name">dependency graph</div>
+      <div class="desc">Dependency insight &amp; security alerts powering Dependabot.</div>
+    </a>
+    <a class="work-card" href="https://planetscale.com/">
+      <div class="name">planetscale</div>
+      <div class="desc">MFA, connection strings, zero-downtime imports &amp; ELT for serverless MySQL.</div>
+    </a>
+    <a class="work-card" href="https://radiantapp.com/">
+      <div class="name">radiant</div>
+      <div class="desc">Real-time AI meeting transcription &amp; artifacts (Rust · Tauri · React).</div>
+    </a>
+    <a class="work-card" href="{{ site.baseurl }}/projects/">
+      <div class="name">more projects</div>
+      <div class="desc">OSS contributions, OData, HDInsight, pkgcloud, and the rest.</div>
+    </a>
+  </section>
+
+  <!-- ===================== WRITING ===================== -->
+  <div class="prompt"><span class="sep">:</span><span class="path">~</span><span class="sep">$</span> <span class="cmd">ls -lt writing/ | head</span></div>
+  <section class="post-list">
+    {% assign posts = site.posts | where_exp: "p", "p.published != false" %}
+    {% for post in posts limit:6 %}
+      <div class="post-row">
+        <div class="date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time></div>
+        <div>
+          <a class="post-link" href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+        </div>
+      </div>
     {% endfor %}
-  </ul>-->
-
-
+    <div class="comment" style="margin-top:.9rem"><a href="{{ site.baseurl }}/writing/">all posts &rarr; writing/</a></div>
+  </section>
 
 </div>

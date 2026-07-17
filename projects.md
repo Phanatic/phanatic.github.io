@@ -1,6 +1,9 @@
 ---
 layout: page
-title : Projects
+title: Projects
+nav_slug: projects
+prompt: ls projects/
+tagline: Selected work across GitHub, PlanetScale, HP, Microsoft, and open source.
 permalink: /projects/
 ---
 

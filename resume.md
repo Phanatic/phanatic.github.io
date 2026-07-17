@@ -1,9 +1,11 @@
 ---
 layout: page
-title : Resume
+title: Resume
+nav_slug: resume
+prompt: cat resume.md
+tagline: 23+ years building cloud services and developer tools used by millions.
 permalink: /resume/
 ---
-
 
 Hi, I'm a Software Engineer at Supernormal.
 
